@@ -1,0 +1,4 @@
+#Thu Apr 30 16:04:23 KST 2020
+base.0=/Users/sangwoo/Documents/GitHub/Final_Project/Android Studio/BluetoothReceiveTest01/app/build/intermediates/dex/debug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
