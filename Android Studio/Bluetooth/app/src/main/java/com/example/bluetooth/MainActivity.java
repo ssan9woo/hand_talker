@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private Set<BluetoothDevice> devices; // 블루투스 디바이스 데이터 셋
     private BluetoothDevice bluetoothDevice; // 블루투스 디바이스
     private BluetoothSocket bluetoothSocket = null; // 블루투스 소켓
-    private OutputStream outputStream = null; // 블루투스에 데이터를 출력하기 위한 출력 스트림
+    //private OutputStream outputStream = null; // 블루투스에 데이터를 출력하기 위한 출력 스트림
     private InputStream inputStream = null; // 블루투스에 데이터를 입력하기 위한 입력 스트림
     private Thread workerThread = null; // 문자열 수신에 사용되는 쓰레드
     private byte[] readBuffer; // 수신 된 문자열을 저장하기 위한 버퍼
@@ -39,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private int pariedDeviceCount;
 
     private TextView textViewReceive; // 수신 된 데이터를 표시하기 위한 텍스트 뷰
-    private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
-    private Button buttonSend; // 송신하기 위한 버튼
+
 
 
 
@@ -50,17 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // 각 컨테이너들의 id를 매인 xml과 맞춰준다.
         textViewReceive = (TextView) findViewById(R.id.textView_receive);
-        editTextSend = (EditText) findViewById(R.id.editText_send);
-        buttonSend = (Button) findViewById(R.id.button_send);
 
-
-
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendData(editTextSend.getText().toString());
-            }
-        });
 
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -159,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
             bluetoothSocket.connect();
             // 데이터 송,수신 스트림을 얻어옵니다.
-            outputStream = bluetoothSocket.getOutputStream();
+            //outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
 
             // 데이터 수신 함수 호출
@@ -236,19 +225,4 @@ public class MainActivity extends AppCompatActivity {
         });
         workerThread.start();
     }
-
-
-
-    void sendData(String text) {
-        // 문자열에 개행문자("\n")를 추가해줍니다.
-        text += "\n";
-        try{
-            // 데이터 송신
-            outputStream.write(text.getBytes());
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
