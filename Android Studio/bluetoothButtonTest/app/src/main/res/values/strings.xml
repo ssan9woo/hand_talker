@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Graduatio_Project</string>
+    <string name="btnBluetoothOn">블루투스 ON</string>
+    <string name="btnBluetoothOff">블루투스 OFF</string>
+    <string name="tvBluetoothStatus">status</string>
+    <string name="btnConnect">연결하기</string>
+    <string name="tvReceiveData">Receive</string>
+    <string name="btnSendData">전송</string>
+    <string name="tvSendData">Send Data</string>
+    <string name="text">Name</string>
+    <string name="value">value</string>
+</resources>
+
