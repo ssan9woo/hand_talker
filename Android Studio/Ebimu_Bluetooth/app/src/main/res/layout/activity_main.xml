@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+android:layout_width="match_parent"
+
+android:layout_height="match_parent"
+
+android:orientation="vertical">
+
+
+
+<LinearLayout
+
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:orientation="horizontal">
+
+
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:text="수신 받은 데이터 : "/>
+
+
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:id="@+id/textView_receive"/>
+
+
+
+</LinearLayout>
+
+
+
+<LinearLayout
+
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:orientation="horizontal">
+
+
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:text="송신 할 데이터 : "/>
+
+
+
+    <EditText
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:id="@+id/editText_send"
+
+        android:ems="10"/>
+
+
+
+</LinearLayout>
+
+
+
+<Button
+
+    android:layout_width="wrap_content"
+
+    android:layout_height="wrap_content"
+
+    android:text="데이터 송신"
+
+    android:id="@+id/button_send"/>
+
+    <TextView
+        android:id="@+id/data2"
+        android:layout_width="208dp"
+        android:layout_height="59dp" />
+
+    <TextView
+        android:id="@+id/data3"
+        android:layout_width="match_parent"
+        android:layout_height="55dp" />
+
+    <TextView
+        android:id="@+id/data4"
+        android:layout_width="match_parent"
+        android:layout_height="64dp" />
+
+    <TextView
+        android:id="@+id/data5"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <TextView
+        android:id="@+id/data6"
+        android:layout_width="match_parent"
+        android:layout_height="68dp" />
+
+    <TextView
+        android:id="@+id/data7"
+        android:layout_width="match_parent"
+        android:layout_height="54dp" />
+
+</LinearLayout>

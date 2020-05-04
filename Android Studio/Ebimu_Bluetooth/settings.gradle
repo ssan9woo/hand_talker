@@ -1,0 +1,2 @@
+rootProject.name='Ebimu_Bluetooth'
+include ':app'
