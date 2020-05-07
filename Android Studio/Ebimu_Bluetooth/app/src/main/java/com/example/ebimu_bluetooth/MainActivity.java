@@ -1,6 +1,7 @@
 package com.example.ebimu_bluetooth;
 
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -42,14 +44,12 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSend; // 송신하기 위한 버튼
     private int pariedDeviceCount;
 
-
     private TextView euler_x;
     private TextView euler_y;
     private TextView euler_z;
     private TextView acc_x;
     private TextView acc_y;
     private TextView acc_z;
-
 
 
     @Override
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
-
+        //bluetoothAdapter.getRemoteDevice(address)
         if (bluetoothAdapter == null)
         { // 디바이스가 블루투스를 지원하지 않을 때
             finish();// 여기에 처리 할 코드를 작성하세요.
@@ -84,7 +84,9 @@ public class MainActivity extends AppCompatActivity {
         else { // 디바이스가 블루투스를 지원 할 때
             if (bluetoothAdapter.isEnabled())// 블루투스가 활성화 상태 (기기에 블루투스가 켜져있음)
             {
-                selectBluetoothDevice(); // 블루투스 디바이스 선택 함수 호출
+                devices = bluetoothAdapter.getBondedDevices();
+                connectDevice("sign");
+                //selectBluetoothDevice(); // 블루투스 디바이스 선택 함수 호출
             }
             else{// 블루투스가 비 활성화 상태 (기기에 블루투스가 꺼져있음)
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);// 블루투스를 활성화 하기 위한 다이얼로그 출력
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_ENABLE_BT:
                 if (requestCode == RESULT_OK)
                 { // '사용'을 눌렀을 때
-                    selectBluetoothDevice(); // 블루투스 디바이스 선택 함수 호출
+                    //selectBluetoothDevice(); // 블루투스 디바이스 선택 함수 호출
                 }
                 else { // '취소'를 눌렀을 때
                     // 여기에 처리 할 코드를 작성하세요.
@@ -110,9 +112,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
-
+    /*
     public void selectBluetoothDevice() {
+
         devices = bluetoothAdapter.getBondedDevices();// 이미 페어링 되어있는 블루투스 기기를 찾습니다.
+
         pariedDeviceCount = devices.size();// 페어링 된 디바이스의 크기를 저장
 
         if (pariedDeviceCount == 0) // 페어링 되어있는 장치가 없는 경우
@@ -146,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alertDialog = builder.create(); // 다이얼로그 생성
             alertDialog.show();
         }
-    }
+    }*/
 
     public void connectDevice(String deviceName) {
         for (BluetoothDevice tempDevice : devices) { // 페어링 된 디바이스들을 모두 탐색
@@ -161,13 +165,10 @@ public class MainActivity extends AppCompatActivity {
         try { // Rfcomm 채널을 통해 블루투스 디바이스와 통신하는 소켓 생성
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
             bluetoothSocket.connect();
-
             outputStream = bluetoothSocket.getOutputStream();// 데이터 송,수신 스트림을 얻어옵니다.
             inputStream = bluetoothSocket.getInputStream();
 
             receiveData(); // 데이터 수신 함수 호출
-            sendData("start");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -200,17 +201,33 @@ public class MainActivity extends AppCompatActivity {
                                     readBufferPosition = 0;
 
                                     handler.post(new Runnable() {
+                                        @SuppressLint("SetTextI18n")
                                         @Override
                                         public void run() {
-
-                                            String[] array = text.split(",");
-
-                                            euler_x.setText(array[0]);
-                                            euler_y.setText(array[1]);
-                                            euler_z.setText(array[2]);
-                                            acc_x.setText(array[3]);
-                                            acc_y.setText(array[4]);
-                                            acc_z.setText(array[5]);
+                                            String[] ebimu = new String[6];
+                                            for(int i = 0; i < 6; i ++)
+                                            {
+                                                ebimu[i] = "";
+                                            }
+                                            int j = 0;
+                                            for(int i = 0 ; i < text.length(); i++)
+                                            {
+                                                if(text.charAt(i) == ',')
+                                                {
+                                                    j += 1;
+                                                    continue;
+                                                }
+                                                else
+                                                {
+                                                    ebimu[j] += text.charAt(i);
+                                                }
+                                            }
+                                            euler_x.setText(ebimu[0]);
+                                            euler_y.setText(ebimu[1]);
+                                            euler_z.setText(ebimu[2]);
+                                            acc_x.setText(ebimu[3]);
+                                            acc_y.setText(ebimu[4]);
+                                            acc_z.setText(ebimu[5]);
                                         }
                                     });
                                 }
@@ -222,17 +239,12 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         });
         workerThread.start();
-        //sendData("start");
     }
+
     void sendData(String text) {
         text += "\n"; // 문자열에 개행문자("\n")를 추가해줍니다.
         try{
@@ -240,5 +252,17 @@ public class MainActivity extends AppCompatActivity {
         }catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        try{
+            workerThread.interrupt();
+            inputStream.close();
+            outputStream.close();
+            bluetoothSocket.close();
+        }catch(Exception e){
+        }
+        super.onDestroy();
     }
 }
