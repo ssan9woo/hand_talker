@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -39,6 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private byte[] readBuffer; // 수신 된 문자열을 저장하기 위한 버퍼
     private int readBufferPosition; // 버퍼 내 문자 저장 위치
 
+    private BluetoothSocket bluetoothSocket2 = null; // 블루투스 소켓
+    private OutputStream outputStream2 = null; // 블루투스에 데이터를 출력하기 위한 출력 스트림
+    private InputStream inputStream2 = null; // 블루투스에 데이터를 입력하기 위한 입력 스트림
+    private Thread workerThread2 = null; // 문자열 수신에 사용되는 쓰레드
+    private byte[] readBuffer2; // 수신 된 문자열을 저장하기 위한 버퍼
+    private int readBufferPosition2; // 버퍼 내 문자 저장 위치
+
+
     private TextView textViewReceive; // 수신 된 데이터를 표시하기 위한 텍스트 뷰
     private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
     private Button buttonSend; // 송신하기 위한 버튼
@@ -50,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView acc_x;
     private TextView acc_y;
     private TextView acc_z;
+    private TextView bluetooth2;
+
+
+    IntentFilter filter1 = new IntentFilter();
 
 
     @Override
@@ -66,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         acc_x = (TextView) findViewById(R.id.data5);
         acc_y = (TextView) findViewById(R.id.data6);
         acc_z = (TextView) findViewById(R.id.data7);
+        bluetooth2 = (TextView) findViewById(R.id.blutooth2);
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             if (bluetoothAdapter.isEnabled())// 블루투스가 활성화 상태 (기기에 블루투스가 켜져있음)
             {
                 devices = bluetoothAdapter.getBondedDevices();
+                connectDevice("HC-06");
                 connectDevice("sign");
                 //selectBluetoothDevice(); // 블루투스 디바이스 선택 함수 호출
             }
@@ -168,6 +183,11 @@ public class MainActivity extends AppCompatActivity {
             outputStream = bluetoothSocket.getOutputStream();// 데이터 송,수신 스트림을 얻어옵니다.
             inputStream = bluetoothSocket.getInputStream();
 
+            bluetoothSocket2 = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+            bluetoothSocket2.connect();
+            outputStream2 = bluetoothSocket2.getOutputStream();// 데이터 송,수신 스트림을 얻어옵니다.
+            inputStream2 = bluetoothSocket2.getInputStream();
+
             receiveData(); // 데이터 수신 함수 호출
         } catch (IOException e) {
             e.printStackTrace();
@@ -245,6 +265,53 @@ public class MainActivity extends AppCompatActivity {
         workerThread.start();
     }
 
+    public void receiveData2() {
+
+        final Handler handler = new Handler();
+        readBufferPosition2 = 0; // 데이터를 수신하기 위한 버퍼를 생성
+        readBuffer2 = new byte[1024];
+
+        workerThread2 = new Thread(new Runnable() { // 데이터를 수신하기 위한 쓰레드 생성
+            @Override
+            public void run() {
+                while (!(Thread.currentThread().isInterrupted())) {
+                    try {
+                        int byteAvailable = inputStream2.available(); // 데이터를 수신했는지 확인합니다.
+                        if (byteAvailable > 0) { // 데이터가 수신 된 경우
+                            byte[] bytes = new byte[byteAvailable]; // 입력 스트림에서 바이트 단위로 읽어 옵니다.
+                            inputStream2.read(bytes);
+
+                            for (int i = 0; i < byteAvailable; i++) { // 입력 스트림 바이트를 한 바이트씩 읽어 옵니다.
+                                byte tempByte = bytes[i];
+
+                                if (tempByte == '\n') { // 개행문자를 기준으로 받음(한줄)
+                                    byte[] encodedBytes = new byte[readBufferPosition2]; // readBuffer 배열을 encodedBytes로 복사
+                                    System.arraycopy(readBuffer2, 0, encodedBytes, 0, encodedBytes.length);
+                                    final String text2 = new String(encodedBytes, "US-ASCII");// 인코딩 된 바이트 배열을 문자열로 변환
+                                    readBufferPosition2 = 0;
+
+                                    handler.post(new Runnable() {
+                                        @SuppressLint("SetTextI18n")
+                                        @Override
+                                        public void run() {
+                                            bluetooth2.setText(text2);
+                                        }
+                                    });
+                                }
+                                else { // 개행 문자가 아닐 경우
+                                    readBuffer[readBufferPosition++] = tempByte;
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        workerThread2.start();
+    }
+
     void sendData(String text) {
         text += "\n"; // 문자열에 개행문자("\n")를 추가해줍니다.
         try{
@@ -253,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    
+
+
     @Override
     protected void onDestroy() {
         try{
