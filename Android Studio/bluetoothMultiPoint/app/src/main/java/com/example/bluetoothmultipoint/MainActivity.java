@@ -5,9 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,15 +34,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView Bluetoothtext0;
     TextView Bluetoothtext1;
     TextView value2;
-
-
     TextView Bluetoothvalue0;
     TextView Bluetoothvalue1;
 
-    RelativeLayout Bluetoothlayout0;
-    RelativeLayout Bluetoothlayout1;
-
-    boolean IsConnect0 = false, IsConnect1 = false;
+    boolean IsConnect0 = false;
+    boolean IsConnect1 = false;
 
     BluetoothAdapter BA;
     BluetoothDevice B0,B1;
@@ -66,9 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final int CONNECTING = 1;
     final int CONNECTED = 2;
     final int INPUTDATA = 9999;
-
-//    MyView M0;
-//    MyView M1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         B0 = BA.getRemoteDevice(B0MA);
         B1 = BA.getRemoteDevice(B1MA);
-//
-//        M0 = new MyView(this,0);
-//        M1 = new MyView(this,1);
-//        Bluetoothlayout0.addView(M0);
-//        Bluetoothlayout1.addView(M1);
     }
 
     @Override
@@ -384,6 +369,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sendMessage(DISCONNECT);
         }
     }
-
 }
 
