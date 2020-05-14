@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MultiPairingWithUI</string>
+    <string name="value2">TextView</string>
+    <string name="value1">TextView</string>
+    <string name="connect1btn">Connect</string>
+    <string name="connect0btn">Connect</string>
+    <string name="value0">TextView</string>
+    <string name="reconnectRight">Right</string>
+    <string name="BroadcastValue">value :</string>
+
+
+    <string name="bluetoothStateLeft">왼손 상태</string>
+    <string name="bluetoothStateRight">오른손 상태</string>
+    <string name="reconnectLeft">Left</string>
+</resources>
