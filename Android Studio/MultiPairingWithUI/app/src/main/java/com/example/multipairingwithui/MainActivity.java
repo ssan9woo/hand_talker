@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +22,8 @@ import java.io.InputStreamReader;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-
-
+    boolean flag = false;
+    TextView sangwoo;
     //--------Right Hand---------
     Button connectRightButton;
     Button reconnectRight;
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sangwoo = (TextView)findViewById(R.id.sangwoo);
         //----------------------Find VIEW---------------------------------//
         connectRightButton = (Button)findViewById(R.id.connectRightButton);
         connectLeftButton = (Button)findViewById(R.id.connectLeftButton);
@@ -129,25 +133,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         B0 = BA.getRemoteDevice(B0MA);
         B1 = BA.getRemoteDevice(B1MA);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        registerReceiver(mainBroadcastReceiver,filter);
+
+
+
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!IsConnect0)
-                {
-                    BC0 = new ConnectThread(B0,0);
-                    BC0.start();
+                try {
+                    BC0.cancel();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                Handler delay = new Handler();
+                delay.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!IsConnect0)
+                        {
+                            BC0 = new ConnectThread(B0,0);
+                            BC0.start();
+                        }
+                    }
+                },100);
             }
         });
 
         reconnectLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!IsConnect1)
-                {
-                    BC1 = new ConnectThread(B1,1);
-                    BC1.start();
+                try {
+                    BC1.cancel();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                Handler delay = new Handler();
+                delay.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!IsConnect1)
+                        {
+                            BC1 = new ConnectThread(B1,1);
+                            BC1.start();
+                        }
+                    }
+                },100);
             }
         });
 
@@ -359,7 +391,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 catch (IOException e){
                     e.printStackTrace();
                 }
-
             }
             sendMessage(DISCONNECT);
         }
@@ -470,8 +501,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
+        unregisterReceiver(mainBroadcastReceiver);
 
         super.onDestroy();
     }
+    public BroadcastReceiver mainBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            final String action = intent.getAction();
+            if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action))
+            {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if(device.getName().equals("sign"))
+                {
+                    sangwoo.setText("오른손 연결끊김");
+                }
+
+                else if(device.getName().equals("HC-06"))
+                {
+                    sangwoo.setText("왼손 연결끊김");
+                }
+            }
+        }
+    };
 }
