@@ -7,4 +7,6 @@
     <string name="bluetoothtext0">bluetoothtext0</string>
     <string name="connect0btn">Connect</string>
     <string name="value0">TextView</string>
+    <string name="reconnectRight">Right</string>
+    <string name="BroadcastValue">value :</string>
 </resources>

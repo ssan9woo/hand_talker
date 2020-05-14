@@ -5,6 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +18,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -30,15 +33,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Button connectbtn0;
     Button connectbtn1;
+    Button reconnectRight;
 
     TextView Bluetoothtext0;
     TextView Bluetoothtext1;
     TextView value2;
+    TextView broadcastValue;
+
+
     TextView Bluetoothvalue0;
     TextView Bluetoothvalue1;
 
-    boolean IsConnect0 = false;
-    boolean IsConnect1 = false;
+
+    boolean IsConnect0 = false, IsConnect1 = false;
 
     BluetoothAdapter BA;
     BluetoothDevice B0,B1;
@@ -60,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final int CONNECTED = 2;
     final int INPUTDATA = 9999;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //----------------------Find VIEW---------------------------------//
         connectbtn0 = (Button)findViewById(R.id.connect0btn);
         connectbtn1 = (Button)findViewById(R.id.connect1btn);
-
+        reconnectRight = (Button)findViewById(R.id.reconnectRight);
 
         Bluetoothtext0 = (TextView)findViewById(R.id.bluetoothtext0);
         Bluetoothtext1 = (TextView)findViewById(R.id.bluetoothtext1);
@@ -75,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         value2 = (TextView)findViewById(R.id.value2);
         Bluetoothvalue0 = (TextView)findViewById(R.id.value0);
         Bluetoothvalue1 = (TextView)findViewById(R.id.value1);
+        broadcastValue = (TextView)findViewById(R.id.broadcastValue);
 
         //----------------------SET Listener---------------------------------//
         connectbtn0.setOnClickListener(this);
@@ -91,6 +100,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         B0 = BA.getRemoteDevice(B0MA);
         B1 = BA.getRemoteDevice(B1MA);
+
+        reconnectRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!IsConnect0)
+                {
+                    BC0 = new ConnectThread(B0,0);
+                    BC0.start();
+                }
+            }
+        });
     }
 
     @Override
@@ -114,9 +134,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         IsConnect0 = false;
                         connectbtn0.setText("CONNECT");
                         Bluetoothtext0.setText("DISCONNECT");
+                        //broadcastValue.setText("연결끊김");
                         break;
                     case CONNECTING:
                         Bluetoothtext0.setText("CONNECTING");
+                        //broadcastValue.setText("연결중");
                         break;
                     case CONNECTED:
                         IsConnect0 = true;
@@ -151,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }
-            else{
+            else if(msg.what == 1){
                 switch (msg.arg1){
                     case DISCONNECT:
                         IsConnect1 = false;
@@ -270,14 +292,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         public void cancel() throws IOException {
-            if(BS != null) {
-                BS.close();
-                BS = null;
-            }
 
             if(connectedThread != null){
                 connectedThread.cancel();
             }
+            Handler delay = new Handler();
+            delay.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(BS != null) {
+                        try {
+                            BS.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        BS = null;
+                    }
+                }
+            },50);
 
             sendMessage(DISCONNECT);
         }
@@ -369,5 +401,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sendMessage(DISCONNECT);
         }
     }
-}
+    public void onDestroy(){
 
+        if(BC0 != null)
+        {
+            try {
+                BC0.cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(BC1 != null)
+        {
+            try {
+                BC1.cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        super.onDestroy();
+    }
+}
