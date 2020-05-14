@@ -1,5 +1,6 @@
 package com.example.multipairingwithui;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -19,18 +20,33 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    //---------Button------------
-    Button connectbtn0;
-    Button connectbtn1;
+
+    //--------Right Hand---------
+    Button connectRightButton;
     Button reconnectRight;
+
+    TextView bluetoothStateRight;
+    TextView rightEulerX;
+    TextView rightEulerY;
+    TextView rightEulerZ;
+
+    TextView rightAccX;
+    TextView rightAccY;
+    TextView rightAccZ;
+
+    //-------Left Hand----------
+    Button connectLeftButton;
     Button reconnectLeft;
 
-    //--------Textview-----------
-    TextView bluetoothStateRight;
     TextView bluetoothStateLeft;
-    TextView value2;
-    TextView Bluetoothvalue0;
-    TextView Bluetoothvalue1;
+    TextView leftEulerX;
+    TextView leftEulerY;
+    TextView leftEulerZ;
+
+    TextView leftAccX;
+    TextView leftAccY;
+    TextView leftAccZ;
+
 
 
     boolean IsConnect0 = false, IsConnect1 = false;
@@ -53,27 +69,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final int INPUTDATA = 9999;
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //----------------------Find VIEW---------------------------------//
-        connectbtn0 = (Button)findViewById(R.id.connect0btn);
-        connectbtn1 = (Button)findViewById(R.id.connect1btn);
+        connectRightButton = (Button)findViewById(R.id.connectRightButton);
+        connectLeftButton = (Button)findViewById(R.id.connectLeftButton);
         reconnectRight = (Button)findViewById(R.id.reconnectRight);
         reconnectLeft = (Button)findViewById(R.id.reconnectLeft);
 
         bluetoothStateRight = (TextView)findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = (TextView)findViewById(R.id.bluetoothStateLeft);
 
-        value2 = (TextView)findViewById(R.id.value2);
-        Bluetoothvalue0 = (TextView)findViewById(R.id.value0);
-        Bluetoothvalue1 = (TextView)findViewById(R.id.value1);
+        rightEulerX = (TextView)findViewById(R.id.rightEulerX);
+        rightEulerY = (TextView)findViewById(R.id.rightEulerY);
+        rightEulerZ = (TextView)findViewById(R.id.rightEulerZ);
+        rightAccX = (TextView)findViewById(R.id.rightAccX);
+        rightAccY = (TextView)findViewById(R.id.rightAccY);
+        rightAccZ = (TextView)findViewById(R.id.rightAccZ);
+
+
+        leftEulerX = (TextView)findViewById(R.id.leftEulerX);
+        leftEulerY = (TextView)findViewById(R.id.leftEulerY);
+        leftEulerZ = (TextView)findViewById(R.id.leftEulerZ);
+        leftAccX = (TextView)findViewById(R.id.leftAccX);
+        leftAccY = (TextView)findViewById(R.id.leftAccY);
+        leftAccZ = (TextView)findViewById(R.id.leftAccZ);
+
+        rightEulerX.setText("rightEuler x");
+        rightEulerY.setText("rightEuler y");
+        rightEulerZ.setText("rightEuler z");
+        rightAccX.setText("rightAcc x");
+        rightAccY.setText("rightAcc y");
+        rightAccZ.setText("rightAcc z");
+
+        leftEulerX.setText("leftEuler x");
+        leftEulerY.setText("leftEuler y");
+        leftEulerZ.setText("leftEuler z");
+        leftAccX.setText("leftAcc x");
+        leftAccY.setText("leftAcc y");
+        leftAccZ.setText("leftAcc z");
 
 
         //----------------------SET Listener---------------------------------//
-        connectbtn0.setOnClickListener(this);
-        connectbtn1.setOnClickListener(this);
+        connectRightButton.setOnClickListener(this);
+        connectLeftButton.setOnClickListener(this);
 
         //----------------------Bluetooth init---------------------------------//
 
@@ -111,6 +153,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void onStart() {
+        super.onStart();
+        if(!IsConnect0)
+        {
+            BC0 = new ConnectThread(B0,0);
+            BC0.start();
+        }
+
+        if(!IsConnect1)
+        {
+            BC1 = new ConnectThread(B1,1);
+            BC1.start();
+        }
+
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -128,9 +187,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(msg.what == 0){      //오른손
                 switch (msg.arg1){
                     case DISCONNECT:
-                        Bluetoothvalue0.setText("-");
+                        rightEulerY.setText("-");
                         IsConnect0 = false;
-                        connectbtn0.setText("CONNECT");
+                        connectRightButton.setText("CONNECT");
                         bluetoothStateRight.setText("오른손 연결끊김");
                         break;
                     case CONNECTING:
@@ -139,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case CONNECTED:
                         IsConnect0 = true;
-                        connectbtn0.setEnabled(true);
-                        connectbtn0.setText("DISCONNECT");
+                        connectRightButton.setEnabled(true);
+                        connectRightButton.setText("DISCONNECT");
                         bluetoothStateRight.setText("오른손 연결됨");
                         break;
                     case INPUTDATA:
@@ -163,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 arr[j] += s.charAt(i);
                             }
                         }
-                        value2.setText("euler x :".concat(arr[1]));
-                        Bluetoothvalue0.setText("euler y :".concat(arr[0]));
+                        rightEulerX.setText("euler x :".concat(arr[0]));
+                        rightEulerY.setText("euler y :".concat(arr[1]));
                         break;
 
                 }
@@ -174,8 +233,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switch (msg.arg1){
                     case DISCONNECT:
                         IsConnect1 = false;
-                        Bluetoothvalue1.setText("-");
-                        connectbtn1.setText("CONNECT");
+                        leftEulerX.setText("-");
+                        connectLeftButton.setText("CONNECT");
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         break;
                     case CONNECTING:
@@ -183,13 +242,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case CONNECTED:
                         IsConnect1 = true;
-                        connectbtn1.setEnabled(true);
-                        connectbtn1.setText("DISCONNECT");
+                        connectLeftButton.setEnabled(true);
+                        connectLeftButton.setText("DISCONNECT");
                         bluetoothStateLeft.setText("왼손 연결됨");
                         break;
                     case INPUTDATA:
                         String s = (String)msg.obj;
-                        Bluetoothvalue1.setText("euler x :".concat(s));
+                        leftEulerX.setText("euler x :".concat(s));
                         break;
                 }
             }
@@ -199,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.connect0btn){
+        if(v.getId() == R.id.connectRightButton){
             if(IsConnect0){
                 //블루투스 연결된 상태
                 if(BC0 != null){
@@ -302,21 +361,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }
-            /*Handler delay = new Handler();
-            delay.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(BS != null) {
-                        try {
-                            BS.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        BS = null;
-                    }
-                }
-            },50);*/
-
             sendMessage(DISCONNECT);
         }
 
