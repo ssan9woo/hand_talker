@@ -23,7 +23,10 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     boolean flag = false;
+
     TextView sangwoo;
+
+
     //--------Right Hand---------
     Button connectRightButton;
     Button reconnectRight;
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         sangwoo = (TextView)findViewById(R.id.sangwoo);
         //----------------------Find VIEW---------------------------------//
         connectRightButton = (Button)findViewById(R.id.connectRightButton);
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         leftAccX.setText("leftAcc x");
         leftAccY.setText("leftAcc y");
         leftAccZ.setText("leftAcc z");
-
+        sangwoo.setText("");
 
         //----------------------SET Listener---------------------------------//
         connectRightButton.setOnClickListener(this);
@@ -192,13 +196,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             BC0 = new ConnectThread(B0,0);
             BC0.start();
         }
-
         if(!IsConnect1)
         {
             BC1 = new ConnectThread(B1,1);
             BC1.start();
         }
-
     }
 
 
@@ -214,19 +216,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Bluetooth state -> View Change
     Handler handler = new Handler(new Handler.Callback() {
+        @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(Message msg) {
             if(msg.what == 0){      //오른손
                 switch (msg.arg1){
                     case DISCONNECT:
-                        rightEulerY.setText("-");
                         IsConnect0 = false;
                         connectRightButton.setText("CONNECT");
                         bluetoothStateRight.setText("오른손 연결끊김");
                         break;
                     case CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
-                        //broadcastValue.setText("연결중");
                         break;
                     case CONNECTED:
                         IsConnect0 = true;
@@ -234,10 +235,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         connectRightButton.setText("DISCONNECT");
                         bluetoothStateRight.setText("오른손 연결됨");
                         break;
+                    case 10:
+                        sangwoo.setText("R");
+                        break;
                     case INPUTDATA:
                         String s = (String)msg.obj;
-                        String[] arr = new String[2];
-                        for(int i = 0 ; i < 2; i ++)
+                        String[] arr = new String[6];
+                        for(int i = 0 ; i < 6; i ++)
                         {
                             arr[i] = "";
                         }
@@ -256,16 +260,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         rightEulerX.setText("euler x :".concat(arr[0]));
                         rightEulerY.setText("euler y :".concat(arr[1]));
+                        rightEulerZ.setText("euler z :".concat(arr[2]));
+                        rightAccX.setText("acc x :".concat(arr[3]));
+                        rightAccY.setText("acc y :".concat(arr[4]));
+                        rightAccZ.setText("acc z :".concat(arr[5]));
                         break;
-
                 }
 
             }
-            else if(msg.what == 1){
+            else if(msg.what == 1){     //왼손
                 switch (msg.arg1){
                     case DISCONNECT:
                         IsConnect1 = false;
-                        leftEulerX.setText("-");
                         connectLeftButton.setText("CONNECT");
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         break;
@@ -278,9 +284,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         connectLeftButton.setText("DISCONNECT");
                         bluetoothStateLeft.setText("왼손 연결됨");
                         break;
+                    case 10:
+                        sangwoo.setText("L");
+                        break;
                     case INPUTDATA:
                         String s = (String)msg.obj;
-                        leftEulerX.setText("euler x :".concat(s));
+
+                        String[] arr = new String[6];
+                        for(int i = 0 ; i < 6; i ++)
+                        {
+                            arr[i] = "";
+                        }
+                        int j = 0;
+                        for(int i = 0; i< s.length(); i++)
+                        {
+                            if(s.charAt(i) == ',')
+                            {
+                                j += 1;
+                                continue;
+                            }
+                            else
+                            {
+                                arr[j] += s.charAt(i);
+                            }
+                        }
+                        leftEulerX.setText("euler x :".concat(arr[0]));
+                        leftEulerY.setText("euler y :".concat(arr[1]));
+                        leftEulerZ.setText("euler z :".concat(arr[2]));
+                        leftAccX.setText("acc x :".concat(arr[3]));
+                        leftAccY.setText("acc y :".concat(arr[4]));
+                        leftAccZ.setText("acc z :".concat(arr[5]));
                         break;
                 }
             }
@@ -441,6 +474,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     if(!s.equals("")){
                         sendMessage(INPUTDATA,s);
+                        //여기다 왼손오른손 구분할게 필요.
                     }
 
                 } catch (IOException e) { }
@@ -450,6 +484,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         public void sendMessage(int arg){
             Message m = new Message();
+
             m.what = bluetooth_index;
             m.arg1 = arg;
 
@@ -458,11 +493,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         public void sendMessage(int arg, String s){
             Message m = new Message();
+            Message v = new Message();
+
             m.what = bluetooth_index;
             m.arg1 = arg;
             m.obj = s;
 
             handler.sendMessage(m);
+            if(bluetooth_index == 0)
+            {
+                v.what = 0;
+                v.arg1 = 10;
+                handler.sendMessage(v);
+            }
+            else if(bluetooth_index == 1)
+            {
+                v.what = 1;
+                v.arg1 = 10;
+                handler.sendMessage(v);
+            }
         }
 
         public void cancel(){
@@ -508,20 +557,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public BroadcastReceiver mainBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            Message isDisconnectedMessage = new Message();
             final String action = intent.getAction();
             if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action))
             {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
+                // what = 0, arg1 = DISCONNECT
                 if(device.getName().equals("sign"))
                 {
-                    sangwoo.setText("오른손 연결끊김");
+                    isDisconnectedMessage.what = 0;
+                    isDisconnectedMessage.arg1 = DISCONNECT;
+                    handler.sendMessage(isDisconnectedMessage);
                 }
 
                 else if(device.getName().equals("HC-06"))
                 {
-                    sangwoo.setText("왼손 연결끊김");
+                    isDisconnectedMessage.what = 1;
+                    isDisconnectedMessage.arg1 = DISCONNECT;
+                    handler.sendMessage(isDisconnectedMessage);
                 }
             }
         }
