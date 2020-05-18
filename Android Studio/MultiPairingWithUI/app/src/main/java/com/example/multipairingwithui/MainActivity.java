@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerReceiver(mainBroadcastReceiver,filter);
 
 
-
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -467,19 +466,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void run() {
             BufferedReader Buffer_in = new BufferedReader(new InputStreamReader(in));
-
+            //이 밑에 조건두고하면 위에 버퍼에 문자열이 쌓이지 않을까
+            //
             while (is){
-                try {
-                    String s = Buffer_in.readLine();
-
-                    if(!s.equals("")){
-                        sendMessage(INPUTDATA,s);
-                        //여기다 왼손오른손 구분할게 필요.
-                    }
-
-                } catch (IOException e) { }
+                    try {
+                        String s = Buffer_in.readLine();
+                        if(IsConnect1 && IsConnect0) {
+                            if (!s.equals("")) {
+                                sendMessage(INPUTDATA, s);
+                            }
+                        }
+                    } catch (IOException e) { }
             }
-
         }
 
         public void sendMessage(int arg){
@@ -531,6 +529,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sendMessage(DISCONNECT);
         }
     }
+
     public void onDestroy(){
 
         if(BC0 != null)
@@ -541,7 +540,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
         if(BC1 != null)
         {
             try {
@@ -565,13 +563,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // what = 0, arg1 = DISCONNECT
                 if(device.getName().equals("sign"))
                 {
+                    try {
+                        BC0.cancel();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     isDisconnectedMessage.what = 0;
                     isDisconnectedMessage.arg1 = DISCONNECT;
                     handler.sendMessage(isDisconnectedMessage);
                 }
-
                 else if(device.getName().equals("HC-06"))
                 {
+                    try {
+                        BC1.cancel();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     isDisconnectedMessage.what = 1;
                     isDisconnectedMessage.arg1 = DISCONNECT;
                     handler.sendMessage(isDisconnectedMessage);
