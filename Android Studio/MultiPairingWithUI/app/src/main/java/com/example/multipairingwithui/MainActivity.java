@@ -2,18 +2,13 @@ package com.example.multipairingwithui;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,22 +19,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     public final static String EXTRA_MESSAGE = "first";
     public static Context mainContext;
-    Intent intent1;
-    Intent btIntent;
-    private BroadcastReceiver mReceiver;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
 
-    private bluetoothService mService;
     TextView sangwoo;
     Button next;
 
@@ -70,15 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
     BluetoothAdapter BA;
 
-    //----------------Bind------------------
-
-    //bluetoothService btService;
-
-
-
-
-
-    //--------------------------------------
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,12 +110,6 @@ public class MainActivity extends AppCompatActivity {
         next = (Button)findViewById(R.id.next);
 
         mainContext = this;
-        //----------------------SET Listener---------------------------------//
-
-
-
-        //----------------------Bluetooth init---------------------------------//
-
 
 
         reconnectRight.setOnClickListener(new View.OnClickListener() {
@@ -154,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
+
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,9 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStart() {
         super.onStart();
-        IntentFilter filter = new IntentFilter();
-        //filter.addAction(Intent.);
-        //btIntent = new Intent(this, bluetoothService.class);
         startService(new Intent(this, bluetoothService.class));
         bindService(new Intent(this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
     }
@@ -202,21 +171,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
-
-
     public String sendFlexData(){
         Intent scalingIntent = new Intent(MainActivity.this,scalingActivity.class);
         String s = rightEulerX.getText().toString();
 
         scalingIntent.putExtra(EXTRA_MESSAGE,s);
-        //하Toast.makeText(getApplicationContext(),"하하" + s ,Toast.LENGTH_LONG).show();
-
         return s;
     }
-
-
-
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @SuppressLint("SetTextI18n")
@@ -331,7 +292,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
 }
