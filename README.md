@@ -159,3 +159,15 @@
    - 일단 5개씩 동기화 하는 부분과 1개씩 동기화 하는 부분 둘다를 코딩할 예정.
    - 연산스레드를 생성해본다 -> 스케일링부터 시작예정.
 ```
+
+- 2020-05-22
+```
+[수행일지]
+   - 모든 서비스와 연산을 백그라운드로 처리해야 해서 Service 에서 연산을 처리할 생각으로 알고리즘을 구성해보았다.
+   - Service Handler에서 다른 Thread의 Handler로 넘겨주는 format 학습.
+     - Looper, Runnable, HandleMessage...
+
+[필요연구]
+   - Service에 있는 ConnectedThread에서 연산 Thread로 String 2차원 배열을 Message로 넘기도록 해야한다.
+   - 넘기고 나면 바로 형변환 후 스케일링 시도 -> 에너지 구하기
+```
