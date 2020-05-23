@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     TextView leftAccZ;
 
     BluetoothAdapter BA;
+    public static String str;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -172,14 +174,15 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public String sendFlexData(){
-        Intent scalingIntent = new Intent(MainActivity.this,scalingActivity.class);
+        //Intent scalingIntent = new Intent(MainActivity.this,scalingActivity.class);
         String s = rightEulerX.getText().toString();
 
-        scalingIntent.putExtra(EXTRA_MESSAGE,s);
+        //scalingIntent.putExtra(EXTRA_MESSAGE,s);
         return s;
     }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
+
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
@@ -221,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
                         rightAccX.setText("acc x :".concat(arr[3]));
                         rightAccY.setText("acc y :".concat(arr[4]));
                         rightAccZ.setText("acc z :".concat(arr[5]));
+
                         break;
                 }
             }
@@ -264,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
                         leftAccX.setText("acc x :".concat(arr[3]));
                         leftAccY.setText("acc y :".concat(arr[4]));
                         leftAccZ.setText("acc z :".concat(arr[5]));
+
                         break;
                 }
             }
@@ -292,4 +297,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }

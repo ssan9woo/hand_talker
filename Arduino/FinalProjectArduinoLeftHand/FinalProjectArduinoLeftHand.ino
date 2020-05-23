@@ -4,12 +4,14 @@ SoftwareSerial bluetooth(2, 3);
 
 float ebimuTest[6] = { 0.00, 10.00, 50.00, 100.00, 150.00, 200.00}; 
 char str[6][20];
+int j = 0;
 
 void setup()
 {
   Serial.begin(9600);
   bluetooth.begin(9600);
 }
+
 
 void loop() {
    if(bluetooth.available())
@@ -32,9 +34,19 @@ void loop() {
         Serial.println();
       }
    }
+
    for(int i = 0; i < 6; i++)
    {
-     ebimuTest[i] += 1.00;
+      if(j < 10)
+      {
+          ebimuTest[i] += 1.00;
+      }
+      else if(j >= 10 && j < 20)
+      {
+          ebimuTest[i] -= 1.00;
+      }
    }
-   delay(50);
+   j += 1;
+   if(j == 20) j = 0;
+   //delay(50);
 }

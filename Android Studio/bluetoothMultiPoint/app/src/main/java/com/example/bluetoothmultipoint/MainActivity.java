@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView Bluetoothvalue0;
     TextView Bluetoothvalue1;
 
-
+    public static final int value = 20;
     boolean IsConnect0 = false, IsConnect1 = false;
 
     BluetoothAdapter BA;
@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i,5000);
         }
-
         B0 = BA.getRemoteDevice(B0MA);
         B1 = BA.getRemoteDevice(B1MA);
 
@@ -112,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -122,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
     //Bluetooth state -> View Change
     Handler handler = new Handler(new Handler.Callback() {
         @Override
