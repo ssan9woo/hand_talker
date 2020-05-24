@@ -203,8 +203,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-
-
     public String sendFlexData(){
         Intent scalingIntent = new Intent(MainActivity.this,scalingActivity.class);
         String s = rightEulerX.getText().toString();
@@ -222,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            Toast.makeText(getApplicationContext(),"문자열",Toast.LENGTH_LONG).show();
             if (msg.what == 0) {
                 switch(msg.arg1)
                 {

@@ -20,16 +20,12 @@ public class scalingActivity extends AppCompatActivity {
     Button button;
     TextView text;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scaling);
         button = (Button)findViewById(R.id.button);
         text = (TextView)findViewById(R.id.textView);
-
-
-
 
         button.setOnClickListener(new View.OnClickListener() {
             Intent IntentExtras = getIntent();
