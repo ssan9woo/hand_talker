@@ -18,6 +18,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import androidx.annotation.NonNull;
@@ -29,25 +30,33 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
 
-public class bluetoothService<signLanguageProcessThread> extends Service {
+public class bluetoothService extends Service {
     public static Context mContext;
     private BroadcastReceiver mReceiver;
+
+    Deque<String> valuesX = new ArrayDeque<>(5);
+    Deque<String> valuesY = new ArrayDeque<>(5);
+    ArrayList<String[]> Data = new ArrayList<String[]>();
+
+    boolean flag1 = false;
+    boolean flag2 = false;
 
     private Messenger mClient = null;
     private Messenger mClient2 = null;
     //IBinder mBinder = new MyBinder();
 
-    boolean IsConnect_left = false,
-            IsConnect_Right = false;
+    boolean IsConnect0 = false,
+            IsConnect1 = false;
 
     BluetoothAdapter BA;
-    BluetoothDevice B_Left, B_Right;
+    BluetoothDevice B0,B1;
 
-    ConnectThread ConThrd_Left;
-    ConnectThread ConThrd_Right;
+    ConnectThread BC0;
+    ConnectThread BC1;
 
-    final String MAC_Left =  "00:18:E4:34:D4:8E";//Bluetooth0 MacAddress
-    final String MAC_Right = "00:18:91:D8:36:42"; //Bluetooth1 MacAddress
+    final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
+
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
@@ -57,13 +66,26 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     public static final int INPUTDATA = 9999;
 
 
+
+    // onCreate : adapter, 및 변수설정, onStartCommand : 연결, onBind : 송신,  left, right 함수 두개로 송신
+
+
+//    public class MyBinder extends Binder{
+//        bluetoothService getMyservice(){ return bluetoothService.this; }
+//    }
+
+    //////////////////////////////
+    //onUnbind() 필요한지 직접 꺼봐야함.
+    //////////////////////////////
+
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
     }
 
-
+    //수신값(현재 필요없음)
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
@@ -85,24 +107,24 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     private void sendMsgToSubActivity(Message msg){
 
     }
-    public void disconnectLeft(){
-       // Message msg = Message.obtain(null,0,DISCONNECT);
-        if(ConThrd_Left != null)
+    public void disconnectRight(){
+        // Message msg = Message.obtain(null,0,DISCONNECT);
+        if(BC0 != null)
         {
             try {
-                ConThrd_Left.cancel();
+                BC0.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void disconnectRight(){
-       // Message msg = Message.obtain(null,1,DISCONNECT);
-        if(ConThrd_Right != null)
+    public void disconnectLeft(){
+        // Message msg = Message.obtain(null,1,DISCONNECT);
+        if(BC1 != null)
         {
             try {
-                ConThrd_Right.cancel();
+                BC1.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -112,61 +134,76 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     @Override
     public void onCreate(){
         BA = BluetoothAdapter.getDefaultAdapter();
-        B_Left = BA.getRemoteDevice(MAC_Left);
-        B_Right = BA.getRemoteDevice(MAC_Right);
+        B0 = BA.getRemoteDevice(B0MA);
+        B1 = BA.getRemoteDevice(B1MA);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(mReceiver,filter);
-
         mContext = this;
+
+        final sign mThread;
+        mThread = new sign(mHandler);
+        mThread.setDaemon(true);
+        mThread.start();
+
         super.onCreate();
     }
+
+    @SuppressLint("HandlerLeak")
+    Handler mHandler = new Handler(){
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case 1:
+                    break;
+            }
+        }
+    };
 
     public void reconnectRight(){
         //if(!IsConnect0)//
         //{
-        ConThrd_Right = new ConnectThread(B_Right,1);
-        ConThrd_Right.start();
+        BC0 = new ConnectThread(B0,0);
+        BC0.start();
         //}
     }
     public void reconnectLeft(){
         //if(!IsConnect1)
         //{
-        ConThrd_Left = new ConnectThread(B_Left,0);
-        ConThrd_Left.start();
+        BC1 = new ConnectThread(B1,1);
+        BC1.start();
         //}
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("BT SERVICE", "SERVICE STARTED");
-        if(!IsConnect_left)
+        if(!IsConnect0)
         {
-            ConThrd_Left = new ConnectThread(B_Left,0);
-            ConThrd_Left.start();
+            BC0 = new ConnectThread(B0,0);
+            BC0.start();
         }
-        if(!IsConnect_Right)
+        if(!IsConnect1)
         {
-            ConThrd_Right = new ConnectThread(B_Right,1);
-            ConThrd_Right.start();
+            BC1 = new ConnectThread(B1,1);
+            BC1.start();
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
     public void onDestroy(){
 
-        if(ConThrd_Left != null)
+        if(BC0 != null)
         {
             try {
-                ConThrd_Left.cancel();
+                BC0.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        if(ConThrd_Right != null)
+        if(BC1 != null)
         {
             try {
-                ConThrd_Right.cancel();
+                BC1.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -193,13 +230,13 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
         public void run() {
             try {
                 Message msg = new Message();
-                if(!IsConnect_left)
+                if(!IsConnect0)
                 {
                     msg.what = bluetooth_index;
                     msg.arg1 = CONNECTING;
                     sendMsgToActivity(msg);
                 }
-                else if(!IsConnect_Right)
+                else if(!IsConnect1)
                 {
                     msg.what = bluetooth_index;
                     msg.arg1 = CONNECTING;
@@ -246,6 +283,7 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
             m.what = bluetooth_index;
             m.arg1 = CONNECTING;
 
+            //handler.sendMessage(m);
         }
     }
 
@@ -256,49 +294,40 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
         InputStream in = null;
         int bluetooth_index;
         boolean is =false;
-        sign mThread;
 
-
-        @SuppressLint("HandlerLeak")
-        Handler mHandler = new Handler(){
-            public void handleMessage(Message msg){
-                switch (msg.what){
-                    case 0:
-                        break;
-                }
-            }
-        };
 
         public ConnectedThread(BluetoothSocket bluetoothsocket, int index) {
             bluetooth_index = index;
+
+
+
             try {
                 in = bluetoothsocket.getInputStream();
                 is = true;
-
                 if(bluetooth_index == 0) IsConnect0 = is;
                 else IsConnect1 = is;
-
                 sendMessage(CONNECTED);
             } catch (IOException e) {
                 cancel();
             }
 
-            mThread = new sign(mHandler);
-            mThread.setDaemon(true);
-            mThread.start();
         }
 
         @Override
         public void run() {
+
+            final sign signThread;
+
+            signThread = new sign(mHandler);
+            signThread.setDaemon(true);
+            signThread.start();
+
             BufferedReader Buffer_in = new BufferedReader(new InputStreamReader(in));
-            Deque<String> valuesX = new ArrayDeque<>(5);
-            Deque<String> valuesY = new ArrayDeque<>(5);
-            String[][] synchronizedString = new String[5][2];
 
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    //if(IsConnect_Right && IsConnect_left) {
+                    if(IsConnect1 && IsConnect0) {
                         if (!s.equals("")) {
                             sendMessage(INPUTDATA, s);
 
@@ -308,24 +337,17 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
                                     if(valuesX.size() == 5 && valuesY.size() == 5){
                                         //combine
                                         for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
+                                            Data.add(new String[]{valuesX.pollFirst(),valuesY.pollFirst()});
+                                            Message handData = Message.obtain(null,0,Data.get(i));
+                                            signThread.bringHandler.sendMessage(handData);
                                         }
-                                        Message msg = Message.obtain(null,0, Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
-                                else {
-                                    valuesX.pollFirst();
-                                    valuesX.push(s);
-                                    if(valuesY.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
+//                                        for(int i = 0; i < 5; i++){
+//                                            System.out.println("오른손"+ (i + 1) + ":" + Data.get(i)[0] + "  왼손"+(i + 1)+ ":" + Data.get(i)[1] + "길이 : " + Data.get(i)[1].length());
+//                                        }
+//                                        System.out.println("----------------------------------------------------------------------------------------------");
+                                        Data.clear();
+                                        valuesX.clear();
+                                        valuesY.clear();
                                     }
                                 }
                             }
@@ -335,24 +357,17 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
                                     if(valuesY.size() == 5 && valuesX.size() == 5){
                                         //combine
                                         for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
+                                            Data.add(new String[]{valuesX.pollFirst(),valuesY.pollFirst()});
+                                            Message handData = Message.obtain(null,0,Data.get(i));
+                                            signThread.bringHandler.sendMessage(handData);
                                         }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
-                                else {
-                                    valuesY.pollFirst();
-                                    valuesY.push(s);
-                                    if(valuesX.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
+//                                        for(int i = 0; i < 5; i++){
+//                                            System.out.println("오른손"+ (i + 1) + ":" + Data.get(i)[0] + "  왼손"+(i + 1)+ ":" + Data.get(i)[1] + "길이 : " + Data.get(i)[1].length());
+//                                        }
+//                                        System.out.println("----------------------------------------------------------------------------------------------");
+                                        Data.clear();
+                                        valuesX.clear();
+                                        valuesY.clear();
                                     }
                                 }
                             }
@@ -379,19 +394,18 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
             m.arg1 = arg;
             m.obj = s;
             sendMsgToActivity(m);
-
         }
 
         public void cancel(){
             is = false;
 
-            if(bluetooth_index == 0) IsConnect_left = is;
-            else IsConnect_Right = is;
+            if(bluetooth_index == 0) IsConnect0 = is;
+            else IsConnect1 = is;
 
             if(in != null){
                 try {
                     in.close();
-                    in=null;
+                    in = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -400,13 +414,17 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
         }
     }
 
-
     public static class sign extends Thread{
         Handler bringHandler;
         Handler sendHandler;
-        String signData = "";
+        ArrayList<String[]> handData;
+        private final Double[] zeroCordinate = {0.00,0.00,0.00};
+        Double[] lastCordinateX;
+
+
         public sign(Handler handler){
             sendHandler = handler;
+            lastCordinateX = zeroCordinate;
         }
 
         @SuppressLint("HandlerLeak")
@@ -417,8 +435,40 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
                 public void handleMessage(Message msg){
                     switch (msg.what){
                         case 0:
+                            String[] s = (String[]) msg.obj;
+                            System.out.println("오른손 Data : " + s[0] + "   왼손 Data : " + s[1]);
+                            /*
                             //2차원배열 오브젝트로 받음[[x1,y1],[x1,y1],[x1,y1],[x1,y1],[x1,y1]]
-                            signData = msg.obj.toString();
+                            //앞에서부터 하나씩 받고 casting 후에 while문 들어가서 에너지 구하기.
+                            //ebinm : 6, flex : 6, 접촉 : 2
+                            //원소 나누고 -> scaling -> e
+                            ArrayList<String[]> signData = (ArrayList<String[]>) msg.obj;
+                            //signData.get(0)[0] -> 14개의
+                            for(int i = 0; i < 5 ; i++){
+                                String[] rightValues = signData.get(i)[0].split(",");
+                                String[] leftValues = signData.get(i)[1].split(",");
+
+                                Double accX = Double.parseDouble(rightValues[3]);
+                                Double accY = Double.parseDouble(rightValues[4]);
+                                Double accZ = Double.parseDouble(rightValues[5]);
+
+                                Double E = Math.pow(accX - lastCordinateX[0],2) + Math.pow(accY - lastCordinateX[1],2) + Math.pow(accZ - lastCordinateX[2],2);
+
+                                lastCordinateX[0] = accX;
+                                lastCordinateX[1] = accY;
+                                lastCordinateX[2] = accZ;
+
+                                Message m = Message.obtain(null,0,E);
+                                sendHandler.sendMessage(m);
+                                //정수실수처리
+                                //스케일링2
+                                //시작을 원점 (0,0,0)
+                                //E1 = (x1 - x0)^2 +
+                            }
+                            //E(total ) > 150
+                            //while(조건) 조건 1,2,3
+                            // 조건 1 : 지화검출 -> while(오른 > 150) -> 끝점
+                            */
                             break;
                     }
                     //send
