@@ -19,7 +19,6 @@ import java.util.Objects;
 public class scalingActivity extends AppCompatActivity {
     Button button;
     TextView text;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

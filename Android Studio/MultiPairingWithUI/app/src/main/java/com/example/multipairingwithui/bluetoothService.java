@@ -80,7 +80,7 @@ public class bluetoothService extends Service {
     private void sendMsgToSubActivity(Message msg){
 
     }
-    public void disconnectRight(){
+    public void disconnectLeft(){
        // Message msg = Message.obtain(null,0,DISCONNECT);
         if(ConThrd_Left != null)
         {
@@ -92,7 +92,7 @@ public class bluetoothService extends Service {
         }
     }
 
-    public void disconnectLeft(){
+    public void disconnectRight(){
        // Message msg = Message.obtain(null,1,DISCONNECT);
         if(ConThrd_Right != null)
         {
@@ -121,15 +121,15 @@ public class bluetoothService extends Service {
     public void reconnectRight(){
         //if(!IsConnect0)//
         //{
-        ConThrd_Left = new ConnectThread(B_Left,0);
-        ConThrd_Left.start();
+        ConThrd_Right = new ConnectThread(B_Right,1);
+        ConThrd_Right.start();
         //}
     }
     public void reconnectLeft(){
         //if(!IsConnect1)
         //{
-        ConThrd_Right = new ConnectThread(B_Right,1);
-        ConThrd_Right.start();
+        ConThrd_Left = new ConnectThread(B_Left,0);
+        ConThrd_Left.start();
         //}
     }
 
@@ -278,10 +278,11 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    if(IsConnect_Right && IsConnect_left) {
+                    //if(IsConnect_Right && IsConnect_left) {
                         if (!s.equals("")) {
                             sendMessage(INPUTDATA, s);
-                        }
+                            System.out.println(s);
+                        //}
                     }
                 } catch (IOException e) { }
             }
