@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -33,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     //--------Right Hand---------
     Button reconnectRight;
-
     TextView bluetoothStateRight;
     TextView rightEulerX;
     TextView rightEulerY;
@@ -66,34 +66,34 @@ public class MainActivity extends AppCompatActivity {
 
         BA = BluetoothAdapter.getDefaultAdapter();
 
-        if(!BA.isEnabled()){
+        if (!BA.isEnabled()) {
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(i,5000);
+            startActivityForResult(i, 5000);
         }
 
-        sangwoo = (TextView)findViewById(R.id.sangwoo);
+        sangwoo = (TextView) findViewById(R.id.sangwoo);
         //----------------------Find VIEW---------------------------------//
 
-        reconnectRight = (Button)findViewById(R.id.reconnectRight);
-        reconnectLeft = (Button)findViewById(R.id.reconnectLeft);
+        reconnectRight = (Button) findViewById(R.id.reconnectRight);
+        reconnectLeft = (Button) findViewById(R.id.reconnectLeft);
 
-        bluetoothStateRight = (TextView)findViewById(R.id.bluetoothStateRight);
-        bluetoothStateLeft = (TextView)findViewById(R.id.bluetoothStateLeft);
+        bluetoothStateRight = (TextView) findViewById(R.id.bluetoothStateRight);
+        bluetoothStateLeft = (TextView) findViewById(R.id.bluetoothStateLeft);
 
-        rightEulerX = (TextView)findViewById(R.id.rightEulerX);
-        rightEulerY = (TextView)findViewById(R.id.rightEulerY);
-        rightEulerZ = (TextView)findViewById(R.id.rightEulerZ);
-        rightAccX = (TextView)findViewById(R.id.rightAccX);
-        rightAccY = (TextView)findViewById(R.id.rightAccY);
-        rightAccZ = (TextView)findViewById(R.id.rightAccZ);
+        rightEulerX = (TextView) findViewById(R.id.rightEulerX);
+        rightEulerY = (TextView) findViewById(R.id.rightEulerY);
+        rightEulerZ = (TextView) findViewById(R.id.rightEulerZ);
+        rightAccX = (TextView) findViewById(R.id.rightAccX);
+        rightAccY = (TextView) findViewById(R.id.rightAccY);
+        rightAccZ = (TextView) findViewById(R.id.rightAccZ);
 
 
-        leftEulerX = (TextView)findViewById(R.id.leftEulerX);
-        leftEulerY = (TextView)findViewById(R.id.leftEulerY);
-        leftEulerZ = (TextView)findViewById(R.id.leftEulerZ);
-        leftAccX = (TextView)findViewById(R.id.leftAccX);
-        leftAccY = (TextView)findViewById(R.id.leftAccY);
-        leftAccZ = (TextView)findViewById(R.id.leftAccZ);
+        leftEulerX = (TextView) findViewById(R.id.leftEulerX);
+        leftEulerY = (TextView) findViewById(R.id.leftEulerY);
+        leftEulerZ = (TextView) findViewById(R.id.leftEulerZ);
+        leftAccX = (TextView) findViewById(R.id.leftAccX);
+        leftAccY = (TextView) findViewById(R.id.leftAccY);
+        leftAccZ = (TextView) findViewById(R.id.leftAccZ);
 
         rightEulerX.setText("rightEuler x");
         rightEulerY.setText("rightEuler y");
@@ -109,29 +109,28 @@ public class MainActivity extends AppCompatActivity {
         leftAccY.setText("leftAcc y");
         leftAccZ.setText("leftAcc z");
         sangwoo.setText("");
-        next = (Button)findViewById(R.id.next);
+        next = (Button) findViewById(R.id.next);
 
         mainContext = this;
-
 
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectRight();
+                ((bluetoothService) bluetoothService.mContext).reconnectRight();
             }
         });
 
         reconnectLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectLeft();
+                ((bluetoothService) bluetoothService.mContext).reconnectLeft();
             }
         });
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent nextIntent = new Intent(MainActivity.this,scalingActivity.class);
+                Intent nextIntent = new Intent(MainActivity.this, scalingActivity.class);
                 startActivity(nextIntent);
             }
         });
@@ -140,16 +139,15 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         startService(new Intent(this, bluetoothService.class));
-        bindService(new Intent(this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
     }
 
-    public void onDestroy(){
-        if(isService)
-        {
+    public void onDestroy() {
+        if (isService) {
             unbindService(conn);
             isService = false;
         }
-        stopService(new Intent(this,bluetoothService.class));
+        stopService(new Intent(this, bluetoothService.class));
         super.onDestroy();
     }
 
@@ -157,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceMessenger = new Messenger(service);
-            try{
-                Message msg = Message.obtain(null,1);
+            try {
+                Message msg = Message.obtain(null, 1);
                 msg.replyTo = mMessenger;
                 mServiceMessenger.send(msg);
             } catch (RemoteException e) {
@@ -173,11 +171,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public String sendFlexData(){
-        //Intent scalingIntent = new Intent(MainActivity.this,scalingActivity.class);
-        String s = rightEulerX.getText().toString();
 
-        //scalingIntent.putExtra(EXTRA_MESSAGE,s);
+    public String sendFlexData(){
+        String s = rightEulerX.getText().toString();
         return s;
     }
 
@@ -187,51 +183,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             if (msg.what == 0) {
-                switch(msg.arg1)
-                {
-                    case bluetoothService.DISCONNECT:
-                        bluetoothStateRight.setText("오른손 연결끊김");
-                        break;
-                    case bluetoothService.CONNECTED:
-                        bluetoothStateRight.setText("오른손 연결됨");
-                        break;
-                    case bluetoothService.CONNECTING:
-                        bluetoothStateRight.setText("오른손 연결중");
-                        break;
-                    case bluetoothService.INPUTDATA:
-                        String s = (String)msg.obj;
-                        String[] arr = new String[6];
-                        for(int i = 0 ; i < 6; i ++)
-                        {
-                            arr[i] = "";
-                        }
-                        int j = 0;
-                        for(int i = 0; i< s.length(); i++)
-                        {
-                            if(s.charAt(i) == ',')
-                            {
-                                j += 1;
-                                continue;
-                            }
-                            else
-                            {
-                                arr[j] += s.charAt(i);
-                            }
-                        }
-                        rightEulerX.setText("euler x :".concat(arr[0]));
-                        rightEulerY.setText("euler y :".concat(arr[1]));
-                        rightEulerZ.setText("euler z :".concat(arr[2]));
-                        rightAccX.setText("acc x :".concat(arr[3]));
-                        rightAccY.setText("acc y :".concat(arr[4]));
-                        rightAccZ.setText("acc z :".concat(arr[5]));
-
-                        break;
-                }
-            }
-            else if(msg.what == 1)
-            {
-                switch(msg.arg1)
-                {
+                switch (msg.arg1) {
                     case bluetoothService.DISCONNECT:
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         break;
@@ -242,23 +194,49 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateLeft.setText("왼손 연결됨");
                         break;
                     case bluetoothService.INPUTDATA:
-                        String s = (String)msg.obj;
-
+                        String s = (String) msg.obj;
                         String[] arr = new String[6];
-                        for(int i = 0 ; i < 6; i ++)
-                        {
+                        for (int i = 0; i < 6; i++) {
                             arr[i] = "";
                         }
                         int j = 0;
-                        for(int i = 0; i< s.length(); i++)
-                        {
-                            if(s.charAt(i) == ',')
-                            {
+                        for (int i = 0; i < s.length(); i++) {
+                            if (s.charAt(i) == ',') {
                                 j += 1;
                                 continue;
+                            } else {
+                                arr[j] += s.charAt(i);
                             }
-                            else
-                            {
+                        rightEulerX.setText("euler x :".concat(arr[0]));
+                        rightEulerY.setText("euler y :".concat(arr[1]));
+                        rightEulerZ.setText("euler z :".concat(arr[2]));
+                        rightAccX.setText("acc x :".concat(arr[3]));
+                        rightAccY.setText("acc y :".concat(arr[4]));
+                        rightAccZ.setText("acc z :".concat(arr[5]));
+                        break;
+                }
+            } else if (msg.what == 1) {
+                switch (msg.arg1) {
+                    case bluetoothService.DISCONNECT:
+                        bluetoothStateRight.setText("오른손 연결끊김");
+                        break;
+                    case bluetoothService.CONNECTED:
+                        bluetoothStateRight.setText("오른손 연결됨");
+                        break;
+                    case bluetoothService.CONNECTING:
+                        bluetoothStateRight.setText("오른손 연결중");
+                        break;
+                    case bluetoothService.INPUTDATA:
+                        String s = (String) msg.obj;
+                        String[] arr = new String[6];
+                        for (int i = 0; i < 6; i++) {
+                            arr[i] = "";
+                        }
+                        int j = 0;
+                        for (int i = 0; i < s.length(); i++) {
+                            if (s.charAt(i) == ',') {
+                                j += 1;
+                            } else {
                                 arr[j] += s.charAt(i);
                             }
                         }
@@ -268,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                         leftAccX.setText("acc x :".concat(arr[3]));
                         leftAccY.setText("acc y :".concat(arr[4]));
                         leftAccZ.setText("acc z :".concat(arr[5]));
-
                         break;
                 }
             }
@@ -276,10 +253,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }));
 
-    private void sendMessageToService(Message msg){
-        if(isService){
-            if(mServiceMessenger != null){
-                try{
+    private void sendMessageToService(Message msg) {
+        if (isService) {
+            if (mServiceMessenger != null) {
+                try {
                     mServiceMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();
