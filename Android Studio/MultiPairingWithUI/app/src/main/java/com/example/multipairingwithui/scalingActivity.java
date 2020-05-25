@@ -23,34 +23,20 @@ public class scalingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scaling);
+
         button = (Button)findViewById(R.id.button);
         text = (TextView)findViewById(R.id.textView);
 
         button.setOnClickListener(new View.OnClickListener() {
-            Intent IntentExtras = getIntent();
-
             @Override
             public void onClick(View v)
             {
                 String s = "";
                 s = ((MainActivity) MainActivity.mainContext).sendFlexData();
                 text.setText(s);
-                //onNewIntent(IntentExtras);
             }
         });
     }
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        String uid = getIntent().getStringExtra(MainActivity.EXTRA_MESSAGE);
-        if(uid != null)
-        {
-            text.setText(uid);
-        }
-        else{
-            text.setText("아직 null값");
-        }
-    }
+
 }

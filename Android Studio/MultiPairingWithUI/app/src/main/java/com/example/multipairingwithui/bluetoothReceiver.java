@@ -4,9 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
-
-import java.io.IOException;
 
 public class bluetoothReceiver extends BroadcastReceiver {
 
