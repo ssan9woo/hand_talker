@@ -341,10 +341,6 @@ public class bluetoothService extends Service {
                                             Message handData = Message.obtain(null,0,Data.get(i));
                                             signThread.bringHandler.sendMessage(handData);
                                         }
-//                                        for(int i = 0; i < 5; i++){
-//                                            System.out.println("오른손"+ (i + 1) + ":" + Data.get(i)[0] + "  왼손"+(i + 1)+ ":" + Data.get(i)[1] + "길이 : " + Data.get(i)[1].length());
-//                                        }
-//                                        System.out.println("----------------------------------------------------------------------------------------------");
                                         Data.clear();
                                         valuesX.clear();
                                         valuesY.clear();
@@ -361,10 +357,6 @@ public class bluetoothService extends Service {
                                             Message handData = Message.obtain(null,0,Data.get(i));
                                             signThread.bringHandler.sendMessage(handData);
                                         }
-//                                        for(int i = 0; i < 5; i++){
-//                                            System.out.println("오른손"+ (i + 1) + ":" + Data.get(i)[0] + "  왼손"+(i + 1)+ ":" + Data.get(i)[1] + "길이 : " + Data.get(i)[1].length());
-//                                        }
-//                                        System.out.println("----------------------------------------------------------------------------------------------");
                                         Data.clear();
                                         valuesX.clear();
                                         valuesY.clear();
