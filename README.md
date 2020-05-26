@@ -192,3 +192,13 @@
 
 [필요연구]
 ```
+- 2020-05-26
+```
+[수행일지]
+   - 동기화 완료 후 ArrayList<String[]>으로 양손 5개의 Data Combine성공 후 연산 스레드로 Handler를 이용해 전송 성공.
+   - sign(연산 스레드)에서 Message로 ArrayList를 받아 출력성공.
+   - 아두이노의 Serial 모니터와 안드로이드 스튜디오의 System로그를 비교하여 양 손 데이터가 알맞게 들어오는 것 확인.
+[필요연구]
+   - 연산 스레드로 온 ArrayList의 양손 원소들을 Type에 맞게 Casting을 한 후 Energy를 구해야 함.
+   - 에너지를 구한 후 sendToAcitivity를 통해 mainActivity에서 E값을 확인.
+```
