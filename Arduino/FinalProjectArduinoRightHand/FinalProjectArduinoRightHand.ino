@@ -4,13 +4,9 @@
 SoftwareSerial bluetooth(2,3);
 
 int EBimuAsciiParser(float *item, int number_of_item);
-int Read_adc(int channel);
-void Send_flex_val();
-int flag = 0;
 char Ebimu[6][20];
 char sbuf[SBUF_SIZE];
 signed int sbuf_cnt=0;
-
 
 void setup()
 {

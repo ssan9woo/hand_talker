@@ -353,33 +353,6 @@ public class bluetoothService extends Service {
                             Data.clear();
                             valuesX.clear();
                         }
-                        /*if(bluetooth_index == 0){
-                            if(valuesX.size() < 5){
-                                valuesX.push(s);
-                            }
-                        }
-                        else if(bluetooth_index == 1){
-                            if(valuesY.size() < 5){
-                                valuesY.push(s);
-                            }
-                        }
-
-                        if(valuesX.size() == 5 && valuesY.size() == 5){
-                            for(int i = 0; i < 5; i++){
-                                Data.add(valuesX.pollFirst());
-                                Data.add(valuesY.pollFirst());
-                            }
-
-                            Message msg = Message.obtain(null,0,Data);
-                            signThread.bringHandler.sendMessage(msg);
-                            //System.out.println(Data + "  " + Data.size());
-
-
-                            Data.clear();
-                            valuesY.clear();
-                            valuesX.clear();
-                        }
-                        */
                     }
                 } catch (IOException e) { }
             }
