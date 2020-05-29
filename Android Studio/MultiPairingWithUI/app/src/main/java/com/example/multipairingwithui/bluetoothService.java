@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -17,9 +16,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import androidx.annotation.NonNull;
@@ -31,9 +30,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
 
-public class bluetoothService<signLanguageProcessThread> extends Service {
+public class bluetoothService extends Service {
     public static Context mContext;
     private BroadcastReceiver mReceiver;
+
+    Deque<String> valuesX = new ArrayDeque<>(5);
+    Deque<String> valuesY = new ArrayDeque<>(5);
+    ArrayList<String> Data = new ArrayList<String>();
+
+    boolean flag1 = false;
+    boolean flag2 = false;
 
     private Messenger mClient = null;
     private Messenger mClient2 = null;
@@ -51,6 +57,12 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
     final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
 
+    //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    //final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
+//    final String B1MA =  "00:18:E4:34:D4:8E";//Bluetooth0 MacAddress 자두이노1
+//    final String B0MA =  "00:18:91:D8:36:42"; //Bluetooth1 MacAddress 자두이노2
+
+
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
@@ -58,6 +70,7 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     public static final int CONNECTING = 50;
     public static final int CONNECTED = 2;
     public static final int INPUTDATA = 9999;
+
 
 
     // onCreate : adapter, 및 변수설정, onStartCommand : 연결, onBind : 송신,  left, right 함수 두개로 송신
@@ -101,7 +114,7 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
 
     }
     public void disconnectRight(){
-       // Message msg = Message.obtain(null,0,DISCONNECT);
+        // Message msg = Message.obtain(null,0,DISCONNECT);
         if(BC0 != null)
         {
             try {
@@ -113,7 +126,7 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     }
 
     public void disconnectLeft(){
-       // Message msg = Message.obtain(null,1,DISCONNECT);
+        // Message msg = Message.obtain(null,1,DISCONNECT);
         if(BC1 != null)
         {
             try {
@@ -133,10 +146,25 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(mReceiver,filter);
-
         mContext = this;
+
+        final sign mThread;
+        mThread = new sign(mHandler);
+        mThread.setDaemon(true);
+        mThread.start();
+
         super.onCreate();
     }
+
+    @SuppressLint("HandlerLeak")
+    Handler mHandler = new Handler(){
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case 1:
+                    break;
+            }
+        }
+    };
 
     public void reconnectRight(){
         //if(!IsConnect0)//
@@ -272,21 +300,13 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
         InputStream in = null;
         int bluetooth_index;
         boolean is =false;
-        sign mThread;
 
-
-        @SuppressLint("HandlerLeak")
-        Handler mHandler = new Handler(){
-            public void handleMessage(Message msg){
-                switch (msg.what){
-                    case 0:
-                        break;
-                }
-            }
-        };
 
         public ConnectedThread(BluetoothSocket bluetoothsocket, int index) {
             bluetooth_index = index;
+
+
+
             try {
                 in = bluetoothsocket.getInputStream();
                 is = true;
@@ -297,79 +317,69 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
                 cancel();
             }
 
-            mThread = new sign(mHandler);
-            mThread.setDaemon(true);
-            mThread.start();
         }
 
         @Override
         public void run() {
+
+            final sign signThread;
+
+            signThread = new sign(mHandler);
+            signThread.setDaemon(true);
+            signThread.start();
+
             BufferedReader Buffer_in = new BufferedReader(new InputStreamReader(in));
-            Deque<String> valuesX = new ArrayDeque<>(5);
-            Deque<String> valuesY = new ArrayDeque<>(5);
-            String[][] synchronizedString = new String[5][2];
 
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    if(IsConnect1 && IsConnect0) {
-                        if (!s.equals("")) {
-                            sendMessage(INPUTDATA, s);
-                            if(bluetooth_index == 0){
-                                if(valuesX.size() < 5){
-                                    valuesX.push(s);
-                                    if(valuesX.size() == 5 && valuesY.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0, Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
-                                else {
-                                    valuesX.pollFirst();
-                                    valuesX.push(s);
-                                    if(valuesY.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
-                            }
-                            else if(bluetooth_index == 1){
-                                if(valuesY.size() < 5){
-                                    valuesY.push(s);
-                                    if(valuesY.size() == 5 && valuesX.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
-                                else {
-                                    valuesY.pollFirst();
-                                    valuesY.push(s);
-                                    if(valuesX.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            synchronizedString[i][0] = valuesX.pollFirst();
-                                            synchronizedString[i][1] = valuesY.pollFirst();
-                                        }
-                                        Message msg = Message.obtain(null,0,Arrays.deepToString(synchronizedString));
-                                        mThread.bringHandler.sendMessage(msg);
-                                    }
-                                }
+
+                    if(IsConnect1 && IsConnect0 && s.length() >= 29){
+                        sendMessage(INPUTDATA, s);
+
+                        if(bluetooth_index == 0){
+                            if(valuesX.size() < 5){
+                                valuesX.push(s);
                             }
                         }
+
+                        if(valuesX.size() == 5){
+                            for(int i = 0; i < 5; i++){
+                                Data.add(valuesX.pollFirst());
+                                Message msg = Message.obtain(null,0,Data.get(i));
+                                signThread.bringHandler.sendMessage(msg);
+                            }
+
+                            Data.clear();
+                            valuesX.clear();
+                        }
+                        /*if(bluetooth_index == 0){
+                            if(valuesX.size() < 5){
+                                valuesX.push(s);
+                            }
+                        }
+                        else if(bluetooth_index == 1){
+                            if(valuesY.size() < 5){
+                                valuesY.push(s);
+                            }
+                        }
+
+                        if(valuesX.size() == 5 && valuesY.size() == 5){
+                            for(int i = 0; i < 5; i++){
+                                Data.add(valuesX.pollFirst());
+                                Data.add(valuesY.pollFirst());
+                            }
+
+                            Message msg = Message.obtain(null,0,Data);
+                            signThread.bringHandler.sendMessage(msg);
+                            //System.out.println(Data + "  " + Data.size());
+
+
+                            Data.clear();
+                            valuesY.clear();
+                            valuesX.clear();
+                        }
+                        */
                     }
                 } catch (IOException e) { }
             }
@@ -403,7 +413,7 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
             if(in != null){
                 try {
                     in.close();
-                    in=null;
+                    in = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -415,8 +425,15 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
     public static class sign extends Thread{
         Handler bringHandler;
         Handler sendHandler;
-        String signData = "";
-        public sign(Handler handler){
+        ArrayList<String[]> handData;
+        Double[] lastCordinateX = new Double[]{0.00, 0.00, 0.00};
+        double[] rightHandData = new double[6];
+        double E = 0.0;
+        boolean energyFlag = false;
+        ArrayList<double[]> storedData;
+
+
+        sign(Handler handler){
             sendHandler = handler;
         }
 
@@ -428,8 +445,41 @@ public class bluetoothService<signLanguageProcessThread> extends Service {
                 public void handleMessage(Message msg){
                     switch (msg.what){
                         case 0:
-                            //2차원배열 오브젝트로 받음[[x1,y1],[x1,y1],[x1,y1],[x1,y1],[x1,y1]]
-                            signData = msg.obj.toString();
+                            String[] arr = ((String)msg.obj).split(",");
+                            for(int i = 0; i < 6; i++){
+                                if(i >= 3){
+                                    rightHandData[i] = Double.parseDouble(arr[i]) * 5;
+                                    //5 를 Math에서 곱해보기
+                                }
+                                else{
+                                    rightHandData[i] = Double.parseDouble(arr[i]);
+                                }
+                            }
+
+                            E = Math.pow(rightHandData[3] - lastCordinateX[0],2) + Math.pow(rightHandData[4] - lastCordinateX[1],2) + Math.pow(rightHandData[5] - lastCordinateX[2],2) ;
+
+                            for(int i = 0; i < 3; i++){
+                                lastCordinateX[i] = rightHandData[i + 3];
+                            }
+                            //System.out.println(E);
+                            if(E >= 150.0){
+                                energyFlag = true;
+                                //System.out.println(rightHandData[0] + "   " + rightHandData[1] + "   " + rightHandData[2]);
+                            }
+                            else{
+                                energyFlag = false;
+                            }
+
+                            if(energyFlag){
+                                storedData.add(new double[]{rightHandData[0],rightHandData[1],rightHandData[2]});
+                            }
+                            else{
+                                if(!storedData.isEmpty()){
+                                    double[] z = storedData.get(storedData.size() - 1);
+                                    System.out.println(z[0] + "  " + z[1] + "  " + z[2]);
+                                    storedData.clear();
+                                }
+                            }
                             break;
                     }
                     //send
