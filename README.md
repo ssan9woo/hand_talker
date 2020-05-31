@@ -202,3 +202,11 @@
    - 연산 스레드로 온 ArrayList의 양손 원소들을 Type에 맞게 Casting을 한 후 Energy를 구해야 함.
    - 에너지를 구한 후 sendToAcitivity를 통해 mainActivity에서 E값을 확인.
 ```
+- 2020-05-31
+```
+[수행일지]
+   - 에너지를 구하는 과정에서 Sliding Window 방식을 찾기 위해 제스처 인식 논문 공부.
+   - 5개의 ArrayList를 순차적으로 하나씩 보내느 방법 채택.
+[필요연구]
+   - 현재 ebimu센서 있는 오른손부터 슬라이딩 윈도우 기법을 사용 해 봐야함. 5개의 frame으로 실험을 해서 에너지 Threshold를 넘는 것을 감지하는지 확인해야함.
+```
