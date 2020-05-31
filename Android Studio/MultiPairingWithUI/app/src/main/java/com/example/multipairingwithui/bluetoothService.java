@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -16,11 +17,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -28,21 +26,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.UUID;
 
 public class bluetoothService extends Service {
     public static Context mContext;
     private BroadcastReceiver mReceiver;
 
-    Deque<String> valuesX = new ArrayDeque<>(5);
-    Deque<String> valuesY = new ArrayDeque<>(5);
-    ArrayList<String> Data = new ArrayList<String>();
-
-    boolean flag1 = false;
-    boolean flag2 = false;
-
     private Messenger mClient = null;
-    private Messenger mClient2 = null;
     //IBinder mBinder = new MyBinder();
 
     boolean IsConnect0 = false,
@@ -57,12 +50,6 @@ public class bluetoothService extends Service {
     final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
     final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
 
-    //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
-    //final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
-//    final String B1MA =  "00:18:E4:34:D4:8E";//Bluetooth0 MacAddress 자두이노1
-//    final String B0MA =  "00:18:91:D8:36:42"; //Bluetooth1 MacAddress 자두이노2
-
-
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
@@ -70,6 +57,10 @@ public class bluetoothService extends Service {
     public static final int CONNECTING = 50;
     public static final int CONNECTED = 2;
     public static final int INPUTDATA = 9999;
+
+    Deque<String> valuesX = new ArrayDeque<>(5);
+    Deque<String> valuesY = new ArrayDeque<>(5);
+    ArrayList<String> Data = new ArrayList<String>();
 
 
 
@@ -110,30 +101,23 @@ public class bluetoothService extends Service {
         } catch (NullPointerException | RemoteException e) {}
     }
 
-    private void sendMsgToSubActivity(Message msg){
-
-    }
     public void disconnectRight(){
         // Message msg = Message.obtain(null,0,DISCONNECT);
-        if(BC0 != null)
-        {
-            try {
-                BC0.cancel();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try{
+            BC0.cancel();
+            //sendMsgToActivity(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void disconnectLeft(){
         // Message msg = Message.obtain(null,1,DISCONNECT);
-        if(BC1 != null)
-        {
-            try {
-                BC1.cancel();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try{
+            BC1.cancel();
+            //sendMsgToActivity(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -146,13 +130,8 @@ public class bluetoothService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(mReceiver,filter);
+
         mContext = this;
-
-        final sign mThread;
-        mThread = new sign(mHandler);
-        mThread.setDaemon(true);
-        mThread.start();
-
         super.onCreate();
     }
 
@@ -296,32 +275,32 @@ public class bluetoothService extends Service {
     //connected bluetooth - communication
     class ConnectedThread extends Thread{
 
-
         InputStream in = null;
-        int bluetooth_index;
-        boolean is =false;
 
+        int bluetooth_index;
+
+        boolean is =false;
 
         public ConnectedThread(BluetoothSocket bluetoothsocket, int index) {
             bluetooth_index = index;
 
-
-
             try {
                 in = bluetoothsocket.getInputStream();
+
                 is = true;
+
                 if(bluetooth_index == 0) IsConnect0 = is;
                 else IsConnect1 = is;
+
                 sendMessage(CONNECTED);
+
             } catch (IOException e) {
                 cancel();
             }
-
         }
 
         @Override
         public void run() {
-
             final sign signThread;
 
             signThread = new sign(mHandler);
@@ -369,7 +348,6 @@ public class bluetoothService extends Service {
 
         public void sendMessage(int arg, String s){
             Message m = new Message();
-            //Message v = new Message();
 
             m.what = bluetooth_index;
             m.arg1 = arg;
@@ -386,7 +364,7 @@ public class bluetoothService extends Service {
             if(in != null){
                 try {
                     in.close();
-                    in = null;
+                    in=null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -394,7 +372,6 @@ public class bluetoothService extends Service {
             sendMessage(DISCONNECT);
         }
     }
-
     public static class sign extends Thread{
         Handler bringHandler;
         Handler sendHandler;
@@ -402,8 +379,8 @@ public class bluetoothService extends Service {
         Double[] lastCordinateX = new Double[]{0.00, 0.00, 0.00};
         double[] rightHandData = new double[6];
         double E = 0.0;
-        boolean energyFlag = false;
-        ArrayList<double[]> storedData;
+        double totalEnergy = 0.0;
+        int count = 0;
 
 
         sign(Handler handler){
@@ -428,30 +405,17 @@ public class bluetoothService extends Service {
                                     rightHandData[i] = Double.parseDouble(arr[i]);
                                 }
                             }
-
                             E = Math.pow(rightHandData[3] - lastCordinateX[0],2) + Math.pow(rightHandData[4] - lastCordinateX[1],2) + Math.pow(rightHandData[5] - lastCordinateX[2],2) ;
 
                             for(int i = 0; i < 3; i++){
                                 lastCordinateX[i] = rightHandData[i + 3];
                             }
                             //System.out.println(E);
-                            if(E >= 150.0){
-                                energyFlag = true;
-                                //System.out.println(rightHandData[0] + "   " + rightHandData[1] + "   " + rightHandData[2]);
+                            if(count < 5){
+                                totalEnergy += E;
                             }
                             else{
-                                energyFlag = false;
-                            }
-
-                            if(energyFlag){
-                                storedData.add(new double[]{rightHandData[0],rightHandData[1],rightHandData[2]});
-                            }
-                            else{
-                                if(!storedData.isEmpty()){
-                                    double[] z = storedData.get(storedData.size() - 1);
-                                    System.out.println(z[0] + "  " + z[1] + "  " + z[2]);
-                                    storedData.clear();
-                                }
+                                
                             }
                             break;
                     }
@@ -461,4 +425,5 @@ public class bluetoothService extends Service {
             Looper.loop();
         }
     }
+
 }
