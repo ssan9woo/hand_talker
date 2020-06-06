@@ -36,7 +36,7 @@ public class bluetoothService extends Service {
 
     Deque<String> valuesX = new ArrayDeque<>(5);
     Deque<String> valuesY = new ArrayDeque<>(5);
-    ArrayList<String[]> Data = new ArrayList<String[]>();
+    ArrayList<String> Data = new ArrayList<String>();
 
     boolean flag1 = false;
     boolean flag2 = false;
@@ -56,6 +56,12 @@ public class bluetoothService extends Service {
 
     final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
     final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
+
+    //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    //final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
+//    final String B1MA =  "00:18:E4:34:D4:8E";//Bluetooth0 MacAddress 자두이노1
+//    final String B0MA =  "00:18:91:D8:36:42"; //Bluetooth1 MacAddress 자두이노2
+
 
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
@@ -327,43 +333,26 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    if(IsConnect1 && IsConnect0) {
-                        if (!s.equals("")) {
-                            sendMessage(INPUTDATA, s);
+                    if((IsConnect1 || IsConnect0) && s.length() >= 29){
+                        sendMessage(INPUTDATA, s);
 
-                            if(bluetooth_index == 0){
-                                if(valuesX.size() < 5){
-                                    valuesX.push(s);
-                                    if(valuesX.size() == 5 && valuesY.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            Data.add(new String[]{valuesX.pollFirst(),valuesY.pollFirst()});
-                                            Message handData = Message.obtain(null,0,Data.get(i));
-                                            signThread.bringHandler.sendMessage(handData);
-                                        }
-                                        Data.clear();
-                                        valuesX.clear();
-                                        valuesY.clear();
-                                    }
-                                }
-                            }
-                            else if(bluetooth_index == 1){
-                                if(valuesY.size() < 5){
-                                    valuesY.push(s);
-                                    if(valuesY.size() == 5 && valuesX.size() == 5){
-                                        //combine
-                                        for(int i = 0; i < 5; i++){
-                                            Data.add(new String[]{valuesX.pollFirst(),valuesY.pollFirst()});
-                                            Message handData = Message.obtain(null,0,Data.get(i));
-                                            signThread.bringHandler.sendMessage(handData);
-                                        }
-                                        Data.clear();
-                                        valuesX.clear();
-                                        valuesY.clear();
-                                    }
-                                }
+                        if(bluetooth_index == 0){
+                            if(valuesX.size() < 5){
+                                valuesX.push(s);
                             }
                         }
+
+                        if(valuesX.size() == 5){
+                            for(int i = 0; i < 5; i++){
+                                Data.add(valuesX.pollFirst());
+                                Message msg = Message.obtain(null,0,Data.get(i));
+                                signThread.bringHandler.sendMessage(msg);
+                            }
+
+                            Data.clear();
+                            valuesX.clear();
+                        }
+
                     }
                 } catch (IOException e) { }
             }
@@ -409,14 +398,15 @@ public class bluetoothService extends Service {
     public static class sign extends Thread{
         Handler bringHandler;
         Handler sendHandler;
-        ArrayList<String[]> handData;
-        private final Double[] zeroCordinate = {0.00,0.00,0.00};
-        Double[] lastCordinateX;
+        Double[] lastCordinateX = new Double[]{0.00, 0.00, 0.00};
+        double[] rightHandData = new double[6];
+        double E = 0.0;
+        double E_sum=0;
+        boolean energyFlag = false;
+        Deque<Double> deq_right = new ArrayDeque<>(5);
 
-
-        public sign(Handler handler){
+        sign(Handler handler){
             sendHandler = handler;
-            lastCordinateX = zeroCordinate;
         }
 
         @SuppressLint("HandlerLeak")
@@ -427,41 +417,31 @@ public class bluetoothService extends Service {
                 public void handleMessage(Message msg){
                     switch (msg.what){
                         case 0:
-                            String[] s = (String[]) msg.obj;
-                            System.out.println("오른손 Data : " + s[0] + "   왼손 Data : " + s[1]);
-                            /*
-                            //2차원배열 오브젝트로 받음[[x1,y1],[x1,y1],[x1,y1],[x1,y1],[x1,y1]]
-                            //앞에서부터 하나씩 받고 casting 후에 while문 들어가서 에너지 구하기.
-                            //ebinm : 6, flex : 6, 접촉 : 2
-                            //원소 나누고 -> scaling -> e
-                            ArrayList<String[]> signData = (ArrayList<String[]>) msg.obj;
-                            //signData.get(0)[0] -> 14개의
-                            for(int i = 0; i < 5 ; i++){
-                                String[] rightValues = signData.get(i)[0].split(",");
-                                String[] leftValues = signData.get(i)[1].split(",");
-
-                                Double accX = Double.parseDouble(rightValues[3]);
-                                Double accY = Double.parseDouble(rightValues[4]);
-                                Double accZ = Double.parseDouble(rightValues[5]);
-
-                                Double E = Math.pow(accX - lastCordinateX[0],2) + Math.pow(accY - lastCordinateX[1],2) + Math.pow(accZ - lastCordinateX[2],2);
-
-                                lastCordinateX[0] = accX;
-                                lastCordinateX[1] = accY;
-                                lastCordinateX[2] = accZ;
-
-                                Message m = Message.obtain(null,0,E);
-                                sendHandler.sendMessage(m);
-                                //정수실수처리
-                                //스케일링2
-                                //시작을 원점 (0,0,0)
-                                //E1 = (x1 - x0)^2 +
+                            String[] arr = ((String)msg.obj).split(",");
+                            for(int i = 0; i < 6; i++){
+                                if(i >= 3){
+                                    rightHandData[i] = Double.parseDouble(arr[i]) * 5;
+                                }
+                                else{
+                                    rightHandData[i] = Double.parseDouble(arr[i]);
+                                }
                             }
-                            //E(total ) > 150
-                            //while(조건) 조건 1,2,3
-                            // 조건 1 : 지화검출 -> while(오른 > 150) -> 끝점
-                            */
-                            break;
+                            E = Math.pow(rightHandData[3] - lastCordinateX[0],2) + Math.pow(rightHandData[4] - lastCordinateX[1],2) + Math.pow(rightHandData[5] - lastCordinateX[2],2) ;
+                            deq_right.push(E);
+                            if(deq_right.size()>5){
+                                deq_right.pollFirst();
+                            }
+                            if(deq_right.size()<5) break;
+
+                            for(int i=0;i<5;i++){
+                                double tmp = deq_right.pop();
+                                deq_right.addFirst(tmp);
+                                E_sum+=tmp;
+                            }
+
+                            //sum이 150 넘으면?
+                            //
+                            E_sum=0;
                     }
                     //send
                 }
