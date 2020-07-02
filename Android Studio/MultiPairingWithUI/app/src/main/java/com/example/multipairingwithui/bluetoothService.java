@@ -54,13 +54,13 @@ public class bluetoothService extends Service {
     ConnectThread BC0;
     ConnectThread BC1;
 
-    final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
     final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
 
     //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
     //final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
 //    final String B1MA =  "00:18:E4:34:D4:8E";//Bluetooth0 MacAddress 자두이노1
-//    final String B0MA =  "00:18:91:D8:36:42"; //Bluetooth1 MacAddress 자두이노2
+    final String B0MA =  "00:18:91:D8:36:42"; //Bluetooth1 MacAddress 자두이노2
 
 
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
@@ -333,6 +333,8 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
+                    System.out.println(s);
+
                     if((IsConnect1 || IsConnect0) && s.length() >= 29){
                         sendMessage(INPUTDATA, s);
 

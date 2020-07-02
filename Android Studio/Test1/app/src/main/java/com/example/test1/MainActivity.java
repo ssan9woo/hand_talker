@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity{
@@ -26,9 +27,15 @@ public class MainActivity extends AppCompatActivity{
         button = (Button) findViewById(R.id.button);
         value = (TextView) findViewById(R.id.value);
 
-        final String[][] str = new String[1][2];
-        str[0][0] = "sangwoo";
-        str[0][1] = "hihi~";
+        final String[][] str = new String[3][2];
+        str[0][0] = "1";
+        str[0][1] = "10";
+        str[1][0] = "100";
+        str[1][1] = "1000";
+        str[2][0] = "10000";
+        str[2][1] = "100000";
+
+
 
         final sign mThread;
         mThread = new sign(mHandler);
@@ -38,22 +45,34 @@ public class MainActivity extends AppCompatActivity{
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message msg = Message.obtain(null,1, Arrays.deepToString(str));
+
+                ArrayList<String[]> signData = new ArrayList<String[]>();
+                signData.add(new String[]{str[0][0],str[0][1]});
+                signData.add(new String[]{str[1][0],str[1][1]});
+                signData.add(new String[]{str[2][0],str[2][1]});
+
+                //Toast.makeText(getApplicationContext(), Arrays.toString(signData.get(1)),Toast.LENGTH_LONG).show();
+                Message msg = Message.obtain(null,1,signData);
                 mThread.backHandler.sendMessage(msg);
-                Toast.makeText(getApplicationContext(),"상우" + Arrays.deepToString(str) ,Toast.LENGTH_LONG).show();
             }
         });
     }
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
-        String s = "";
+
+
+        @SuppressLint("SetTextI18n")
         public void handleMessage(Message msg){
+
             switch(msg.what){
                 case 1:
-                    s = msg.obj.toString();
+                    ArrayList<String[]> sign = (ArrayList<String[]>) msg.obj;
+                    value.setText("x : " + sign.get(0)[0] + "y : " + sign.get(0)[1]);
+//                    ArrayList signData = (ArrayList) msg.obj;
+//                    String m = signData.get(0)[1];
+//                    value.setText(m);
                     break;
             }
-            value.setText(s);
         }
     };
 
@@ -61,7 +80,7 @@ public class MainActivity extends AppCompatActivity{
     public class sign extends Thread{
         Handler backHandler;
         Handler mainHandler;
-        String s = "";
+
 
         sign(Handler handler){
             mainHandler = handler;
@@ -70,15 +89,19 @@ public class MainActivity extends AppCompatActivity{
         public void run(){
             Looper.prepare();
             backHandler = new Handler(){
-                public void handleMessage(Message msg){
-                    switch(msg.what){
+                public void handleMessage(Message msg) {
+                    ArrayList<String[]> sign = new ArrayList<String[]>();
+                    switch (msg.what) {
                         case 1:
-                            s = msg.obj.toString();
+                            sign = (ArrayList<String[]>) msg.obj;
+                            String m = sign.get(0)[0];
+                            Toast.makeText(getApplicationContext(),m,Toast.LENGTH_LONG).show();
                             break;
                     }
-                    Message message = Message.obtain(null,1,s);
-                    mainHandler.sendMessage(message);
-                    //Message message2 = Message.obtain(null,0,s.substring(2,))
+                    for(int i = 0; i < 3; i++){
+                        Message message = Message.obtain(null, 1, sign);
+                        mainHandler.sendMessage(message);
+                    }
                 }
             };
             Looper.loop();
