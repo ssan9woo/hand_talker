@@ -47,7 +47,9 @@ public class bluetoothService extends Service {
     ConnectThread BC0;
     ConnectThread BC1;
 
-    final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    //final String B0MA = "98:D3:71:FD:47:5A"; //Bluetooth0 MacAddress
+    final String B0MA = "00:18:91:D8:36:42"; //Bluetooth0 MacAddress
+
     final String B1MA = "98:D3:51:FD:88:9A"; //Bluetooth1 MacAddress
 
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
@@ -313,26 +315,26 @@ public class bluetoothService extends Service {
                 try {
                     String s = Buffer_in.readLine();
 
-                    if(IsConnect1 && IsConnect0 && s.length() >= 29){
-                        sendMessage(INPUTDATA, s);
-
-                        if(bluetooth_index == 0){
-                            if(valuesX.size() < 5){
-                                valuesX.push(s);
-                            }
-                        }
-
-                        if(valuesX.size() == 5){
-                            for(int i = 0; i < 5; i++){
-                                Data.add(valuesX.pollFirst());
-                                Message msg = Message.obtain(null,0,Data.get(i));
-                                signThread.bringHandler.sendMessage(msg);
-                            }
-
-                            Data.clear();
-                            valuesX.clear();
-                        }
-                    }
+                    //if(IsConnect1 && IsConnect0 && s.length() >= 54){
+                    System.out.println(s);
+//                        sendMessage(INPUTDATA, s);
+//
+//                        if(bluetooth_index == 0){
+//                            if(valuesX.size() < 5){
+//                                valuesX.push(s);
+//                            }
+//                        }
+//
+//                        if(valuesX.size() == 5){
+//                            for(int i = 0; i < 5; i++){
+//                                Data.add(valuesX.pollFirst());
+//                                Message msg = Message.obtain(null,0,Data.get(i));
+//                                signThread.bringHandler.sendMessage(msg);
+//                            }
+//                            Data.clear();
+//                            valuesX.clear();
+//                        }
+                    //}
                 } catch (IOException e) { }
             }
         }
@@ -410,12 +412,13 @@ public class bluetoothService extends Service {
                             for(int i = 0; i < 3; i++){
                                 lastCordinateX[i] = rightHandData[i + 3];
                             }
-                            //System.out.println(E);
+                            System.out.println(E);
                             if(count < 5){
                                 totalEnergy += E;
                             }
                             else{
-                                
+                                //정욱이 말대로 Queue로 구현해야함. 그렇지 않으면 5개 합의 에너지를 구하고 다음 차례로 넘어갈 시 첫번째 원소를 찾을 수 없음. -> Queue로 구현.
+                                //복잡도 pollFirst 와 push 할때 delay가 생기는지 확인 해야함.
                             }
                             break;
                     }

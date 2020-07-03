@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 #define SBUF_SIZE 1024
-SoftwareSerial bluetooth(2, 3);
+SoftwareSerial bluetooth(4, 7);
 
 float ebimuTest[6] = { 0.00, 10.00, 50.00, 100.00, 150.00, 200.00}; 
 char str[6][20];
