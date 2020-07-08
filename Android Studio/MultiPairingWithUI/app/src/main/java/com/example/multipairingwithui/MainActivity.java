@@ -24,16 +24,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.UUID;
-
 public class MainActivity extends AppCompatActivity {
 
-    Intent intent1;
-    Intent btIntent;
     private BroadcastReceiver mReceiver;
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
@@ -41,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     private bluetoothService mService;
     TextView sangwoo;
-
-
 
     //--------Right Hand---------
     Button reconnectRight;
@@ -70,15 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     BluetoothAdapter BA;
 
-    //----------------Bind------------------
-
-    //bluetoothService btService;
-
-
-
-
-
-    //--------------------------------------
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,13 +113,6 @@ public class MainActivity extends AppCompatActivity {
         sangwoo.setText("");
 
         mainContext = this;
-        //----------------------SET Listener---------------------------------//
-
-
-
-        //----------------------Bluetooth init---------------------------------//
-
-
 
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,8 +132,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         IntentFilter filter = new IntentFilter();
-        //filter.addAction(Intent.);
-        //btIntent = new Intent(this, bluetoothService.class);
+
         startService(new Intent(this, bluetoothService.class));
         bindService(new Intent(this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
     }

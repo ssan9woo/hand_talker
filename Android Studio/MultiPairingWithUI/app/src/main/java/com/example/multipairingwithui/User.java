@@ -8,8 +8,8 @@ public class User {
     public User(){
         left_min = new int[5];
         left_max = new int[5];
-        right_min = new int[5];
-        right_max = new int[5];
+        right_min = new int[6];
+        right_max = new int[6];
     }
     public void Set_min(int value[],String hand){
         switch (hand){
