@@ -437,12 +437,9 @@ public class bluetoothService extends Service {
                 System.out.print(E_left_sum);
                 System.out.print(" ");
                 System.out.println(E_right_sum);
-                /*
+                
                 if(E_left_sum>150& E_right_sum >150.0){
                 }
-
-                }*/
-
             };
             Looper.loop();
         }
