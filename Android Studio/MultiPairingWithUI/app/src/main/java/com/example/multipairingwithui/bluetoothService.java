@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -27,17 +28,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 import java.util.UUID;
-
 public class bluetoothService extends Service {
-    public static Context mContext;
+    @SuppressLint("StaticFieldLeak")
+    static public  Context mContext;
     private BroadcastReceiver mReceiver;
-
     private Messenger mClient = null;
     static sign mThread= null;
     boolean IsConnect_right = false,
             IsConnect_left = false;
-
+    static public int[] rightHand_Flex = new int[]{0, 0, 0, 0, 0, 0};
+    static public int[] leftHand_Flex = new int[]{0, 0, 0, 0, 0};
     BluetoothAdapter BA;
     BluetoothDevice B_right,B_left;
 
@@ -55,20 +57,24 @@ public class bluetoothService extends Service {
     public static final int CONNECTED = 2;
     public static final int INPUTDATA = 9999;
 
+    private Messenger mClient2 = null;   // Activity 에서 가져온 Messenger
+    IBinder mBinder = new MyBinder();
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mMessenger.getBinder();
+        return mBinder;
     }
-
+    class MyBinder extends Binder {
+        bluetoothService getService() { // 서비스 객체를 리턴
+            return bluetoothService.this;
+        }
+    }
     //수신값(현재 필요없음)
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            switch(msg.what){
-                case 1:
+            if(msg.what == 1){
                     mClient = msg.replyTo;
-                    break;
             }
             return false;
         }
@@ -77,11 +83,12 @@ public class bluetoothService extends Service {
     private void sendMsgToActivity(Message msg){
         try{
             mClient.send(msg);
-        } catch (NullPointerException | RemoteException e) {}
+        } catch (NullPointerException | RemoteException ignored) {}
     }
 
     public void disconnectRight(){
-        // Message msg = Message.obtain(null,0,DISCONNECT);
+        Message msg = Message.obtain(null,0,DISCONNECT);
+        sendMsgToActivity(msg);
         if(BC_right != null)
         {
             try {
@@ -92,7 +99,8 @@ public class bluetoothService extends Service {
         }
     }
     public void disconnectLeft(){
-        // Message msg = Message.obtain(null,1,DISCONNECT);
+        Message msg = Message.obtain(null,1,DISCONNECT);
+        sendMsgToActivity(msg);
         if(BC_left != null)
         {
             try {
@@ -120,28 +128,25 @@ public class bluetoothService extends Service {
         super.onCreate();
     }
 
+
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
-            switch(msg.what){
-                case 1:
-                    break;
-            }
         }
     };
 
     public void reconnectRight(){
         if(!IsConnect_right)
         {
-        BC_right = new ConnectThread(B_right,0);
-        BC_right.start();
+            BC_right = new ConnectThread(B_right,0);
+            BC_right.start();
         }
     }
     public void reconnectLeft(){
         if(!IsConnect_left)
         {
-        BC_left = new ConnectThread(B_left,1);
-        BC_left.start();
+            BC_left = new ConnectThread(B_left,1);
+            BC_left.start();
         }
     }
 
@@ -180,7 +185,6 @@ public class bluetoothService extends Service {
         }
         super.onDestroy();
     }
-
 
     class ConnectThread extends Thread{
 
@@ -231,7 +235,7 @@ public class bluetoothService extends Service {
             }
         }
 
-        public void cancel() throws IOException {
+        void cancel() throws IOException {
 
             if(connectedThread != null){
                 connectedThread.cancel();
@@ -246,14 +250,6 @@ public class bluetoothService extends Service {
                     e.printStackTrace();
                 }
             }
-        }
-
-        public void sendMessage(int arg){
-            Message m = new Message();
-            m.what = bluetooth_index;
-            m.arg1 = CONNECTING;
-
-            //handler.sendMessage(m);
         }
     }
 
@@ -300,7 +296,7 @@ public class bluetoothService extends Service {
                     */
 
                     //System.out.println(s);
-                    if(IsConnect_left && IsConnect_right){
+                    if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==0 && s.length()>=63) || (bluetooth_index==1 && s.length()>=54)) {
                             if(Data.size() < 5){
                                 Data.add(s);
@@ -314,11 +310,11 @@ public class bluetoothService extends Service {
                             }
                         }
                     }
-                } catch (IOException e) { }
+                } catch (IOException ignored) { }
             }
         }
 
-        public void sendMessage(int arg){
+        void sendMessage(int arg){
             Message m = new Message();
             m.what = bluetooth_index;
             m.arg1 = arg;
@@ -336,7 +332,7 @@ public class bluetoothService extends Service {
             sendMsgToActivity(m);
         }
 
-        public void cancel(){
+        void cancel(){
             is = false;
 
             if(bluetooth_index == 0) IsConnect_right = is;
@@ -357,24 +353,25 @@ public class bluetoothService extends Service {
     public static class sign extends Thread{
         Handler bringHandler;
         Handler sendHandler;
-
         double[] lastCoordinate_right = new double[]{0.00, 0.00, 0.00};
         double[] rightHand_Gyro = new double[]{0.00, 0.00, 0.00};
         double[] rightHand_Acc = new double[]{0.00, 0.00, 0.00};
-        int[] rightHand_Flex = new int[]{0, 0, 0, 0, 0, 0,};
+
         boolean[] rightHand_Touch=new boolean[]{false, false};
 
         double[] lastCoordinate_left = new double[]{0.00, 0.00, 0.00};
         double[] leftHand_Gyro = new double[]{0.00, 0.00, 0.00};
         double[] leftHand_Acc = new double[]{0.00, 0.00, 0.00};
-        int[] leftHand_Flex = new int[]{0, 0, 0, 0, 0, 0};
-        double E_right=0;
+
+        double E_right=0.0;
         double E_left=0;
         double E_right_sum=0;
         double E_left_sum=0;
-        Deque<Double> deq_right = new ArrayDeque<>(5);
-        Deque<Double> deq_left = new ArrayDeque<>(5);
+        Deque<Double> deq_right = new ArrayDeque<Double>();
+        Deque<Double> deq_left = new ArrayDeque<Double>();
 
+        LinkedList<LinkedList<Integer>> dtw_right = new LinkedList<>();
+        LinkedList<LinkedList<Integer>> dtw_left = new LinkedList<>();
         sign(Handler handler){
             sendHandler = handler;
         }
@@ -386,7 +383,6 @@ public class bluetoothService extends Service {
             bringHandler = new Handler(){
                 public void handleMessage(Message msg){
                     String[] arr = ((String)msg.obj).split(",");
-                    //System.out.println(arr.length);
                     switch (msg.what){
                         case 0://Right hand
                             for(int i=0; i< 14;i++){
@@ -433,23 +429,26 @@ public class bluetoothService extends Service {
                             break;
                         default:
                             break;
-                }
-                System.out.print(E_left_sum);
-                System.out.print(" ");
-                System.out.println(E_right_sum);
-                /*
-                if(E_left_sum>150& E_right_sum >150.0){
-                }
+                    }
+                    /*
+                    if(E_left_sum>150 && E_right_sum >150.0){
 
-                }*/
-
+                    }*/
+                }
             };
             Looper.loop();
         }
-        public double get_energy(double Acc[], double lastAcc[]){
+        double get_energy(double[] Acc, double[] lastAcc){
             double energy;
             energy = Math.pow(Acc[0] - lastAcc[0],2) + Math.pow(Acc[1] - lastAcc[1],2) + Math.pow(Acc[2] - lastAcc[2],2) ;
             return energy;
         }
     }
+    public int[] getRightHand_Flex(){
+        return rightHand_Flex;
+    }
+    public int[] getLeftHand_Flex(){
+        return leftHand_Flex;
+    }
+
 }

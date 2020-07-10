@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     TextView leftAccZ;
 
     BluetoothAdapter BA;
-
+    Button next;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         reconnectRight = (Button)findViewById(R.id.reconnectRight);
         reconnectLeft = (Button)findViewById(R.id.reconnectLeft);
+        next= (Button)findViewById(R.id.next);
 
         bluetoothStateRight = (TextView)findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = (TextView)findViewById(R.id.bluetoothStateLeft);
@@ -127,6 +128,13 @@ public class MainActivity extends AppCompatActivity {
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), scalingActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void onStart() {
@@ -166,11 +174,6 @@ public class MainActivity extends AppCompatActivity {
             isService = false;
         }
     };
-
-    public String sendFlexData(){
-        String s = rightEulerX.getText().toString();
-        return s;
-    }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @SuppressLint("SetTextI18n")
@@ -285,7 +288,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
 }
