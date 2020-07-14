@@ -13,33 +13,36 @@ public class User {
     }
     public void Set_min(int value[],String hand){
         switch (hand){
-            case "left":
+            case "LEFT":
+                System.arraycopy(value,0,left_min,0,left_min.length);
                 left_min=value;
                 break;
-            case "right":
+            case "RIGHT":
+                System.arraycopy(value,0,right_min,0,right_min.length);
                 right_min=value;
                 break;
         }
     }
     public void Set_max(int value[],String hand){
         switch (hand){
-            case "left":
+            case "LEFT":
+                System.arraycopy(value,0,left_max,0,left_max.length);
                 left_max=value;
                 break;
-            case "right":
+            case "RIGHT":
+                System.arraycopy(value,0,right_max,0,right_max.length);
                 right_max=value;
                 break;
         }
     }
-
-    public double Get_scaled_data(int value,int idx,String hand){
+    public double Get_scaled_data(int flex_value,int idx,String hand){
         double ret=0.00;
         switch (hand) {
-            case "left":
-                ret = (double) (value - this.left_min[idx]) / (this.left_max[idx] - this.left_min[idx]);
+            case "LEFT":
+                ret = (double) (flex_value - this.left_min[idx]) / (this.left_max[idx] - this.left_min[idx]);
                 break;
-            case "right":
-                ret = (double) (value - this.right_min[idx]) / (this.right_max[idx] - this.right_min[idx]);
+            case "RIGHT":
+                ret = (double) (flex_value - this.right_min[idx]) / (this.right_max[idx] - this.right_min[idx]);
                 break;
         }
         return ret;

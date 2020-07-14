@@ -12,4 +12,8 @@
     <string name="bluetoothStateLeft">왼손 상태</string>
     <string name="bluetoothStateRight">오른손 상태</string>
     <string name="reconnectLeft">Left</string>
+    <string name="left_paper">left_paper</string>
+    <string name="left_rock">left_rock</string>
+    <string name="right_paper">right_paper</string>
+    <string name="right_rock">right_rock</string>
 </resources>

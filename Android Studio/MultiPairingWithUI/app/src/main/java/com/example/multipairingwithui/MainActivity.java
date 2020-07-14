@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BroadcastReceiver mReceiver;
+    @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
     //--------Right Hand---------
     Button reconnectRight;
-
     TextView bluetoothStateRight;
     TextView rightEulerX;
     TextView rightEulerY;
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     TextView leftAccZ;
 
     BluetoothAdapter BA;
-
+    Button next;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         reconnectRight = (Button)findViewById(R.id.reconnectRight);
         reconnectLeft = (Button)findViewById(R.id.reconnectLeft);
-
+        next= (Button)findViewById(R.id.next);
         bluetoothStateRight = (TextView)findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = (TextView)findViewById(R.id.bluetoothStateLeft);
 
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         rightAccX = (TextView)findViewById(R.id.rightAccX);
         rightAccY = (TextView)findViewById(R.id.rightAccY);
         rightAccZ = (TextView)findViewById(R.id.rightAccZ);
-
 
         leftEulerX = (TextView)findViewById(R.id.leftEulerX);
         leftEulerY = (TextView)findViewById(R.id.leftEulerY);
@@ -127,6 +125,14 @@ public class MainActivity extends AppCompatActivity {
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), scalingActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void onStart() {
@@ -166,11 +172,6 @@ public class MainActivity extends AppCompatActivity {
             isService = false;
         }
     };
-
-    public String sendFlexData(){
-        String s = rightEulerX.getText().toString();
-        return s;
-    }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @SuppressLint("SetTextI18n")
