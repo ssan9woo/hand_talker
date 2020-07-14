@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BroadcastReceiver mReceiver;
+    @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
     //--------Right Hand---------
     Button reconnectRight;
-
     TextView bluetoothStateRight;
     TextView rightEulerX;
     TextView rightEulerY;
@@ -79,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         reconnectRight = (Button)findViewById(R.id.reconnectRight);
         reconnectLeft = (Button)findViewById(R.id.reconnectLeft);
         next= (Button)findViewById(R.id.next);
-
         bluetoothStateRight = (TextView)findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = (TextView)findViewById(R.id.bluetoothStateLeft);
 
@@ -89,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         rightAccX = (TextView)findViewById(R.id.rightAccX);
         rightAccY = (TextView)findViewById(R.id.rightAccY);
         rightAccZ = (TextView)findViewById(R.id.rightAccZ);
-
 
         leftEulerX = (TextView)findViewById(R.id.leftEulerX);
         leftEulerY = (TextView)findViewById(R.id.leftEulerY);
@@ -135,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
     public void onStart() {

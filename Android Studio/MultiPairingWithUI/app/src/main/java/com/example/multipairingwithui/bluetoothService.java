@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,9 +18,11 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import com.example.multipairingwithui.User;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,7 +36,7 @@ import java.util.UUID;
 public class bluetoothService extends Service {
     @SuppressLint("StaticFieldLeak")
     static public  Context mContext;
-    private BroadcastReceiver mReceiver;
+    bluetoothReceiver mReceiver;
     private Messenger mClient = null;
     static sign mThread= null;
     boolean IsConnect_right = false,
@@ -42,7 +45,7 @@ public class bluetoothService extends Service {
     static public int[] leftHand_Flex = new int[]{0, 0, 0, 0, 0};
     BluetoothAdapter BA;
     BluetoothDevice B_right,B_left;
-
+    public static User user;
     ConnectThread BC_right;
     ConnectThread BC_left;
 
@@ -52,12 +55,22 @@ public class bluetoothService extends Service {
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
+    public static final int LEFT =0;
+    public static final int RIGHT =1;
+    public static final int ROCK=0;
+    public static final int PAPER=1;
+    public static final String[] str_hand={"LEFT","RIGHT"};
+    public static final String[] str_rock_or_paper={"ROCK","PAPER"};
+    public static final String LEN_PREFIX = "Count_";
+    public static final String VAL_PREFIX = "IntValue_";
     public static final int DISCONNECT = 0;
     public static final int CONNECTING = 50;
     public static final int CONNECTED = 2;
     public static final int INPUTDATA = 9999;
 
-    private Messenger mClient2 = null;   // Activity 에서 가져온 Messenger
+    static SharedPreferences sharePref = null;
+    static SharedPreferences.Editor editor = null;
+
     IBinder mBinder = new MyBinder();
     @Nullable
     @Override
@@ -69,16 +82,6 @@ public class bluetoothService extends Service {
             return bluetoothService.this;
         }
     }
-    //수신값(현재 필요없음)
-    private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            if(msg.what == 1){
-                    mClient = msg.replyTo;
-            }
-            return false;
-        }
-    }));
 
     private void sendMsgToActivity(Message msg){
         try{
@@ -111,6 +114,7 @@ public class bluetoothService extends Service {
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate(){
         BA = BluetoothAdapter.getDefaultAdapter();
@@ -120,14 +124,35 @@ public class bluetoothService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(mReceiver,filter);
+
+        String SHARE_NAME = "SHARE_PREF";
+        sharePref = getSharedPreferences(SHARE_NAME,MODE_PRIVATE);
+        editor =sharePref.edit();
+
         mContext = this;
         mThread = new sign(mHandler);
         mThread.setDaemon(true);
         mThread.start();
 
+        user = new User();
+
+        user.Set_min(getUserdata(str_hand[0]+str_rock_or_paper[0]),str_hand[0]);
+        user.Set_max(getUserdata(str_hand[0]+str_rock_or_paper[1]),str_hand[0]);
+        //user.Set_min(getUserdata(str_hand[1]+str_rock_or_paper[0]),str_hand[1]);
+        //user.Set_max(getUserdata(str_hand[1]+str_rock_or_paper[1]),str_hand[1]);
+
         super.onCreate();
     }
 
+    public int[] getUserdata(String name){
+        int[] ret;
+        int count = sharePref.getInt(LEN_PREFIX + name, 0);
+        ret = new int[count];
+        for (int i = 0; i < count; i++){
+            ret[i] = sharePref.getInt(VAL_PREFIX+ name + i, i);
+        }
+        return ret;
+    }
 
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
@@ -281,7 +306,7 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-
+                    //System.out.println(s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -295,7 +320,6 @@ public class bluetoothService extends Service {
                     오른쪽 손 총 최소 길이 = 63
                     */
 
-                    //System.out.println(s);
                     if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==0 && s.length()>=63) || (bluetooth_index==1 && s.length()>=54)) {
                             if(Data.size() < 5){
@@ -318,25 +342,14 @@ public class bluetoothService extends Service {
             Message m = new Message();
             m.what = bluetooth_index;
             m.arg1 = arg;
-
-            sendMsgToActivity(m);
-        }
-
-        public void sendMessage(int arg, String s){
-            Message m = new Message();
-            //Message v = new Message();
-
-            m.what = bluetooth_index;
-            m.arg1 = arg;
-            m.obj = s;
             sendMsgToActivity(m);
         }
 
         void cancel(){
             is = false;
 
-            if(bluetooth_index == 0) IsConnect_right = is;
-            else IsConnect_left = is;
+            if(bluetooth_index == 0) IsConnect_right = false;
+            else IsConnect_left = false;
 
             if(in != null){
                 try {
@@ -367,9 +380,9 @@ public class bluetoothService extends Service {
         double E_left=0;
         double E_right_sum=0;
         double E_left_sum=0;
-        Deque<Double> deq_right = new ArrayDeque<Double>();
-        Deque<Double> deq_left = new ArrayDeque<Double>();
-
+        Deque<Double> deq_right = new ArrayDeque(5);
+        Deque<Double> deq_left = new ArrayDeque(5);
+        double a=0;
         LinkedList<LinkedList<Integer>> dtw_right = new LinkedList<>();
         LinkedList<LinkedList<Integer>> dtw_left = new LinkedList<>();
         sign(Handler handler){
@@ -381,11 +394,11 @@ public class bluetoothService extends Service {
         public void run() {
             Looper.prepare();
             bringHandler = new Handler(){
-                public void handleMessage(Message msg){
+                public void handleMessage(@NonNull Message msg){
                     String[] arr = ((String)msg.obj).split(",");
                     switch (msg.what){
                         case 0://Right hand
-                            for(int i=0; i< 14;i++){
+                            for(int i=0; i< arr.length;i++){
                                 if(i > 11){
                                     rightHand_Touch[i-12] = Boolean.parseBoolean(arr[i]);
                                 }
@@ -399,13 +412,15 @@ public class bluetoothService extends Service {
                                     rightHand_Gyro[i] = Double.parseDouble(arr[i]);
                                 }
                             }
-                            E_right=get_energy(rightHand_Acc,lastCoordinate_right);
-                            for(int i=0; i<3;i++)
-                                lastCoordinate_right=rightHand_Acc;
+                            E_right=get_energy(RIGHT);
                             deq_right.push(E_right);
                             E_right_sum+=E_right;
-                            if(deq_right.size()>5)
-                                E_right_sum-=deq_right.pollFirst();
+                            if(deq_right.size()>5){
+                                    E_right_sum-=deq_right.pollFirst();
+                            }
+
+
+
                             break;
                         case 1://Left hand
                             for(int i=0; i< arr.length;i++){
@@ -419,7 +434,7 @@ public class bluetoothService extends Service {
                                     leftHand_Gyro[i] = Double.parseDouble(arr[i]);
                                 }
                             }
-                            E_left=get_energy(leftHand_Acc,lastCoordinate_left);
+                            E_left=get_energy(LEFT);
                             for(int i=0; i<3;i++)
                                 lastCoordinate_left=leftHand_Acc;
                             deq_left.push(E_left);
@@ -438,9 +453,16 @@ public class bluetoothService extends Service {
             };
             Looper.loop();
         }
-        double get_energy(double[] Acc, double[] lastAcc){
+        double get_energy(int hand){
             double energy;
-            energy = Math.pow(Acc[0] - lastAcc[0],2) + Math.pow(Acc[1] - lastAcc[1],2) + Math.pow(Acc[2] - lastAcc[2],2) ;
+            if(hand==RIGHT) {
+                energy = Math.pow(rightHand_Acc[0] - lastCoordinate_right[0], 2) + Math.pow(rightHand_Acc[1] - lastCoordinate_right[1], 2) + Math.pow(rightHand_Acc[2] - lastCoordinate_right[2], 2);
+                System.arraycopy(rightHand_Acc,0,lastCoordinate_right,0,rightHand_Acc.length);
+            }
+            else{
+                energy = Math.pow(leftHand_Acc[0] - lastCoordinate_left[0], 2) + Math.pow(leftHand_Acc[1] - lastCoordinate_left[1], 2) + Math.pow(leftHand_Acc[2] - lastCoordinate_left[2], 2);
+                System.arraycopy(leftHand_Acc,0,lastCoordinate_left,0,leftHand_Acc.length);
+            }
             return energy;
         }
     }
@@ -450,5 +472,4 @@ public class bluetoothService extends Service {
     public int[] getLeftHand_Flex(){
         return leftHand_Flex;
     }
-
 }
