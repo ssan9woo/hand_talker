@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class bluetoothReceiver extends BroadcastReceiver {
     @Override
@@ -21,6 +22,7 @@ public class bluetoothReceiver extends BroadcastReceiver {
             if(device.getAddress().equals("00:18:91:D8:36:42"))
             {
                 ((bluetoothService) bluetoothService.mContext).disconnectLeft();
+                Log.d("ASd","ㅃㅆㅃㅆㅃㅆㅃㅆㅃㅆ");
             }
         }
     }

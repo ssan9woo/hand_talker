@@ -10,9 +10,10 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
-import com.example.multipairingwithui.bluetoothService.MyBinder;
 
 import java.util.Arrays;
 
@@ -20,7 +21,6 @@ public class scalingActivity extends AppCompatActivity {
 
     static SharedPreferences sharePref = null;
     static SharedPreferences.Editor editor = null;
-
     private bluetoothService ms;
     private boolean isService;
     @SuppressLint("CommitPrefEdits")
@@ -31,26 +31,24 @@ public class scalingActivity extends AppCompatActivity {
         String SHARE_NAME = "SHARE_PREF";
         sharePref = getSharedPreferences(SHARE_NAME,MODE_PRIVATE);
         editor =sharePref.edit();
-        bindService(new Intent(this, bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
         isService = true;
+
     }
 
     public void onDestroy(){
         if(isService)
         {
-            unbindService(conn);
             isService = false;
         }
-        stopService(new Intent(this,bluetoothService.class));
         super.onDestroy();
     }
+
 
     public void btnclick(View view){
         int id=view.getId();
         switch (id){
             case R.id.btn_left_rock :
                 save_flex_value(bluetoothService.LEFT,bluetoothService.ROCK,get_flex_value(bluetoothService.LEFT));
-                System.out.println(Arrays.toString(getUserdata("LEFTROCK")));
                 break;
             case R.id.btn_left_paper :
                 save_flex_value(bluetoothService.LEFT,bluetoothService.PAPER,get_flex_value(bluetoothService.LEFT));
@@ -72,34 +70,22 @@ public class scalingActivity extends AppCompatActivity {
         }
         return ret;
     }
-    private ServiceConnection conn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MyBinder mb = (MyBinder) iBinder;
-            ms = mb.getService();
-            Toast.makeText(getApplicationContext(), "Service Connected", Toast.LENGTH_LONG).show();
-            isService = true;
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            isService=false;
-        }
-    };
 
     public int[] get_flex_value(int id){
         int[] flex_value;
         switch (id){
             case bluetoothService.LEFT:
-                flex_value = ms.getLeftHand_Flex();
-                //System.out.println(Arrays.toString(flex_value));
+                flex_value = ((bluetoothService) bluetoothService.mContext).getLeftHand_Flex();
+                System.out.println(Arrays.toString(flex_value));
                 break;
             case bluetoothService.RIGHT:
-                flex_value =ms.getRightHand_Flex();
-                //System.out.println(Arrays.toString(flex_value));
+                flex_value = ((bluetoothService) bluetoothService.mContext).getRightHand_Flex();
+                System.out.println(Arrays.toString(flex_value));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + id);
         }
+
         return flex_value;
     }
     public void save_flex_value(int id, int rock_or_paper,int[] flex_values){

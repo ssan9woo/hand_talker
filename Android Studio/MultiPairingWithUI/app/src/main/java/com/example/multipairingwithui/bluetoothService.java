@@ -18,7 +18,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import com.example.multipairingwithui.User;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class bluetoothService extends Service {
     public static User user;
     ConnectThread BC_right;
     ConnectThread BC_left;
-
+    private Intent nextIntent;
     final String BMA_left = "00:18:91:D8:36:42" ;//Bluetooth0 MacAddress 자두이노 왼쪽
     final String BMA_right =  "00:18:E4:34:D4:8B"; //Bluetooth1 MacAddress 자두이노 오른쪽
 
@@ -59,6 +58,7 @@ public class bluetoothService extends Service {
     public static final int RIGHT =1;
     public static final int ROCK=0;
     public static final int PAPER=1;
+    public static final int BOTH=100;
     public static final String[] str_hand={"LEFT","RIGHT"};
     public static final String[] str_rock_or_paper={"ROCK","PAPER"};
     public static final String LEN_PREFIX = "Count_";
@@ -67,22 +67,28 @@ public class bluetoothService extends Service {
     public static final int CONNECTING = 50;
     public static final int CONNECTED = 2;
     public static final int INPUTDATA = 9999;
-
+    public static final int MSG_REGISTER_CLIENT = 1;
+    public static final int MSG_SEND_TO_ACTIVITY = 4;
     static SharedPreferences sharePref = null;
     static SharedPreferences.Editor editor = null;
 
-    IBinder mBinder = new MyBinder();
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-    class MyBinder extends Binder {
-        bluetoothService getService() { // 서비스 객체를 리턴
-            return bluetoothService.this;
-        }
+        return mMessenger.getBinder();
     }
 
+    private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClient = msg.replyTo;
+                    break;
+            }
+            return false;
+        }
+    }));
     private void sendMsgToActivity(Message msg){
         try{
             mClient.send(msg);
@@ -102,8 +108,8 @@ public class bluetoothService extends Service {
         }
     }
     public void disconnectLeft(){
-        //Message msg = Message.obtain(null,LEFT,DISCONNECT);
-        //sendMsgToActivity(msg);
+        Message msg = Message.obtain(null,LEFT,DISCONNECT);
+        sendMsgToActivity(msg);
         if(BC_left != null)
         {
             try {
@@ -112,11 +118,13 @@ public class bluetoothService extends Service {
                 e.printStackTrace();
             }
         }
+
     }
 
     @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate(){
+
         BA = BluetoothAdapter.getDefaultAdapter();
         B_right = BA.getRemoteDevice(BMA_right);
         B_left = BA.getRemoteDevice(BMA_left);
@@ -138,8 +146,9 @@ public class bluetoothService extends Service {
 
         user.Set_min(getUserdata(str_hand[LEFT]+str_rock_or_paper[ROCK]),str_hand[LEFT]);
         user.Set_max(getUserdata(str_hand[LEFT]+str_rock_or_paper[PAPER]),str_hand[LEFT]);
-        //user.Set_min(getUserdata(str_hand[RIGHT]+str_rock_or_paper[ROCK]),str_hand[RIGHT]);
-        //user.Set_max(getUserdata(str_hand[RIGHT]+str_rock_or_paper[PAPER]),str_hand[RIGHT]);
+        user.Set_min(getUserdata(str_hand[RIGHT]+str_rock_or_paper[ROCK]),str_hand[RIGHT]);
+        user.Set_max(getUserdata(str_hand[RIGHT]+str_rock_or_paper[PAPER]),str_hand[RIGHT]);
+
 
         super.onCreate();
     }
@@ -294,6 +303,10 @@ public class bluetoothService extends Service {
                 if(bluetooth_index == RIGHT) IsConnect_right = is;
                 else IsConnect_left = is;
                 sendMessage(CONNECTED);
+                if (IsConnect_left && IsConnect_right){
+                    Message a = Message.obtain(null,BOTH);
+                    sendMsgToActivity(a);
+                }
             } catch (IOException e) {
                 cancel();
             }
@@ -306,7 +319,7 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    System.out.println(s);
+                   // System.out.println(s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -319,8 +332,9 @@ public class bluetoothService extends Service {
                     오른쪽 손 총 최소 길이 = 67
                     */
 
-                    if(IsConnect_left || IsConnect_right){
-                        if((bluetooth_index==LEFT && s.length()>=58) || (bluetooth_index==RIGHT && s.length()>=54)) {
+                    if(IsConnect_left && IsConnect_right){
+
+                        if((bluetooth_index==LEFT && s.length()>=58) || (bluetooth_index==RIGHT && s.length()>=67)) {
                             if(Data.size() < 5){
                                 Data.add(s);
                             }
@@ -382,10 +396,10 @@ public class bluetoothService extends Service {
         double E_left_sum=0;
         double battery_left=0;
         double battery_right=0;
+
         Deque<Double> deq_right = new ArrayDeque(5);
         Deque<Double> deq_left = new ArrayDeque(5);
-        LinkedList<LinkedList<Integer>> dtw_right = new LinkedList<>();
-        LinkedList<LinkedList<Integer>> dtw_left = new LinkedList<>();
+
         sign(Handler handler){
             sendHandler = handler;
         }
@@ -400,8 +414,12 @@ public class bluetoothService extends Service {
 
                     switch (msg.what){
                         case RIGHT://Right hand
+                            //System.out.println((String)msg.obj);
                             for(int i=0; i< arr.length;i++){
-                                if(i > 11){
+                                if(i > 13){
+                                    battery_right=Double.parseDouble(arr[i]);
+                                }
+                                else if(i > 11){
                                     rightHand_Touch[i-12] = Boolean.parseBoolean(arr[i]);
                                 }
                                 else if(i > 5){
@@ -422,6 +440,7 @@ public class bluetoothService extends Service {
                             }
                             break;
                         case LEFT://Left hand
+                            //System.out.println((String)msg.obj);
                             for(int i=0; i< arr.length;i++){
                                 if(i>10){
                                     battery_left=Double.parseDouble(arr[i]);
