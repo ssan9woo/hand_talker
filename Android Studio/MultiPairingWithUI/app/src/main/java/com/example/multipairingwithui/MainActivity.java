@@ -27,11 +27,11 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
+    public static final int LEFT =0;
+    public static final int RIGHT =1;
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
-
-    private bluetoothService mService;
     TextView sangwoo;
 
     //--------Right Hand---------
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            if (msg.what == 0) {
+            if (msg.what == RIGHT) {
                 switch(msg.arg1)
                 {
                     case bluetoothService.DISCONNECT:
@@ -202,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
                             if(s.charAt(i) == ',')
                             {
                                 j += 1;
-                                continue;
                             }
                             else
                             {
@@ -218,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
             }
-            else if(msg.what == 1)
+            else if(msg.what == LEFT)
             {
                 switch(msg.arg1)
                 {
@@ -245,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
                             if(s.charAt(i) == ',')
                             {
                                 j += 1;
-                                continue;
                             }
                             else
                             {
