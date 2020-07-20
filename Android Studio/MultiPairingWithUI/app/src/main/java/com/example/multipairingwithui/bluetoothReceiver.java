@@ -13,12 +13,12 @@ public class bluetoothReceiver extends BroadcastReceiver {
         if(action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             assert device != null;
-            if(device.getName().equals("Right"))
+            if(device.getAddress().equals("00:18:E4:34:D4:8B"))
             {
                 ((bluetoothService) bluetoothService.mContext).disconnectRight();
             }
 
-            if(device.getName().equals("Left"))
+            if(device.getAddress().equals("00:18:91:D8:36:42"))
             {
                 ((bluetoothService) bluetoothService.mContext).disconnectLeft();
             }
