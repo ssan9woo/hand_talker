@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/bluetoothStateRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bluetoothStateRight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.79"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.615" />
+
+    <TextView
+        android:id="@+id/bluetoothStateLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bluetoothStateLeft"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.185"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.615" />
+
+    <Button
+        android:id="@+id/reconnectRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reconnectRight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.808"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.759" />
+
+    <Button
+        android:id="@+id/reconnectLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reconnectLeft"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/reconnectRight"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.759" />
+
+    <ImageView
+        android:id="@+id/leftRock"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.103"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453"
+        app:srcCompat="@drawable/rock" />
+
+    <ImageView
+        android:id="@+id/rightRock"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.892"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453"
+        app:srcCompat="@drawable/rock" />
+
+    <ImageView
+        android:id="@+id/leftPaper"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.103"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453"
+        app:srcCompat="@drawable/paper" />
+
+    <ImageView
+        android:id="@+id/rightPaper"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.892"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453"
+        app:srcCompat="@drawable/paper" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
