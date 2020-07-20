@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">Ebimu_Bluetooth</string>
-    <string name="button_send">데이터 송신</string>
-    <string name="questionReceive">수신 받은 데이터 :</string>
-    <string name="questionTransfer">송신할 데이터</string>
-    <string name="editText_send">데이터</string>
-    <string name="btnBtOn">블루투스on</string>
-    <string name="btnBtOff">블루투스off</string>
-</resources>
