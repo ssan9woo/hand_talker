@@ -7,7 +7,7 @@
     <string name="value0">TextView</string>
     <string name="reconnectRight">Right</string>
     <string name="BroadcastValue">value :</string>
-
+    <string name="signMessage">수화하세요</string>
 
     <string name="bluetoothStateLeft">왼손 상태</string>
     <string name="bluetoothStateRight">오른손 상태</string>
