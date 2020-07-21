@@ -39,22 +39,27 @@ void setup()
 } 
 void loop(){
    float vin = analogRead(0);
-    vin = (vin * 5.0) / 1024.0;
-   if(EBimuAsciiParser(axis_6,6)){
-       for(int i = 0; i < 5; i++){
-           flexData[i] = read_adc(i+1);
-           sprintf(leftHandFlex[i],"%d",flexData[i]);
-       }
-       Serial.println(" ");
-       //Ebimu casting
-       Serial.print("  6 axis : ");
-       for(int i = 0; i < 6; i++){   
-           dtostrf(axis_6[i],7,2,leftHandEbimu[i]);
-           Serial.print(axis_6[i]); Serial.print(" ");
-       }
-       Serial.println(" "); 
-       dtostrf(vin,7,2,vcc_buff);
-       //send Ebimu
+   vin = (vin * 5.0) / 1024.0;
+   int flag=1;
+   EBimuAsciiParser(axis_6,6);
+   if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
+   
+   for(int i = 0; i < 5; i++){
+       flexData[i] = read_adc(i+1);
+       sprintf(leftHandFlex[i],"%d",flexData[i]);
+   }
+       
+   Serial.println(" ");
+   //Ebimu casting
+   Serial.print("  6 axis : ");
+   for(int i = 0; i < 6; i++){   
+       dtostrf(axis_6[i],7,2,leftHandEbimu[i]);
+       Serial.print(axis_6[i]); Serial.print(" ");
+   }
+   Serial.println(" "); 
+   dtostrf(vin,7,2,vcc_buff);
+   //send Ebimu
+   if(flag){
        for(int i = 0; i < 6; i++){
            bluetooth.write(leftHandEbimu[i]);
            bluetooth.write(",");
@@ -65,11 +70,11 @@ void loop(){
            else if(i==4) bluetooth.write(leftHandFlex[3]);
            else          bluetooth.write(leftHandFlex[i]);
            bluetooth.write(",");
-
        } 
        bluetooth.write(vcc_buff);
        bluetooth.write("\n");
-    }
+   }
+    
 }
 
 int read_adc(int channel)
@@ -117,10 +122,6 @@ int EBimuAsciiParser(float *item, int number_of_item)
             {
                 item[i] = atof(addr);
                 addr = strtok(NULL,",");
-                if(item[3] >= 10 || item[4] >= 10 || item[5] >= 10)
-                {
-                    return 0;
-                }
             }
             result = 1;
         }

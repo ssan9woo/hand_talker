@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("create","여기는 크리에이트");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BA = BluetoothAdapter.getDefaultAdapter();

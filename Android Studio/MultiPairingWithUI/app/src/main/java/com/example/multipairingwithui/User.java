@@ -35,8 +35,8 @@ public class User {
                 break;
         }
     }
-    public double Get_scaled_data(int flex_value,int idx,String hand){
-        double ret=0.00;
+    public int Get_scaled_data(int flex_value,int idx,String hand){
+        double ret=0.0;
         switch (hand) {
             case "LEFT":
                 ret = (double) (flex_value - this.left_min[idx]) / (this.left_max[idx] - this.left_min[idx]);
@@ -45,6 +45,6 @@ public class User {
                 ret = (double) (flex_value - this.right_min[idx]) / (this.right_max[idx] - this.right_min[idx]);
                 break;
         }
-        return ret;
+        return (int) Math.round(ret*10);
     }
 }

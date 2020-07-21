@@ -22,7 +22,6 @@ public class bluetoothReceiver extends BroadcastReceiver {
             if(device.getAddress().equals("00:18:91:D8:36:42"))
             {
                 ((bluetoothService) bluetoothService.mContext).disconnectLeft();
-                Log.d("ASd","ㅃㅆㅃㅆㅃㅆㅃㅆㅃㅆ");
             }
         }
     }

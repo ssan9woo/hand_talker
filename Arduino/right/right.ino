@@ -48,24 +48,26 @@ void loop()
    vin = (vin * 5.0) / 1024.0;
    capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
    capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
-
-   if(EBimuAsciiParser(axis_6,6)){
-       for(int i = 0; i < 6; i++){
-           flexData[i] = read_adc(i+3);
-           if(i==5)flexData[i]=3000;
-           sprintf(rightHandFlex[i],"%d",flexData[i]);
-           Serial.print("  Flex" + String(i+1) + ":  "); Serial.println(flexData[i],DEC);
-       }
-       Serial.println(" ");
-       //Ebimu casting
-       Serial.print("  6 axis : ");
-       for(int i = 0; i < 6; i++){   
-           dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
-           Serial.print(axis_6[i]); Serial.println(" ");
-       }
-       Serial.println(" ");  
-       dtostrf(vin,7,2,vcc_buff);    
-       //send Ebimu
+   int flag = 1;
+   
+   if(EBimuAsciiParser(axis_6,6))
+   if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
+   
+   for(int i = 0; i < 6; i++){
+       flexData[i] = read_adc(i+3);
+       if(i==5)flexData[i]=3000;
+       sprintf(rightHandFlex[i],"%d",flexData[i]);
+   }
+   //Ebimu casting
+   Serial.print("  6 axis : ");
+   for(int i = 0; i < 6; i++){   
+       dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
+       Serial.print(axis_6[i]); Serial.print(" ");
+   }
+   Serial.println(" ");  
+   dtostrf(vin,7,2,vcc_buff);    
+   //send Ebimu
+   if(flag){
        for(int i = 0; i < 6; i++){
            bluetooth.write(rightHandEbimu[i]);
            bluetooth.write(",");
@@ -95,7 +97,6 @@ void loop()
        bluetooth.write(",");
        bluetooth.write(vcc_buff);
        bluetooth.write("\n");
-       
     }
 }
 
@@ -144,10 +145,6 @@ int EBimuAsciiParser(float *item, int number_of_item)
             {
                 item[i] = atof(addr);
                 addr = strtok(NULL,",");
-                if(item[3] >= 10 || item[4] >= 10 || item[5] >= 10)
-                {
-                    return 0;
-                }
             }
             result = 1;
         }
