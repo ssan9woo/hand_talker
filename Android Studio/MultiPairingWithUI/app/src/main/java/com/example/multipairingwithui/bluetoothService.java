@@ -346,9 +346,9 @@ public class bluetoothService extends Service {
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 67
                     */
-                    if(IsConnect_left || IsConnect_right){
-
+                    if(IsConnect_left && IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
+
                             if(Data.size() < 5){
                                 Data.add(s);
                             }
@@ -361,7 +361,6 @@ public class bluetoothService extends Service {
                             }
                         }
                     }
-
                 } catch (IOException ignored) { }
             }
         }

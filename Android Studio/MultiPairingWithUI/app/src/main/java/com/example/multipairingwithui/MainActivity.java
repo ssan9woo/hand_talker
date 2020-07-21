@@ -17,6 +17,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,10 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int LEFT =0;
     public static final int RIGHT =1;
     public static final int BOTH =100;
-    String LEFT_STATE="LEFT_STATE";
-    String RIGHT_STATE="RIGHT_STATE";
-    int left_onoff=0;
-    int  right_onoff=0;
+
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
@@ -40,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView leftPaper;
     ImageView rightRock;
     ImageView rightPaper;
+    ImageView signImage;
 
     //--------Right Hand---------
     Button reconnectRight;
@@ -49,8 +49,13 @@ public class MainActivity extends AppCompatActivity {
     Button reconnectLeft;
     TextView bluetoothStateLeft;
 
+    //animation
+    Animation fadeOutAnimation;
+    Animation fadeInAnimation;
+    TextView signMessage;
+
     BluetoothAdapter BA;
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,10 +69,16 @@ public class MainActivity extends AppCompatActivity {
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
-        rightPaper = findViewById(R.id.rightPaper);
-
+        rightPaper = findViewById(R.id.leftPaper);
         rightPaper.setVisibility(View.INVISIBLE);
         leftPaper.setVisibility(View.INVISIBLE);
+
+
+        signImage = findViewById(R.id.signImage);
+        signImage.setVisibility(View.INVISIBLE);
+        signMessage = findViewById(R.id.signMessage);
+        signMessage.setVisibility(View.INVISIBLE);
+
         //----------------------Find VIEW---------------------------------//
         reconnectRight = findViewById(R.id.reconnectRight);
         reconnectLeft = findViewById(R.id.reconnectLeft);
@@ -88,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
-
+        fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
+        fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
     }
 
     public void onStart() {
@@ -138,13 +150,11 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateRight.setText("오른손 연결끊김");
                         rightRock.setVisibility(View.VISIBLE);
                         rightPaper.setVisibility(View.INVISIBLE);
-                        right_onoff=0;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
                         rightRock.setVisibility(View.INVISIBLE);
                         rightPaper.setVisibility(View.VISIBLE);
-                        right_onoff=1;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
@@ -159,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         leftRock.setVisibility(View.VISIBLE);
                         leftPaper.setVisibility(View.INVISIBLE);
-                        left_onoff=0;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateLeft.setText("왼손 연결중");
@@ -168,24 +177,30 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateLeft.setText("왼손 연결됨");
                         leftRock.setVisibility(View.INVISIBLE);
                         leftPaper.setVisibility(View.VISIBLE);
-                        left_onoff=1;
                         break;
                 }
             }
             else if(msg.what == BOTH)
             {
-                leftRock.setVisibility(View.INVISIBLE);
-                rightRock.setVisibility(View.INVISIBLE);
-                leftPaper.setVisibility(View.INVISIBLE);
-                rightPaper.setVisibility(View.INVISIBLE);
                 bluetoothStateLeft.setVisibility(View.INVISIBLE);
                 bluetoothStateRight.setVisibility(View.INVISIBLE);
                 reconnectLeft.setVisibility(View.INVISIBLE);
                 reconnectRight.setVisibility(View.INVISIBLE);
 
-                //수화하세요 이모티콘 올리기
-            }
+                //animation
+                rightPaper.startAnimation(fadeOutAnimation);
+                leftPaper.startAnimation(fadeOutAnimation);
+                signImage.startAnimation(fadeInAnimation);
+                signMessage.startAnimation(fadeInAnimation);
 
+                Handler mHandler = new Handler();
+                mHandler.postDelayed(new Runnable()  {
+                    public void run() {
+                        signImage.startAnimation(fadeOutAnimation);
+                        signMessage.startAnimation(fadeOutAnimation);
+                    }
+                }, 500); // 0.5초후
+            }
             return false;
         }
     }));
