@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -19,18 +20,22 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.UUID;
 public class bluetoothService extends Service {
     @SuppressLint("StaticFieldLeak")
@@ -52,6 +57,7 @@ public class bluetoothService extends Service {
     final String BMA_right =  "00:18:E4:34:D4:8B"; //Bluetooth1 MacAddress 자두이노 오른쪽
 
     final String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB"; //SPP UUID
+
     final UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
     public static final int LEFT =0;
@@ -185,7 +191,6 @@ public class bluetoothService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("BT SERVICE", "SERVICE STARTED");
         if(!IsConnect_right)
         {
             BC_right = new ConnectThread(B_right,RIGHT);
@@ -219,6 +224,16 @@ public class bluetoothService extends Service {
         }
         super.onDestroy();
     }
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
+            throws IOException {
+        try {
+            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
+            return (BluetoothSocket) ((Method) m).invoke(device, SPP_UUID);
+        } catch (Exception e) {
+            Log.e("ERROR", "Could not create Insecure RFComm Connection",e);
+        }
+        return device.createRfcommSocketToServiceRecord(SPP_UUID);
+    }
 
     class ConnectThread extends Thread{
 
@@ -251,7 +266,8 @@ public class bluetoothService extends Service {
                     sendMsgToActivity(msg);
                 }
 
-                BS = BD.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+                //BS = BD.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+                BS=createBluetoothSocket(BD);
                 BS.connect();
 
                 connectedThread = new ConnectedThread(BS, bluetooth_index);
@@ -319,7 +335,6 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                   // System.out.println(s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -331,9 +346,9 @@ public class bluetoothService extends Service {
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 67
                     */
-
                     if(IsConnect_left && IsConnect_right){
-                        if((bluetooth_index==LEFT && s.length()>=58) || (bluetooth_index==RIGHT && s.length()>=67)) {
+                        if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
+
                             if(Data.size() < 5){
                                 Data.add(s);
                             }
@@ -390,13 +405,13 @@ public class bluetoothService extends Service {
 
         double E_right=0.0;
         double E_left=0;
-        double E_right_sum=0;
-        double E_left_sum=0;
+        Double E_right_sum=0.0;
+        Double E_left_sum=0.0;
         double battery_left=0;
         double battery_right=0;
+        Queue<Double> leftenergy_q = new LinkedList<>();
+        Queue<Double> rightenergy_q = new LinkedList<>();
 
-        Deque<Double> deq_right = new ArrayDeque(5);
-        Deque<Double> deq_left = new ArrayDeque(5);
 
         sign(Handler handler){
             sendHandler = handler;
@@ -407,12 +422,11 @@ public class bluetoothService extends Service {
         public void run() {
             Looper.prepare();
             bringHandler = new Handler(){
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 public void handleMessage(@NonNull Message msg){
                     String[] arr = ((String)msg.obj).split(",");
-
                     switch (msg.what){
                         case RIGHT://Right hand
-                            //System.out.println((String)msg.obj);
                             for(int i=0; i< arr.length;i++){
                                 if(i > 13){
                                     battery_right=Double.parseDouble(arr[i]);
@@ -421,7 +435,7 @@ public class bluetoothService extends Service {
                                     rightHand_Touch[i-12] = Boolean.parseBoolean(arr[i]);
                                 }
                                 else if(i > 5){
-                                    rightHand_Flex[i-6] = Integer.parseInt(arr[i]);
+                                    rightHand_Flex[i-6] = user.Get_scaled_data(Integer.parseInt(arr[i]),i-6,"RIGHT");
                                 }
                                 else if(i > 2){
                                     rightHand_Acc[i-3] = Double.parseDouble(arr[i]) * 5.0;
@@ -431,20 +445,20 @@ public class bluetoothService extends Service {
                                 }
                             }
                             E_right=get_energy(RIGHT);
-                            deq_right.push(E_right);
                             E_right_sum+=E_right;
-                            if(deq_right.size()>5){
-                                E_right_sum-=deq_right.pollFirst();
+                            rightenergy_q.offer(E_right);
+                            if (rightenergy_q.size()>5){
+                                    E_right_sum-=rightenergy_q.poll();
                             }
+                            Log.d("right energy",String.valueOf(E_right_sum));
                             break;
                         case LEFT://Left hand
-                            //System.out.println((String)msg.obj);
                             for(int i=0; i< arr.length;i++){
                                 if(i>10){
                                     battery_left=Double.parseDouble(arr[i]);
                                 }
                                 else if(i>5){
-                                    leftHand_Flex[i-6] = Integer.parseInt(arr[i]);
+                                    leftHand_Flex[i-6] = user.Get_scaled_data(Integer.parseInt(arr[i]),i-6,"LEFT");
                                 }
                                 else if(i>2){
                                     leftHand_Acc[i-3] = Double.parseDouble(arr[i]) * 5.0;
@@ -454,17 +468,16 @@ public class bluetoothService extends Service {
                                 }
                             }
                             E_left=get_energy(LEFT);
-                            deq_left.push(E_left);
                             E_left_sum+=E_left;
-                            //Log.d("left_energy",Double.toString(E_left_sum));
-                            if(deq_left.size()>5)
-                                E_left_sum-=deq_left.pollFirst();
-                            //Log.d("left_energy",Double.toString(E_left_sum));
+                            leftenergy_q.offer(E_left);
+                            if (leftenergy_q.size()>5){
+                                E_left_sum-=leftenergy_q.poll();
+                            }
+                            Log.d("leftEnergy",String.valueOf(E_left_sum));
                             break;
                         default:
                             break;
                     }
-
                 }
             };
             Looper.loop();
@@ -476,7 +489,7 @@ public class bluetoothService extends Service {
                 System.arraycopy(rightHand_Acc,0,lastCoordinate_right,0,rightHand_Acc.length);
             }
             else{
-                energy = Math.pow(leftHand_Acc[0], 2) + Math.pow(leftHand_Acc[1], 2) + Math.pow(leftHand_Acc[2], 2);
+                energy = Math.pow(leftHand_Acc[0] - lastCoordinate_left[0], 2) + Math.pow(leftHand_Acc[1] - lastCoordinate_left[1], 2) + Math.pow(leftHand_Acc[2] - lastCoordinate_left[2], 2);
                 System.arraycopy(leftHand_Acc,0,lastCoordinate_left,0,leftHand_Acc.length);
             }
             return energy;
