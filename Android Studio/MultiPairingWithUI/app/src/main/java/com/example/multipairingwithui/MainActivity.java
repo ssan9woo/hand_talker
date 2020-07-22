@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     //animation
     Animation fadeOutAnimation;
     Animation fadeInAnimation;
+    Animation clearAnimation;
     TextView signMessage;
 
     BluetoothAdapter BA;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         });
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
+        clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.clear);
     }
 
     public void onStart() {
@@ -138,7 +140,9 @@ public class MainActivity extends AppCompatActivity {
             isService = false;
         }
     };
-
+    //초기상태 [왼손 상태 -> 왼손 연결중, Handler로 5초뒤에 연결됨 아닐시 연결 안된것으로 판단, 연결끊킴으로 넘어가기]
+    //방법1. 5초뒤에 연결됨 아닐시에 service에서 sendMessage하는 함수 호출
+    //sendMessage -> mainActivity로 disconnect 보내기
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @SuppressLint("SetTextI18n")
         @Override
@@ -148,11 +152,13 @@ public class MainActivity extends AppCompatActivity {
                 {
                     case bluetoothService.DISCONNECT:
                         bluetoothStateRight.setText("오른손 연결끊김");
-                        rightRock.setVisibility(View.VISIBLE);
                         rightPaper.setVisibility(View.INVISIBLE);
+                        rightRock.setVisibility(View.VISIBLE);
+                        reconnectRight.setVisibility(View.VISIBLE);
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
+                        reconnectRight.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.INVISIBLE);
                         rightPaper.setVisibility(View.VISIBLE);
                         break;
@@ -167,16 +173,18 @@ public class MainActivity extends AppCompatActivity {
                 {
                     case bluetoothService.DISCONNECT:
                         bluetoothStateLeft.setText("왼손 연결끊김");
-                        leftRock.setVisibility(View.VISIBLE);
                         leftPaper.setVisibility(View.INVISIBLE);
-                        break;
-                    case bluetoothService.CONNECTING:
-                        bluetoothStateLeft.setText("왼손 연결중");
+                        leftRock.setVisibility(View.VISIBLE);
+                        reconnectLeft.setVisibility(View.VISIBLE);
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateLeft.setText("왼손 연결됨");
+                        reconnectLeft.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.INVISIBLE);
                         leftPaper.setVisibility(View.VISIBLE);
+                        break;
+                    case bluetoothService.CONNECTING:
+                        bluetoothStateLeft.setText("왼손 연결중");
                         break;
                 }
             }
@@ -191,11 +199,12 @@ public class MainActivity extends AppCompatActivity {
                 rightPaper.startAnimation(fadeOutAnimation);
                 leftPaper.startAnimation(fadeOutAnimation);
                 signImage.startAnimation(fadeInAnimation);
-                signMessage.startAnimation(fadeInAnimation);
 
                 Handler mHandler = new Handler();
                 mHandler.postDelayed(new Runnable()  {
                     public void run() {
+                        rightPaper.startAnimation(clearAnimation);
+                        leftPaper.startAnimation(clearAnimation);
                         signImage.startAnimation(fadeOutAnimation);
                         signMessage.startAnimation(fadeOutAnimation);
                     }
