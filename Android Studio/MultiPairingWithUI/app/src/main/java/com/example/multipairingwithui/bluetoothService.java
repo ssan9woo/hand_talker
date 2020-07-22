@@ -145,7 +145,7 @@ public class bluetoothService extends Service {
 
         mContext = this;
         mThread = new sign(mHandler);
-        mThread.setDaemon(true);
+        //mThread.setDaemon(true);
         mThread.start();
 
         user = new User();
@@ -155,6 +155,18 @@ public class bluetoothService extends Service {
         user.Set_min(getUserdata(str_hand[RIGHT]+str_rock_or_paper[ROCK]),str_hand[RIGHT]);
         user.Set_max(getUserdata(str_hand[RIGHT]+str_rock_or_paper[PAPER]),str_hand[RIGHT]);
 
+
+
+        if(!IsConnect_right)
+        {
+            BC_right = new ConnectThread(B_right,RIGHT);
+            BC_right.start();
+        }
+        if(!IsConnect_left)
+        {
+            BC_left = new ConnectThread(B_left,LEFT);
+            BC_left.start();
+        }
 
         super.onCreate();
     }
@@ -190,38 +202,19 @@ public class bluetoothService extends Service {
         }
     }
 
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!IsConnect_right)
-        {
-            BC_right = new ConnectThread(B_right,RIGHT);
-            BC_right.start();
-        }
-        if(!IsConnect_left)
-        {
-            BC_left = new ConnectThread(B_left,LEFT);
-            BC_left.start();
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
 
     public void onDestroy(){
 
-        if(BC_right != null)
-        {
             try {
                 BC_right.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        if(BC_left != null)
-        {
             try {
                 BC_left.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
         super.onDestroy();
     }
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
@@ -286,7 +279,7 @@ public class bluetoothService extends Service {
         }
 
         void cancel() throws IOException {
-
+            System.out.println("cancel");
             if(connectedThread != null){
                 connectedThread.cancel();
             }
@@ -331,10 +324,10 @@ public class bluetoothService extends Service {
         @Override
         public void run() {
             BufferedReader Buffer_in = new BufferedReader(new InputStreamReader(in));
-
             while (is){
                 try {
                     String s = Buffer_in.readLine();
+                    //Log.d("nuff",s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -451,7 +444,7 @@ public class bluetoothService extends Service {
                             if (rightenergy_q.size()>5){
                                     E_right_sum-=rightenergy_q.poll();
                             }
-                            Log.d("right energy",String.valueOf(E_right_sum));
+                            //Log.d("right energy",String.valueOf(E_right_sum));
                             break;
                         case LEFT://Left hand
                             for(int i=0; i< arr.length;i++){
@@ -474,7 +467,7 @@ public class bluetoothService extends Service {
                             if (leftenergy_q.size()>5){
                                 E_left_sum-=leftenergy_q.poll();
                             }
-                            Log.d("leftEnergy",String.valueOf(E_left_sum));
+                            //Log.d("leftEnergy",String.valueOf(E_left_sum));
                             break;
                         default:
                             break;
