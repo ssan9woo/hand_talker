@@ -56,52 +56,76 @@
         app:layout_constraintVertical_bias="0.759" />
 
     <ImageView
-        android:id="@+id/leftRock"
-        android:layout_width="150dp"
+        android:id="@+id/rightPaper"
+        android:layout_width="165dp"
         android:layout_height="160dp"
+        android:src="@drawable/left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.103"
+        app:layout_constraintHorizontal_bias="0.934"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.453"
-        app:srcCompat="@drawable/rock" />
+        app:layout_constraintVertical_bias="0.453" />
 
     <ImageView
         android:id="@+id/rightRock"
-        android:layout_width="150dp"
+        android:layout_width="165dp"
         android:layout_height="160dp"
+        android:src="@drawable/rock2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.892"
+        app:layout_constraintHorizontal_bias="0.934"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.453"
-        app:srcCompat="@drawable/rock" />
+        app:layout_constraintVertical_bias="0.453" />
+
+    <ImageView
+        android:id="@+id/leftRock"
+        android:layout_width="165dp"
+        android:layout_height="160dp"
+        android:src="@drawable/rock1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.065"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453" />
 
     <ImageView
         android:id="@+id/leftPaper"
-        android:layout_width="150dp"
+        android:layout_width="165dp"
         android:layout_height="160dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.103"
+        app:layout_constraintHorizontal_bias="0.065"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.453"
-        app:srcCompat="@drawable/paper" />
+        app:srcCompat="@drawable/nnn" />
 
     <ImageView
-        android:id="@+id/rightPaper"
-        android:layout_width="150dp"
-        android:layout_height="160dp"
+        android:id="@+id/signImage"
+        android:layout_width="312dp"
+        android:layout_height="241dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.892"
+        app:layout_constraintHorizontal_bias="0.525"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.453"
-        app:srcCompat="@drawable/paper" />
+        app:layout_constraintVertical_bias="0.44"
+        app:srcCompat="@drawable/sign" />
+
+    <TextView
+        android:id="@+id/signMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="수화하세요"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.476"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.667" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
