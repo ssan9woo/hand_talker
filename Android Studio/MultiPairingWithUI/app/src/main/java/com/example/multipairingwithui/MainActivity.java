@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
-        rightPaper = findViewById(R.id.leftPaper);
+        rightPaper = findViewById(R.id.rightPaper);
         rightPaper.setVisibility(View.INVISIBLE);
         leftPaper.setVisibility(View.INVISIBLE);
 

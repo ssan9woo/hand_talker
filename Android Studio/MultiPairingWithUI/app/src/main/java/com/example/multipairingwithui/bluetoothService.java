@@ -158,7 +158,10 @@ public class bluetoothService extends Service {
 
         super.onCreate();
     }
-
+    public int getVcc(){
+        int a = 0;
+        return a;
+    }
     public int[] getUserdata(String name){
         int[] ret;
         int count = sharePref.getInt(LEN_PREFIX + name, 0);
@@ -348,7 +351,6 @@ public class bluetoothService extends Service {
                     */
                     if(IsConnect_left && IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
-
                             if(Data.size() < 5){
                                 Data.add(s);
                             }

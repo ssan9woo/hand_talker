@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.util.Arrays;
 
+@SuppressLint("Registered")
 public class scalingActivity extends AppCompatActivity {
 
     static SharedPreferences sharePref = null;
