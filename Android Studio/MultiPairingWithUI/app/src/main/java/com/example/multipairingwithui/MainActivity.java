@@ -69,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
-        rightPaper = findViewById(R.id.leftPaper);
+        rightPaper = findViewById(R.id.rightPaper);
+
         rightPaper.setVisibility(View.INVISIBLE);
         leftPaper.setVisibility(View.INVISIBLE);
 
@@ -150,11 +151,15 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateRight.setText("오른손 연결끊김");
                         rightRock.setVisibility(View.VISIBLE);
                         rightPaper.setVisibility(View.INVISIBLE);
+                        reconnectRight.setVisibility(View.VISIBLE);
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
                         rightRock.setVisibility(View.INVISIBLE);
+                        rightPaper.setImageResource(R.drawable.nnn);
+
                         rightPaper.setVisibility(View.VISIBLE);
+
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
@@ -169,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         leftRock.setVisibility(View.VISIBLE);
                         leftPaper.setVisibility(View.INVISIBLE);
+                        reconnectLeft.setVisibility(View.VISIBLE);
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateLeft.setText("왼손 연결중");
@@ -176,7 +182,9 @@ public class MainActivity extends AppCompatActivity {
                     case bluetoothService.CONNECTED:
                         bluetoothStateLeft.setText("왼손 연결됨");
                         leftRock.setVisibility(View.INVISIBLE);
+                        leftPaper.setImageResource(R.drawable.left);
                         leftPaper.setVisibility(View.VISIBLE);
+
                         break;
                 }
             }
@@ -190,16 +198,16 @@ public class MainActivity extends AppCompatActivity {
                 //animation
                 rightPaper.startAnimation(fadeOutAnimation);
                 leftPaper.startAnimation(fadeOutAnimation);
-                signImage.startAnimation(fadeInAnimation);
-                signMessage.startAnimation(fadeInAnimation);
-
+                //딜레이
                 Handler mHandler = new Handler();
                 mHandler.postDelayed(new Runnable()  {
                     public void run() {
                         signImage.startAnimation(fadeOutAnimation);
                         signMessage.startAnimation(fadeOutAnimation);
+
                     }
-                }, 500); // 0.5초후
+                }, 3000); // 0.5초후
+
             }
             return false;
         }
