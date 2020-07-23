@@ -43,18 +43,19 @@ void loop(){
    int flag=1;
    EBimuAsciiParser(axis_6,6);
    if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
-   
    for(int i = 0; i < 5; i++){
        flexData[i] = read_adc(i+1);
        sprintf(leftHandFlex[i],"%d",flexData[i]);
+       Serial.print(flexData[i]); Serial.print(" ");
+       if(flexData[i]<1000) flag=0;
    }
-       
-   Serial.println(" ");
+   
    //Ebimu casting
    Serial.print("  6 axis : ");
    for(int i = 0; i < 6; i++){   
        dtostrf(axis_6[i],7,2,leftHandEbimu[i]);
-       Serial.print(axis_6[i]); Serial.print(" ");
+       //Serial.print(axis_6[i]); Serial.print(" ");
+       if(axis_6[i]<-180 || axis_6[i]>180) flag=0;
    }
    Serial.println(" "); 
    dtostrf(vin,7,2,vcc_buff);
