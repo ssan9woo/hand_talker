@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.drm.DrmStore;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -42,6 +43,8 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 public class bluetoothService extends Service {
     @SuppressLint("StaticFieldLeak")
     static public  Context mContext;
+    public String voltLeft = "";
+    public String voltRight = "";
     bluetoothReceiver mReceiver;
     private Messenger mClient = null;
     static sign mThread= null;
@@ -224,6 +227,14 @@ public class bluetoothService extends Service {
         return device.createRfcommSocketToServiceRecord(SPP_UUID);
     }
 
+    public String GetVoltLeft(){
+        return voltLeft;
+    }
+
+    public String GetVoltRight(){
+        return voltRight;
+    }
+
     class ConnectThread extends Thread{
 
         BluetoothDevice BD;
@@ -323,6 +334,13 @@ public class bluetoothService extends Service {
                     */
                     if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
+                            String[] parameter = s.split(",");
+                            if(bluetooth_index == LEFT)
+                                voltLeft = parameter[parameter.length -1];
+                            if(bluetooth_index == RIGHT)
+                                voltRight = parameter[parameter.length-1];
+
+
                             if(Data.size() < 5){
                                 Data.add(s);
                             }

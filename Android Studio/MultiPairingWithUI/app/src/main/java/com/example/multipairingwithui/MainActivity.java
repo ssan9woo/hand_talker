@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int LEFT =0;
@@ -34,12 +37,15 @@ public class MainActivity extends AppCompatActivity {
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
+    //Timer
+    private TimerTask Task;
+    private Timer Timer;
 
     ImageView leftRock;
     ImageView leftPaper;
     ImageView rightRock;
     ImageView rightPaper;
-    ImageView signImage;
+    ImageView signImage,batHighRight,batHighLeft,batMiddleRight,batMiddleLeft,batLowRight,batLowLeft;
 
     //--------Right Hand---------
     Button reconnectRight;
@@ -66,6 +72,13 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i,5000);
         }
+        //battery
+        batHighLeft = findViewById(R.id.batHighLeft);
+        batHighRight = findViewById(R.id.batHighRight);
+        batMiddleLeft = findViewById(R.id.batMiddleLeft);
+        batMiddleRight = findViewById(R.id.batMiddleRight);
+        batLowLeft = findViewById(R.id.batLowLeft2);
+        batLowRight = findViewById(R.id.batLowRight);
 
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
@@ -103,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
         clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.clear);
+
+
     }
 
     public void onStart() {
@@ -190,6 +205,52 @@ public class MainActivity extends AppCompatActivity {
             }
             else if(msg.what == BOTH)
             {
+                Task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        String voltRight = ((bluetoothService) bluetoothService.mContext).voltRight;
+                        String voltLeft = ((bluetoothService) bluetoothService.mContext).voltLeft;
+
+                        if (voltRight.equals("") && voltLeft.equals("")) {
+
+                            double l_volt = Double.parseDouble(voltLeft) * 20.0;
+                            double r_volt = Double.parseDouble(voltRight) * 20.0;
+
+                            if (l_volt >= 0 && l_volt <= 30) {
+                                batLowLeft.setVisibility(View.VISIBLE);
+                                batMiddleLeft.setVisibility(View.INVISIBLE);
+                                batHighLeft.setVisibility(View.INVISIBLE);
+                            } else if (l_volt > 30 && l_volt <= 60) {
+                                batLowLeft.setVisibility(View.INVISIBLE);
+                                batMiddleLeft.setVisibility(View.VISIBLE);
+                                batHighLeft.setVisibility(View.INVISIBLE);
+                            } else if (l_volt > 60 && l_volt <= 100) {
+                                batLowLeft.setVisibility(View.INVISIBLE);
+                                batMiddleLeft.setVisibility(View.INVISIBLE);
+                                batHighLeft.setVisibility(View.VISIBLE);
+                            }
+
+                            //right
+                            if (r_volt >= 0 && r_volt <= 30) {
+                                batLowRight.setVisibility(View.VISIBLE);
+                                batMiddleRight.setVisibility(View.INVISIBLE);
+                                batHighRight.setVisibility(View.INVISIBLE);
+                            } else if (r_volt > 30 && r_volt <= 60) {
+                                batLowRight.setVisibility(View.INVISIBLE);
+                                batMiddleRight.setVisibility(View.VISIBLE);
+                                batHighRight.setVisibility(View.INVISIBLE);
+                            } else if (r_volt > 60 && r_volt <= 100) {
+                                batLowRight.setVisibility(View.INVISIBLE);
+                                batMiddleRight.setVisibility(View.INVISIBLE);
+                                batHighRight.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                };
+                Timer = new Timer();
+                Timer.schedule(Task,0,10000);
+
+
                 bluetoothStateLeft.setVisibility(View.INVISIBLE);
                 bluetoothStateRight.setVisibility(View.INVISIBLE);
                 reconnectLeft.setVisibility(View.INVISIBLE);
