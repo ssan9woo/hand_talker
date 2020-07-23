@@ -208,8 +208,8 @@ public class MainActivity extends AppCompatActivity {
                 Task = new TimerTask() {
                     @Override
                     public void run() {
-                        String voltRight = ((bluetoothService) bluetoothService.mContext).voltRight;
-                        String voltLeft = ((bluetoothService) bluetoothService.mContext).voltLeft;
+                        String voltRight = ((bluetoothService) bluetoothService.mContext).GetVoltRight();
+                        String voltLeft = ((bluetoothService) bluetoothService.mContext).GetVoltLeft();
 
                         if (voltRight.equals("") && voltLeft.equals("")) {
 
