@@ -66,9 +66,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         for(int i=0;i <str_CONSONANT.length;i++){
             if(PreferenceManager.IskeyinPref(consonant+str_CONSONANT[i],mContext)){
                 list_consonant.add(str_CONSONANT[i]);
-                Log.d("Exs",str_CONSONANT[i]);
             }
-            Log.d("NO",str_CONSONANT[i]);
         }
         for(int i=0;i<str_VOWEL.length;i++){
             if(PreferenceManager.IskeyinPref(vowel+str_VOWEL[i],mContext)){
@@ -182,7 +180,6 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             return false;
         }
     }));
-
     public void onDestory(){
         if(isService)
         {
