@@ -165,6 +165,20 @@ public class bluetoothService extends Service {
 
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
+        super.onCreate();
+    }
+    public int getVcc(){
+        int a = 0;
+        return a;
+    }
+    public int[] getUserdata(String name){
+        int[] ret;
+        int count = sharePref.getInt(LEN_PREFIX + name, 0);
+        ret = new int[count];
+        for (int i = 0; i < count; i++){
+            ret[i] = sharePref.getInt(VAL_PREFIX+ name + i, i);
+        }
+        return ret;
     }
 
     @SuppressLint("HandlerLeak")
