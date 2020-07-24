@@ -20,7 +20,6 @@ char rightHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
 char sbuf[SBUF_SIZE];
 signed int sbuf_cnt=0;
-//-----------------------------------------------
 long capacitor_left;
 long capacitor_right;
 char capacitor_buff[2][40];
@@ -36,7 +35,6 @@ void setup()
   digitalWrite(SELPIN,HIGH); 
   digitalWrite(DATAOUT,LOW); 
   digitalWrite(SPICLOCK,LOW);
-
   //Serial
   Serial.begin(115200);
   //Bluetooth
@@ -59,14 +57,12 @@ void loop()
        //Serial.print(flexData[i]); Serial.print(" ");
        if(flexData[i]<1000) flag=0;
    }
-   //Ebimu casting
-   //Serial.print("  6 axis : ");
    for(int i = 0; i < 6; i++){   
        dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
        Serial.print(axis_6[i]); Serial.print(" ");
        if(axis_6[i]<-180 || axis_6[i]>180) flag=0;
    }
-   Serial.println(" ");  
+   Serial.println("");  
    dtostrf(vin,7,2,vcc_buff);    
    //send Ebimu
    if(flag){
@@ -81,22 +77,23 @@ void loop()
        }
        
        //send Capacitor
-       if(capacitor_left>50){
-           sprintf(capacitor_buff[0],"1");
+       
+       if(capacitor_left>70){
+           sprintf(capacitor_buff[0],"true");
        }
        else{
-           sprintf(capacitor_buff[0],"0");
+           sprintf(capacitor_buff[0],"false");
        }
-       if(capacitor_right>50){
-           sprintf(capacitor_buff[1],"1");
+       if(capacitor_right>70){
+           sprintf(capacitor_buff[1],"true");
        }
        else{
-           sprintf(capacitor_buff[1],"0");
+           sprintf(capacitor_buff[1],"false");
        }
-       bluetooth.write(capacitor_buff[0]);
-       bluetooth.write(",");
-       bluetooth.write(capacitor_buff[1]);
-       bluetooth.write(",");
+       for(int i=0;i<2;i++){
+           bluetooth.write(capacitor_buff[i]);
+           bluetooth.write(",");
+       }
        bluetooth.write(vcc_buff);
        bluetooth.write("\n");
     }

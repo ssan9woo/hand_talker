@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class StartActivity extends AppCompatActivity {
 
-    private static int SPLASH_TIME_OUT= 3000;
+    private static int SPLASH_TIME_OUT= 1500;
     // Hooks
     View first, second, third, fourth, fifth, sixth;
     TextView hand, slogan;

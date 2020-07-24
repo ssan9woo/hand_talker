@@ -162,10 +162,6 @@ public class bluetoothService extends Service {
         }catch (Exception e){
             Log.e("ERROR","Could not load default values",e);
         }
-        BC_right = new ConnectThread(B_right,RIGHT);
-        BC_right.start();
-        BC_left = new ConnectThread(B_left,LEFT);
-        BC_left.start();
 
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
@@ -206,7 +202,6 @@ public class bluetoothService extends Service {
         }
     }
     public void onDestroy(){
-
         try {
             BC_right.cancel();
         } catch (IOException e) {
@@ -255,10 +250,12 @@ public class bluetoothService extends Service {
             msg.what = bluetooth_index;
             msg.arg1 = CONNECTING;
             sendMsgToActivity(msg);
+
             try {
                 BS.connect();
                 connectedThread = new ConnectedThread(BS, bluetooth_index);
-                connectedThread.start();
+                connectedThread.start();;
+
             } catch (IOException e) {
                 e.printStackTrace();
                 try {
@@ -316,7 +313,6 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    Log.d("BUFF",s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -328,6 +324,7 @@ public class bluetoothService extends Service {
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
                     */
+                    //Log.d("BUFF",s+ "!!!!"+s.length());
 
                     if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
@@ -378,17 +375,7 @@ public class bluetoothService extends Service {
 
         double[] lastCoordinate_right = new double[]{0.00, 0.00, 0.00};
         double[] lastCoordinate_left = new double[]{0.00, 0.00, 0.00};
-        /*
-        double[] rightHand_Acc = new double[]{0.00, 0.00, 0.00};
-        boolean[] rightHand_Touch=new boolean[]{false, false};
-        double[] leftHand_Acc = new double[]{0.00, 0.00, 0.00};
-        int[] rightHand_Flex = new int[]{0, 0, 0, 0, 0, 0};
-        int[] leftHand_Flex = new int[]{0, 0, 0, 0, 0};
-        double[] leftHand_Gyro = new double[]{0.00, 0.00, 0.00};
-        double[] rightHand_Gyro = new double[]{0.00, 0.00, 0.00};
-        double battery_left=0;
-        double battery_right=0;
-        */
+
         double[] Acc = new double[]{0, 0, 0};
         boolean[] Touch=new boolean[]{false, false};
         int[] Flex_left = new int[]{0, 0, 0, 0, 0};
@@ -442,6 +429,7 @@ public class bluetoothService extends Service {
                             right_hand.setFlex(Flex_right);
                             right_hand.setGyro(Gyro);
                             right_hand.setTouch(Touch);
+
                             E_right=get_energy(RIGHT);
                             E_right_sum+=E_right;
                             rightenergy_q.offer(E_right);
@@ -483,7 +471,7 @@ public class bluetoothService extends Service {
                             break;
                     }
                     //왼손 오른손 둘중 하나의 에너지가 150이상 이라면 스택에 쌓아둠//
-                    if(E_right_sum < 150){
+                    if(E_right_sum < 100){
                         if(right_stack.IsGesture()){
                             Log.d("gesture",Arrays.toString(right_stack.popflex()) +" "+ Arrays.toString(right_stack.popgyro())+ Arrays.toString(right_hand.getTouch()));
 
@@ -541,7 +529,7 @@ public class bluetoothService extends Service {
             gyro.clear();
         }
         public boolean IsGesture(){
-            return flex.size()>7;
+            return flex.size()>5;
         }
     }
 }
