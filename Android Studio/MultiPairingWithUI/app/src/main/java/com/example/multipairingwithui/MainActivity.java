@@ -6,16 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -24,7 +21,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final int LEFT =0;
     public static final int RIGHT =1;
@@ -55,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
     Animation clearAnimation;
     TextView signMessage;
 
+    //Variables
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    Toolbar toolbar;
+
     BluetoothAdapter BA;
     @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
@@ -70,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
-        rightPaper = findViewById(R.id.leftPaper);
+        rightPaper = findViewById(R.id.rightPaper);
         rightPaper.setVisibility(View.INVISIBLE);
         leftPaper.setVisibility(View.INVISIBLE);
 
@@ -100,9 +111,60 @@ public class MainActivity extends AppCompatActivity {
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
+
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
         clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.clear);
+
+        /*-----------------------------------Hooks-------------------------------------*/
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolbar);
+
+        /*--------------------------Tool Bar----------------------------*/
+        setSupportActionBar(toolbar);
+
+        /*--------------------------Navigation Drawer Menu----------------------------*/
+
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem( R.id.nav_home );
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if( drawerLayout.isDrawerOpen( GravityCompat.START ) ){
+            drawerLayout.closeDrawer( GravityCompat.START );
+        }
+        else{
+            super.onBackPressed();
+        }
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        switch ( menuItem.getItemId() ){
+            case R.id.nav_home:
+                break;
+            case R.id.nav_add_del:
+                Intent intent_add = new Intent( MainActivity.this, AddDelActivity.class);
+                startActivity(intent_add);
+                break;
+            case R.id.nav_scaling:
+                Intent intent_scaling = new Intent( MainActivity.this, scalingActivity.class);
+                startActivity(intent_scaling);
+                break;
+        }
+        drawerLayout.closeDrawer( GravityCompat.START );
+        finish();
+        return true;
     }
 
     public void onStart() {
@@ -140,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
             isService = false;
         }
     };
+
     //초기상태 [왼손 상태 -> 왼손 연결중, Handler로 5초뒤에 연결됨 아닐시 연결 안된것으로 판단, 연결끊킴으로 넘어가기]
     //방법1. 5초뒤에 연결됨 아닐시에 service에서 sendMessage하는 함수 호출
     //sendMessage -> mainActivity로 disconnect 보내기
@@ -151,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 switch(msg.arg1)
                 {
                     case bluetoothService.DISCONNECT:
+                        bluetoothStateRight.setVisibility(View.VISIBLE);
                         bluetoothStateRight.setText("오른손 연결끊김");
                         rightPaper.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.VISIBLE);
@@ -172,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 switch(msg.arg1)
                 {
                     case bluetoothService.DISCONNECT:
+                        bluetoothStateLeft.setVisibility(View.VISIBLE);
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         leftPaper.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.VISIBLE);
