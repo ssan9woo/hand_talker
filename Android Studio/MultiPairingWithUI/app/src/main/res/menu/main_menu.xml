@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item android:title="menu">
+
+            <item
+                android:id="@+id/nav_home"
+                android:title="처음으로"
+                android:icon="@drawable/nav_ic_home" />
+            <item
+                android:id="@+id/nav_add_del"
+                android:title="수화 추가/제거"
+                android:icon="@drawable/nav_ic_add" />
+            <item
+                android:id="@+id/nav_scaling"
+                android:title="스케일링"
+                android:icon="@drawable/nav_ic_scaling" />
+            <item
+                android:id="@+id/nav_setting"
+                android:title="환경설정"
+                android:icon="@drawable/nav_ic_settings" />
+        </item>
+
+    </group>
+
+</menu>

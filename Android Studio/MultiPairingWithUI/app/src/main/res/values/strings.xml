@@ -16,4 +16,6 @@
     <string name="left_rock">left_rock</string>
     <string name="right_paper">right_paper</string>
     <string name="right_rock">right_rock</string>
+    <string name="navigation_drawer_open" />
+    <string name="navigation_drawer_close" />
 </resources>
