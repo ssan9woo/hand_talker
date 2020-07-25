@@ -16,20 +16,20 @@ public class Hand {
         else flex= new int[]{0, 0, 0, 0, 0};
         if(h=="RIGHT") touch=new boolean[]{false,false};
     }
-    public void setFlex(int[] v){
-            System.arraycopy(v,0,flex,0,v.length);
+    public void setFlex(int[] flex){
+            System.arraycopy(flex,0,this.flex,0,flex.length);
     }
-    public void setGyro(double[] v){
-        System.arraycopy(v,0,gyro,0,v.length);
+    public void setGyro(double[] gyro){
+        System.arraycopy(gyro,0,this.gyro,0,gyro.length);
     }
-    public void setAcc(double[] v){
-        System.arraycopy(v,0,acc,0,v.length);
+    public void setAcc(double[] acc){
+        System.arraycopy(acc,0,this.acc,0,acc.length);
     }
-    public void setTouch(boolean[] v){
-        System.arraycopy(v,0,touch,0,v.length);
+    public void setTouch(boolean[] touch){
+        System.arraycopy(touch,0,this.touch,0,touch.length);
     }
-    public void setBattery(double v){
-        battery=v;
+    public void setBattery(double battery){
+        this.battery=battery;
     }
     public int[] getFlex(){
         return flex;

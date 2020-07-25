@@ -11,7 +11,7 @@ public class User {
         right_min = new int[6];
         right_max = new int[6];
     }
-    public void Set_min(int value[],String hand){
+    public void Set_min(int[] value, String hand){
         switch (hand){
             case "LEFT":
                 System.arraycopy(value,0,left_min,0,left_min.length);
@@ -23,7 +23,7 @@ public class User {
                 break;
         }
     }
-    public void Set_max(int value[],String hand){
+    public void Set_max(int[] value, String hand){
         switch (hand){
             case "LEFT":
                 System.arraycopy(value,0,left_max,0,left_max.length);

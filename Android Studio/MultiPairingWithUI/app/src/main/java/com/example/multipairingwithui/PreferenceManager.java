@@ -63,45 +63,30 @@ public class PreferenceManager {
         }
         editor.apply();
     }
-    public static Hand get_gesture_value(String h,String name, Context context){
+    public static Syllable get_gesture_value(String name,String chr, Context context){
         SharedPreferences sharePref = getPreferences(context);
-        Hand hand = new Hand(h);
+        String key = chr+name;
+        Syllable syllable = new Syllable(chr);
         double[] gyro = new double[3];
-        int[] flex;
-        boolean[] touch;
-        int count = sharePref.getInt(LEN_PREFIX + name, 0);
+        int[] flex = new int[6];
+        boolean[] touch = new boolean[2];
+        int count = sharePref.getInt(LEN_PREFIX + key, 0);
 
-        if(h.equals("RIGHT")) {
-            flex = new int[6];
-            touch = new boolean[2];
-            for (int i = 0; i < count; i++) {
-                //0 1 2 / 3 4 5 6 7 8 / 9 10
-                if (i > 8) {
-                    touch[i-9] = sharePref.getBoolean(VAL_PREFIX+ name + i, false);
-                } else if (i > 2) {
-                    flex[i-3] = sharePref.getInt(VAL_PREFIX+ name + i, 0);
-                } else {
-                    gyro[i] = getDouble(sharePref,VAL_PREFIX+name+i,0);
-                }
+        for (int i = 0; i < count; i++) {
+            //0 1 2 / 3 4 5 6 7 8 / 9 10
+            if (i > 8) {
+                touch[i-9] = sharePref.getBoolean(VAL_PREFIX+ key, false);
+            } else if (i > 2) {
+                flex[i-3] = sharePref.getInt(VAL_PREFIX+ key, 0);
+            } else {
+                gyro[i] = getDouble(sharePref, VAL_PREFIX + key, 0);
             }
-            hand.setTouch(touch);
-            hand.setGyro(gyro);
-            hand.setFlex(flex);
+            syllable.setTouch(touch);
+            syllable.setGyro(gyro);
+            syllable.setFlex(flex);
         }
-        else{
-            flex = new int[5];
-            for (int i = 0; i < count; i++) {
-                //0 1 2 / 3 4 5 6 7
-                 if (i > 2) {
-                    flex[i-3] = sharePref.getInt(VAL_PREFIX+ name + i, 0);
-                } else {
-                    gyro[i] = getDouble(sharePref,VAL_PREFIX + name + i,0);
-                }
-            }
-            hand.setGyro(gyro);
-            hand.setFlex(flex);
-        }
-        return hand;
+
+        return syllable;
     }
     public static boolean IskeyinPref(String name, Context context){
         SharedPreferences sharePref = getPreferences(context);
