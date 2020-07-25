@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SyncAdapterType;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -171,16 +172,6 @@ public class bluetoothService extends Service {
         int a = 0;
         return a;
     }
-    public int[] getUserdata(String name){
-        int[] ret;
-        int count = sharePref.getInt(LEN_PREFIX + name, 0);
-        ret = new int[count];
-        for (int i = 0; i < count; i++){
-            ret[i] = sharePref.getInt(VAL_PREFIX+ name + i, i);
-        }
-        return ret;
-    }
-
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -467,14 +458,24 @@ public class bluetoothService extends Service {
                             if(E_left_sum >= 150 || E_right_sum >= 150) {
                                 Log.d("leftEnergy", String.valueOf(E_left_sum));
                                 left_stack.push(Gyro,Flex_left);
+
                             }
                             break;
                     }
                     //왼손 오른손 둘중 하나의 에너지가 150이상 이라면 스택에 쌓아둠//
                     if(E_right_sum < 100){
                         if(right_stack.IsGesture()){
-                            Log.d("gesture",Arrays.toString(right_stack.popflex()) +" "+ Arrays.toString(right_stack.popgyro())+ Arrays.toString(right_hand.getTouch()));
-
+                            //지화 인지 양손수화인지 구분 필요
+                            //Log.d("gesture",Arrays.toString(right_stack.popflex()) +" "+ Arrays.toString(right_stack.popgyro())+ Arrays.toString(right_hand.getTouch()));
+                            Syllable syllable =  new Syllable();
+                            syllable.setFlex(right_stack.popflex());
+                            syllable.setGyro(right_stack.popgyro());
+                            syllable.setTouch(right_hand.getTouch());
+                            Message m = new Message();
+                            m.what=MainActivity.GESTURE;
+                            m.arg1=MainActivity.SYLLABLE;
+                            m.obj= syllable;
+                            //sendMessage(m);
                         }
                         right_stack.clear();
                     }

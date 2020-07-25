@@ -30,11 +30,23 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final int LEFT =0;
-    public static final int RIGHT =1;
-    public static final int BOTH =100;
+    public static final int LEFT = 0;
+    public static final int RIGHT = 1;
+    public static final int BOTH = 100;
+    public static final int GESTURE = 1000;
+    public static final int SYLLABLE = 2000;
+    public static final int CONSONANT = 2001;
+    public static final int VOWEL = 2002;
+    public static final int WORD = 3000;
 
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
@@ -67,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
 
     BluetoothAdapter BA;
+
+    Syllable[] consonants;
+    Syllable[] vowels;
+
     @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         rightPaper = findViewById(R.id.rightPaper);
         rightPaper.setVisibility(View.INVISIBLE);
         leftPaper.setVisibility(View.INVISIBLE);
-
 
         signImage = findViewById(R.id.signImage);
         signImage.setVisibility(View.INVISIBLE);
@@ -111,6 +126,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ((bluetoothService)bluetoothService.mContext).reconnectLeft();
             }
         });
+
+        for(int i=0;i <AddDelActivity.str_CONSONANT.length;i++){
+            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
+                consonants[i]=new Syllable();
+                try {
+                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant,AddDelActivity.str_CONSONANT[i], mainContext).clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+        for(int i=0;i <AddDelActivity.str_VOWEL.length;i++){
+            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
+                vowels[i]=new Syllable();
+                try {
+                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel,AddDelActivity.str_VOWEL[i], mainContext).clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
 
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
@@ -275,6 +314,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }, 500); // 0.5초후
             }
+            else if (msg.what == GESTURE){
+                switch (msg.arg1){
+                    /*객체 처리 해줘야함
+                    msg.obj를 Syllable 객체로 만들어줘야함
+                    Syllable 클래스안에
+                    getEuclideanDistance()함수 사용
+                    */
+                    case SYLLABLE:
+                        Syllable syllable= new Syllable();
+                        HashMap<String, Double> map = new HashMap<String, Double>();
+                        for (Syllable consonant : consonants) {
+                            map.put(consonant.syllable, consonant.getEuclideanDistance(syllable));
+                        }
+                        for(Syllable vowel : vowels){
+                            map.put(vowel.syllable, vowel.getEuclideanDistance(syllable));
+                        }
+                        String ret=HashMapSort(map);
+                        break;
+                    case WORD:
+                        break;
+                }
+            }
             return false;
         }
     }));
@@ -290,7 +351,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
+    public static String HashMapSort(final HashMap<String,Double> map) {
+        List<String> list = new ArrayList<>(map.keySet());
+        Collections.sort(list,new Comparator() {
+            public int compare(Object o1,Object o2) {
+                Object v1 = map.get(o1);
+                Object v2 = map.get(o2);
+                return ((Comparable) v2).compareTo(v1);
+            }
+        });
+        Collections.reverse(list);
+        return list.get(list.size()-1);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

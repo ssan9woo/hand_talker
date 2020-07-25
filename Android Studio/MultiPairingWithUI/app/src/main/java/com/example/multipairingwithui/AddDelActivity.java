@@ -39,10 +39,10 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     Toolbar toolbar;
-    private static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅠ","ㅎ"};
-    private static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
-    private static final String consonant="CONSONANT";
-    private static final String vowel="VOWEL";
+    public static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅠ","ㅎ"};
+    public static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
+    public static final String consonant="CONSONANT";
+    public static final String vowel="VOWEL";
     Button consonant_btnAdd, consonant_btnDel;
     Button vowel_btnAdd, vowel_btnDel;
     EditText consonant_edittext;
