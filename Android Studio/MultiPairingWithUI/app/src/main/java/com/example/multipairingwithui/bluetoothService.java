@@ -154,14 +154,17 @@ public class bluetoothService extends Service {
 
         user = new User();;
         try {
-            user.Set_min(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[ROCK]),mContext), str_hand[LEFT]);
-            user.Set_max(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[PAPER]),mContext), str_hand[LEFT]);
+            //user.Set_min(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[ROCK]),mContext), str_hand[LEFT]);
+            //user.Set_max(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[PAPER]),mContext), str_hand[LEFT]);
             user.Set_min(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]),mContext), str_hand[RIGHT]);
             user.Set_max(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]),mContext), str_hand[RIGHT]);
         }catch (Exception e){
             Log.e("ERROR","Could not load default values",e);
         }
-
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[ROCK]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[PAPER]), mContext)));
+        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
+        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
         super.onCreate();
@@ -191,16 +194,22 @@ public class bluetoothService extends Service {
         }
     }
     public void onDestroy(){
-        try {
-            BC_right.cancel();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(BC_right !=null) {
+            try {
+                BC_right.cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            BC_left.cancel();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(BC_left !=null) {
+            try {
+                BC_left.cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        if(mReceiver != null)
+            unregisterReceiver(mReceiver);
         super.onDestroy();
     }
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
@@ -314,7 +323,6 @@ public class bluetoothService extends Service {
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
                     */
-                   //Log.d("BUFF",s+ "!!!!"+s.length());
 
                     if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
@@ -424,7 +432,7 @@ public class bluetoothService extends Service {
                             E_right_sum+=E_right;
                             rightenergy_q.offer(E_right);
                             if (rightenergy_q.size()>5) E_right_sum-=rightenergy_q.poll();
-                            if(E_left_sum >=150 || E_right_sum >= 150) {
+                            if(E_left_sum >=130 || E_right_sum >= 130) {
                                 Log.d("rightEnergy", String.valueOf(E_right_sum));
                                 right_stack.push(Gyro,Flex_right);
                             }
@@ -457,27 +465,22 @@ public class bluetoothService extends Service {
                             if(E_left_sum >= 150 || E_right_sum >= 150) {
                                 Log.d("leftEnergy", String.valueOf(E_left_sum));
                                 left_stack.push(Gyro,Flex_left);
-
                             }
                             break;
                     }
                     //왼손 오른손 둘중 하나의 에너지가 150이상 이라면 스택에 쌓아둠//
                     if(E_right_sum < 100){
                         if(right_stack.IsGesture()){
-                            //지화 인지 양손수화인지 구분 필요
-                            //Log.d("gesture",Arrays.toString(right_stack.popflex()) +" "+ Arrays.toString(right_stack.popgyro())+ Arrays.toString(right_hand.getTouch()));
                             Syllable syllable =  new Syllable();
                             syllable.setFlex(right_stack.popflex());
                             syllable.setGyro(right_stack.popgyro());
                             syllable.setTouch(right_hand.getTouch());
+                            Log.d("TT",Arrays.toString(syllable.getTouch()));
                             Message m = new Message();
                             m.what=MainActivity.GESTURE;
                             m.arg1=MainActivity.SYLLABLE;
                             m.obj= syllable;
-                            Log.d("sendMessage","msg");
                             sendMsgToActivity(m);
-
-                            //sendMessage(m);
                         }
                         right_stack.clear();
                     }
@@ -532,7 +535,7 @@ public class bluetoothService extends Service {
             gyro.clear();
         }
         public boolean IsGesture(){
-            return flex.size()>5;
+            return flex.size()>4;
         }
     }
 }

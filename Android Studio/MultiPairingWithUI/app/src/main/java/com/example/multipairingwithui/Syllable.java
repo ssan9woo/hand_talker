@@ -43,20 +43,19 @@ public class Syllable implements Cloneable{
     public boolean[] getTouch(){
         return touch;
     }
-    public double getEuclideanDistance(Syllable obj){
+    public double getEuclideanDistance_Flex(Syllable obj){
         double dist=0.00;
-        double f=0.00;
-        double g=0.00;
-        for(int i=0;i<flex.length-1;i++){
-            dist+= Math.pow(this.flex[i] - obj.flex[i],2);
-            f+=Math.pow(this.flex[i] - obj.flex[i],2);
-        }
 
+        for(int i=0;i<flex.length;i++){
+            dist+= Math.pow(this.flex[i] - obj.flex[i],2);
+        }
+        return dist;
+    }
+    public double getEuclideanDistance_Gyro(Syllable obj){
+        double dist=0.00;
         for(int i=0;i<gyro.length;i++){
             dist+= Math.pow(this.gyro[i] - obj.gyro[i],2);
-            g+=Math.pow(this.flex[i] - obj.flex[i],2);
         }
-        Log.d("get",this.syllable+dist+"   F:  "+f+"    G: "+g);
         return dist;
     }
     @Override

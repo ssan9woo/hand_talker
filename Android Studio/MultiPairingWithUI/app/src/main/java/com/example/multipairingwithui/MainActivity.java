@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -38,7 +39,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Stack;
+import static android.speech.tts.TextToSpeech.ERROR;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,12 +54,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int CONSONANT = 2001;
     public static final int VOWEL = 2002;
     public static final int WORD = 3000;
+    public static boolean isconnect_left = false;
+    public static boolean isconnect_right = false;
     int arr_cnt=0;
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
-
+    private TextToSpeech tts;
     ImageView leftRock;
     ImageView leftPaper;
     ImageView rightRock;
@@ -92,76 +98,90 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BA = BluetoothAdapter.getDefaultAdapter();
-        if(!BA.isEnabled()){
+        if (!BA.isEnabled()) {
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(i,5000);
+            startActivityForResult(i, 5000);
         }
-
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
         rightPaper = findViewById(R.id.rightPaper);
-        rightPaper.setVisibility(View.INVISIBLE);
-        leftPaper.setVisibility(View.INVISIBLE);
-
         signImage = findViewById(R.id.signImage);
         signImage.setVisibility(View.INVISIBLE);
         signMessage = findViewById(R.id.signMessage);
         signMessage.setVisibility(View.INVISIBLE);
-
-        //----------------------Find VIEW---------------------------------//
+        leftPaper.setVisibility(View.INVISIBLE);
+        rightPaper.setVisibility(View.INVISIBLE);
         reconnectRight = findViewById(R.id.reconnectRight);
         reconnectLeft = findViewById(R.id.reconnectLeft);
         bluetoothStateRight = findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = findViewById(R.id.bluetoothStateLeft);
+        if (savedInstanceState != null) {
+            isconnect_left = savedInstanceState.getBoolean(bluetoothService.str_hand[LEFT]);
+            isconnect_right = savedInstanceState.getBoolean(bluetoothService.str_hand[RIGHT]);
+        }
+        if(isconnect_left) {
+            leftPaper.setVisibility(View.VISIBLE);
+            leftRock.setVisibility(View.INVISIBLE);
+            bluetoothStateLeft.setVisibility(View.INVISIBLE);
+            reconnectLeft.setVisibility(View.INVISIBLE);
+        }
+        if(isconnect_right){
+            rightPaper.setVisibility(View.VISIBLE);
+            rightRock.setVisibility(View.INVISIBLE);
+            bluetoothStateRight.setVisibility(View.INVISIBLE);
+            reconnectRight.setVisibility(View.INVISIBLE);
+        }
+
+
 
         mainContext = this;
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectRight();
+                ((bluetoothService) bluetoothService.mContext).reconnectRight();
             }
         });
 
         reconnectLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectLeft();
+                ((bluetoothService) bluetoothService.mContext).reconnectLeft();
             }
         });
 
-        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
-                arr_cnt+=1;
+        for (int i = 0; i < AddDelActivity.str_CONSONANT.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.consonant + AddDelActivity.str_CONSONANT[i], mainContext)) {
+                arr_cnt += 1;
             }
         }
-        consonants=new Syllable[arr_cnt];
-        arr_cnt=0;
-        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
-                arr_cnt+=1;
+        consonants = new Syllable[arr_cnt];
+        arr_cnt = 0;
+        for (int i = 0; i < AddDelActivity.str_VOWEL.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
+                arr_cnt += 1;
             }
         }
-        vowels=new Syllable[arr_cnt];
+        vowels = new Syllable[arr_cnt];
 
-        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
-                consonants[i]=new Syllable();
+        for (int i = 0; i < AddDelActivity.str_CONSONANT.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.consonant + AddDelActivity.str_CONSONANT[i], mainContext)) {
+                consonants[i] = new Syllable();
                 try {
-                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant,AddDelActivity.str_CONSONANT[i], mainContext).clone();
-                    Log.d("Oncreate", consonants[i].syllable+ Arrays.toString(consonants[i].getFlex())+ Arrays.toString(consonants[i].getGyro()));
+                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
+                    Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
-        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
-                vowels[i]=new Syllable();
+        for (int i = 0; i < AddDelActivity.str_VOWEL.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
+                vowels[i] = new Syllable();
                 try {
-                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel,AddDelActivity.str_VOWEL[i], mainContext).clone();
+                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
+                    Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -171,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
-        clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.clear);
+        clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.clear);
 
         /*-----------------------------------Hooks-------------------------------------*/
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -184,14 +204,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /*--------------------------Navigation Drawer Menu----------------------------*/
 
         navigationView.bringToFront();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem( R.id.nav_home );
-    }
+        navigationView.setCheckedItem(R.id.nav_home);
 
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != ERROR) {
+                    // 언어를 선택한다.
+                    tts.setLanguage(Locale.KOREAN);
+                }
+            }
+        });
+        tts.setSpeechRate(1.0f);    // 읽는 속도는 기본 설정
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState); // 반드시 호출해 주세요.
+        Log.d("onSaveInstanceState","여기는 세이브");
+        // 추가로 자료를 저장하는 코드는 여기에 작성 하세요.
+        outState.putBoolean(bluetoothService.str_hand[LEFT], isconnect_left);
+        outState.putBoolean(bluetoothService.str_hand[RIGHT], isconnect_right);
+    }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(" onRestoreInstanceState","여기는 가져옴");
+        // 추가로 자료를 복원하는 코드는 여기에 작성하세요.
+    }
     @Override
     public void onBackPressed() {
 
@@ -201,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else{
             super.onBackPressed();
         }
-
     }
 
     @Override
@@ -220,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         drawerLayout.closeDrawer( GravityCompat.START );
-        finish();
+        //finish();
         return true;
     }
 
@@ -237,6 +280,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             isService = false;
         }
         stopService(new Intent(this,bluetoothService.class));
+        if(tts != null){
+            tts.stop();
+            tts.shutdown();
+            tts = null;
+        }
+        System.out.println("123123123");
         super.onDestroy();
     }
 
@@ -267,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.d("Messenger",String.valueOf(msg.what));
             if (msg.what == RIGHT) {
                 switch(msg.arg1)
                 {
@@ -277,12 +325,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         rightPaper.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.VISIBLE);
                         reconnectRight.setVisibility(View.VISIBLE);
+                        isconnect_right=false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
                         reconnectRight.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.INVISIBLE);
                         rightPaper.setVisibility(View.VISIBLE);
+                        isconnect_right=true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
@@ -299,12 +349,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         leftPaper.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.VISIBLE);
                         reconnectLeft.setVisibility(View.VISIBLE);
+                        isconnect_left=false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateLeft.setText("왼손 연결됨");
                         reconnectLeft.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.INVISIBLE);
                         leftPaper.setVisibility(View.VISIBLE);
+                        isconnect_left=true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateLeft.setText("왼손 연결중");
@@ -341,18 +393,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     getEuclideanDistance()함수 사용
                     */
                     case SYLLABLE:
-                        Syllable syllable= new Syllable();
+                        Syllable syllable;
                         syllable = (Syllable) msg.obj;
                         HashMap<String, Double> map = new HashMap<String, Double>();
+
                         for (Syllable consonant : consonants) {
-                            map.put(consonant.syllable, consonant.getEuclideanDistance(syllable));
-                            Log.d("Euclidean",consonant.syllable+" "+ consonant.getEuclideanDistance(syllable));
+                            if(Arrays.equals(consonant.touch,syllable.touch)) {
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 40) {
+                                    map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
+                                    Log.d("Euclidean", consonant.syllable + " " + consonant.getEuclideanDistance_Gyro(syllable));
+                                }
+                            }
                         }
                         for(Syllable vowel : vowels){
-                            map.put(vowel.syllable, vowel.getEuclideanDistance(syllable));
+                            if(Arrays.equals(vowel.touch,syllable.touch)) {
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 40) {
+                                    map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
+                                    Log.d("Euclidean", vowel.syllable + " " + vowel.getEuclideanDistance_Gyro(syllable));
+                                }
+                            }
                         }
-                        String ret=HashMapSort(map);
-                        Log.d("ret",ret);
+                        System.out.println(map.size()+String.valueOf(map.isEmpty()));
+
+                        if(!map.isEmpty()) {
+                            Log.d("map", String.valueOf(map));
+                            String ret = HashMapSort(map);
+                            Log.d("ret", ret);
+                            tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
+                        }
                         break;
                     case WORD:
                         break;
@@ -375,7 +443,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
-        Log.d("List",String.valueOf(map));
         Collections.sort(list,new Comparator() {
             public int compare(Object o1,Object o2) {
                 Object v1 = map.get(o1);
