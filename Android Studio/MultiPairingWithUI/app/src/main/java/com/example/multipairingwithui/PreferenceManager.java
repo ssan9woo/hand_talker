@@ -65,32 +65,28 @@ public class PreferenceManager {
     }
     public static Syllable get_gesture_value(String name,String chr, Context context){
         SharedPreferences sharePref = getPreferences(context);
-        String key = chr+name;
+        String key = name+chr;
         Syllable syllable = new Syllable(chr);
         double[] gyro = new double[3];
         int[] flex = new int[6];
         boolean[] touch = new boolean[2];
         int count = sharePref.getInt(LEN_PREFIX + key, 0);
-
         for (int i = 0; i < count; i++) {
-            //0 1 2 / 3 4 5 6 7 8 / 9 10
             if (i > 8) {
-                touch[i-9] = sharePref.getBoolean(VAL_PREFIX+ key, false);
+                touch[i-9] = sharePref.getBoolean(VAL_PREFIX+ key+i, false);
             } else if (i > 2) {
-                flex[i-3] = sharePref.getInt(VAL_PREFIX+ key, 0);
+                flex[i-3] = sharePref.getInt(VAL_PREFIX+key+i, 0);
             } else {
-                gyro[i] = getDouble(sharePref, VAL_PREFIX + key, 0);
+                gyro[i] = getDouble(sharePref, VAL_PREFIX + key+i, 0);
             }
             syllable.setTouch(touch);
             syllable.setGyro(gyro);
             syllable.setFlex(flex);
         }
-
         return syllable;
     }
     public static boolean IskeyinPref(String name, Context context){
         SharedPreferences sharePref = getPreferences(context);
-        Log.d("Here",LEN_PREFIX+name);
         int count = sharePref.getInt(LEN_PREFIX + name, 0);
         return count > 0;
     }

@@ -1,6 +1,7 @@
 package com.example.multipairingwithui;
 
 import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -42,15 +43,21 @@ public class Syllable implements Cloneable{
     public boolean[] getTouch(){
         return touch;
     }
-    public Double getEuclideanDistance(Syllable obj){
+    public double getEuclideanDistance(Syllable obj){
         double dist=0.00;
-        for(int i=0;i<flex.length;i++){
+        double f=0.00;
+        double g=0.00;
+        for(int i=0;i<flex.length-1;i++){
             dist+= Math.pow(this.flex[i] - obj.flex[i],2);
+            f+=Math.pow(this.flex[i] - obj.flex[i],2);
         }
+
         for(int i=0;i<gyro.length;i++){
             dist+= Math.pow(this.gyro[i] - obj.gyro[i],2);
+            g+=Math.pow(this.flex[i] - obj.flex[i],2);
         }
-        return 1 / ( 1+ Math.sqrt(dist));
+        Log.d("get",this.syllable+dist+"   F:  "+f+"    G: "+g);
+        return dist;
     }
     @Override
     @NonNull
