@@ -47,7 +47,7 @@ void loop()
    capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
    capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
    int flag = 1;
-   
+   Serial.print(capacitor_left); Serial.print("  ");Serial.print(capacitor_right);
    if(EBimuAsciiParser(axis_6,6))
    if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
    
@@ -59,7 +59,7 @@ void loop()
    }
    for(int i = 0; i < 6; i++){   
        dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
-       Serial.print(axis_6[i]); Serial.print(" ");
+       //Serial.print(axis_6[i]); Serial.print(" ");
        if(axis_6[i]<-180 || axis_6[i]>180) flag=0;
    }
    Serial.println("");  

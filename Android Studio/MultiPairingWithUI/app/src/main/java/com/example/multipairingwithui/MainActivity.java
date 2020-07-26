@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -38,7 +39,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Stack;
+import static android.speech.tts.TextToSpeech.ERROR;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
     boolean isService = false;
-
+    private TextToSpeech tts;
     ImageView leftRock;
     ImageView leftPaper;
     ImageView rightRock;
@@ -92,9 +96,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BA = BluetoothAdapter.getDefaultAdapter();
-        if(!BA.isEnabled()){
+        if (!BA.isEnabled()) {
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(i,5000);
+            startActivityForResult(i, 5000);
         }
 
         leftRock = findViewById(R.id.leftRock);
@@ -119,49 +123,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectRight();
+                ((bluetoothService) bluetoothService.mContext).reconnectRight();
             }
         });
 
         reconnectLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((bluetoothService)bluetoothService.mContext).reconnectLeft();
+                ((bluetoothService) bluetoothService.mContext).reconnectLeft();
             }
         });
 
-        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
-                arr_cnt+=1;
+        for (int i = 0; i < AddDelActivity.str_CONSONANT.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.consonant + AddDelActivity.str_CONSONANT[i], mainContext)) {
+                arr_cnt += 1;
             }
         }
-        consonants=new Syllable[arr_cnt];
-        arr_cnt=0;
-        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
-                arr_cnt+=1;
+        consonants = new Syllable[arr_cnt];
+        arr_cnt = 0;
+        for (int i = 0; i < AddDelActivity.str_VOWEL.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
+                arr_cnt += 1;
             }
         }
-        vowels=new Syllable[arr_cnt];
+        vowels = new Syllable[arr_cnt];
 
-        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
-                consonants[i]=new Syllable();
+        for (int i = 0; i < AddDelActivity.str_CONSONANT.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.consonant + AddDelActivity.str_CONSONANT[i], mainContext)) {
+                consonants[i] = new Syllable();
                 try {
-                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant,AddDelActivity.str_CONSONANT[i], mainContext).clone();
-                    Log.d("Oncreate", consonants[i].syllable+ Arrays.toString(consonants[i].getFlex())+ Arrays.toString(consonants[i].getGyro()));
+                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
+                    Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
-        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
-                vowels[i]=new Syllable();
+        for (int i = 0; i < AddDelActivity.str_VOWEL.length; i++) {
+            if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
+                vowels[i] = new Syllable();
                 try {
-                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel,AddDelActivity.str_VOWEL[i], mainContext).clone();
+                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
+                    Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -171,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
-        clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.clear);
+        clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.clear);
 
         /*-----------------------------------Hooks-------------------------------------*/
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -184,14 +188,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /*--------------------------Navigation Drawer Menu----------------------------*/
 
         navigationView.bringToFront();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem( R.id.nav_home );
-    }
+        navigationView.setCheckedItem(R.id.nav_home);
 
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != ERROR) {
+                    // 언어를 선택한다.
+                    tts.setLanguage(Locale.KOREAN);
+                }
+            }
+        });
+        tts.setSpeechRate(1.0f);    // 읽는 속도는 기본 설정
+
+    }
     @Override
     public void onBackPressed() {
 
@@ -237,6 +252,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             isService = false;
         }
         stopService(new Intent(this,bluetoothService.class));
+        if(tts != null){
+            tts.stop();
+            tts.shutdown();
+            tts = null;
+        }
         super.onDestroy();
     }
 
@@ -267,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.d("Messenger",String.valueOf(msg.what));
             if (msg.what == RIGHT) {
                 switch(msg.arg1)
                 {
@@ -341,18 +360,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     getEuclideanDistance()함수 사용
                     */
                     case SYLLABLE:
-                        Syllable syllable= new Syllable();
+                        Syllable syllable;
                         syllable = (Syllable) msg.obj;
                         HashMap<String, Double> map = new HashMap<String, Double>();
+
                         for (Syllable consonant : consonants) {
-                            map.put(consonant.syllable, consonant.getEuclideanDistance(syllable));
-                            Log.d("Euclidean",consonant.syllable+" "+ consonant.getEuclideanDistance(syllable));
+                            if(Arrays.equals(consonant.touch,syllable.touch)) {
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 40) {
+                                    map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
+                                    Log.d("Euclidean", consonant.syllable + " " + consonant.getEuclideanDistance_Gyro(syllable));
+                                }
+                            }
                         }
                         for(Syllable vowel : vowels){
-                            map.put(vowel.syllable, vowel.getEuclideanDistance(syllable));
+                            if(Arrays.equals(vowel.touch,syllable.touch)) {
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 40) {
+                                    map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
+                                    Log.d("Euclidean", vowel.syllable + " " + vowel.getEuclideanDistance_Gyro(syllable));
+                                }
+                            }
                         }
-                        String ret=HashMapSort(map);
-                        Log.d("ret",ret);
+                        System.out.println(map.size()+String.valueOf(map.isEmpty()));
+
+                        if(!map.isEmpty()) {
+                            Log.d("map", String.valueOf(map));
+                            String ret = HashMapSort(map);
+                            Log.d("ret", ret);
+                            tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
+                        }
                         break;
                     case WORD:
                         break;
@@ -375,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
-        Log.d("List",String.valueOf(map));
         Collections.sort(list,new Comparator() {
             public int compare(Object o1,Object o2) {
                 Object v1 = map.get(o1);

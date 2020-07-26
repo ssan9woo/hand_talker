@@ -39,7 +39,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     Toolbar toolbar;
-    public static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅠ","ㅎ"};
+    public static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"};
     public static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
     public static final String consonant="CONSONANT";
     public static final String vowel="VOWEL";
@@ -132,8 +132,9 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(pos != ListView.INVALID_POSITION){
                 list_consonant.remove(pos);
                 consonant_listview.clearChoices();
-                consonant_adapter.notifyDataSetChanged();
                 PreferenceManager.remove_gesture_value(bluetoothService.CONSONANT +str,mContext);
+                consonant_adapter.notifyDataSetChanged();
+
             }
         }else if(v == vowel_btnAdd){
             String str = vowel_edittext.getText().toString();
@@ -145,12 +146,13 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             }
         }else if(v == vowel_btnDel){
             int pos = vowel_listview.getCheckedItemPosition();
-            String str = consonant_adapter.getItem(pos);
+            String str = vowel_adapter.getItem(pos);
             if(pos != ListView.INVALID_POSITION){
                 list_vowel.remove(pos);
                 vowel_listview.clearChoices();
-                vowel_adapter.notifyDataSetChanged();
                 PreferenceManager.remove_gesture_value(bluetoothService.VOWEL+str,mContext);
+                vowel_adapter.notifyDataSetChanged();
+
             }
         }
     }
