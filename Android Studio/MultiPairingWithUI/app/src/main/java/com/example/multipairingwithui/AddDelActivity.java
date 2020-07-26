@@ -62,7 +62,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adddel);
         mContext=this;
-
+        bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
         for(int i=0;i <str_CONSONANT.length;i++){
             if(PreferenceManager.IskeyinPref(consonant+str_CONSONANT[i],mContext)){
                 list_consonant.add(str_CONSONANT[i]);
@@ -91,8 +91,11 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem( R.id.nav_add_del );
 
-        bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
+
     }
+
+
+
     public void setLayout(){
         consonant_listview = (ListView) findViewById(R.id.consonant_listview);
         consonant_btnAdd = (Button) findViewById(R.id.consonant_btnAdd);
@@ -187,10 +190,14 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         {
             isService = false;
         }
-        unbindService(conn);
         super.onDestroy();
 
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(conn);
+    };
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch ( menuItem.getItemId() ){

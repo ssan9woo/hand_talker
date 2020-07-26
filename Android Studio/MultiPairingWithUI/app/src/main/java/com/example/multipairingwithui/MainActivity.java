@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int CONSONANT = 2001;
     public static final int VOWEL = 2002;
     public static final int WORD = 3000;
+    public static boolean isconnect_left = false;
+    public static boolean isconnect_right = false;
     int arr_cnt=0;
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
@@ -100,24 +102,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i, 5000);
         }
-
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
         rightPaper = findViewById(R.id.rightPaper);
-        rightPaper.setVisibility(View.INVISIBLE);
-        leftPaper.setVisibility(View.INVISIBLE);
-
         signImage = findViewById(R.id.signImage);
         signImage.setVisibility(View.INVISIBLE);
         signMessage = findViewById(R.id.signMessage);
         signMessage.setVisibility(View.INVISIBLE);
-
-        //----------------------Find VIEW---------------------------------//
+        leftPaper.setVisibility(View.INVISIBLE);
+        rightPaper.setVisibility(View.INVISIBLE);
         reconnectRight = findViewById(R.id.reconnectRight);
         reconnectLeft = findViewById(R.id.reconnectLeft);
         bluetoothStateRight = findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = findViewById(R.id.bluetoothStateLeft);
+        if (savedInstanceState != null) {
+            isconnect_left = savedInstanceState.getBoolean(bluetoothService.str_hand[LEFT]);
+            isconnect_right = savedInstanceState.getBoolean(bluetoothService.str_hand[RIGHT]);
+        }
+        if(isconnect_left) {
+            leftPaper.setVisibility(View.VISIBLE);
+            leftRock.setVisibility(View.INVISIBLE);
+            bluetoothStateLeft.setVisibility(View.INVISIBLE);
+            reconnectLeft.setVisibility(View.INVISIBLE);
+        }
+        if(isconnect_right){
+            rightPaper.setVisibility(View.VISIBLE);
+            rightRock.setVisibility(View.INVISIBLE);
+            bluetoothStateRight.setVisibility(View.INVISIBLE);
+            reconnectRight.setVisibility(View.INVISIBLE);
+        }
+
+
 
         mainContext = this;
         reconnectRight.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +221,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         tts.setSpeechRate(1.0f);    // 읽는 속도는 기본 설정
-
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState); // 반드시 호출해 주세요.
+        Log.d("onSaveInstanceState","여기는 세이브");
+        // 추가로 자료를 저장하는 코드는 여기에 작성 하세요.
+        outState.putBoolean(bluetoothService.str_hand[LEFT], isconnect_left);
+        outState.putBoolean(bluetoothService.str_hand[RIGHT], isconnect_right);
+    }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(" onRestoreInstanceState","여기는 가져옴");
+        // 추가로 자료를 복원하는 코드는 여기에 작성하세요.
     }
     @Override
     public void onBackPressed() {
@@ -216,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else{
             super.onBackPressed();
         }
-
     }
 
     @Override
@@ -235,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         drawerLayout.closeDrawer( GravityCompat.START );
-        finish();
+        //finish();
         return true;
     }
 
@@ -257,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tts.shutdown();
             tts = null;
         }
+        System.out.println("123123123");
         super.onDestroy();
     }
 
@@ -296,12 +325,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         rightPaper.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.VISIBLE);
                         reconnectRight.setVisibility(View.VISIBLE);
+                        isconnect_right=false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
                         reconnectRight.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.INVISIBLE);
                         rightPaper.setVisibility(View.VISIBLE);
+                        isconnect_right=true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
@@ -318,12 +349,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         leftPaper.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.VISIBLE);
                         reconnectLeft.setVisibility(View.VISIBLE);
+                        isconnect_left=false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateLeft.setText("왼손 연결됨");
                         reconnectLeft.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.INVISIBLE);
                         leftPaper.setVisibility(View.VISIBLE);
+                        isconnect_left=true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateLeft.setText("왼손 연결중");

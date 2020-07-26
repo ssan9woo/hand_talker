@@ -208,7 +208,8 @@ public class bluetoothService extends Service {
                 e.printStackTrace();
             }
         }
-        unregisterReceiver(mReceiver);
+        if(mReceiver != null)
+            unregisterReceiver(mReceiver);
         super.onDestroy();
     }
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
