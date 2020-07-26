@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -30,7 +31,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int CONSONANT = 2001;
     public static final int VOWEL = 2002;
     public static final int WORD = 3000;
-
+    int arr_cnt=0;
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
@@ -127,11 +130,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        for(int i=0;i <AddDelActivity.str_CONSONANT.length;i++){
+        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
+            if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
+                arr_cnt+=1;
+            }
+        }
+        consonants=new Syllable[arr_cnt];
+        arr_cnt=0;
+        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
+            if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
+                arr_cnt+=1;
+            }
+        }
+        vowels=new Syllable[arr_cnt];
+
+        for(int i=0;i < AddDelActivity.str_CONSONANT.length;i++){
             if(PreferenceManager.IskeyinPref(AddDelActivity.consonant+AddDelActivity.str_CONSONANT[i],mainContext)){
                 consonants[i]=new Syllable();
                 try {
                     consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant,AddDelActivity.str_CONSONANT[i], mainContext).clone();
+                    Log.d("Oncreate", consonants[i].syllable+ Arrays.toString(consonants[i].getFlex())+ Arrays.toString(consonants[i].getGyro()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -139,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        for(int i=0;i <AddDelActivity.str_VOWEL.length;i++){
+        for(int i=0;i < AddDelActivity.str_VOWEL.length;i++){
             if(PreferenceManager.IskeyinPref(AddDelActivity.vowel+AddDelActivity.str_VOWEL[i],mainContext)){
                 vowels[i]=new Syllable();
                 try {
@@ -249,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @SuppressLint("SetTextI18n")
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            Log.d("Messenger",String.valueOf(msg.what));
             if (msg.what == RIGHT) {
                 switch(msg.arg1)
                 {
@@ -323,14 +342,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     */
                     case SYLLABLE:
                         Syllable syllable= new Syllable();
+                        syllable = (Syllable) msg.obj;
                         HashMap<String, Double> map = new HashMap<String, Double>();
                         for (Syllable consonant : consonants) {
                             map.put(consonant.syllable, consonant.getEuclideanDistance(syllable));
+                            Log.d("Euclidean",consonant.syllable+" "+ consonant.getEuclideanDistance(syllable));
                         }
                         for(Syllable vowel : vowels){
                             map.put(vowel.syllable, vowel.getEuclideanDistance(syllable));
                         }
                         String ret=HashMapSort(map);
+                        Log.d("ret",ret);
                         break;
                     case WORD:
                         break;
@@ -353,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
+        Log.d("List",String.valueOf(map));
         Collections.sort(list,new Comparator() {
             public int compare(Object o1,Object o2) {
                 Object v1 = map.get(o1);
@@ -360,7 +383,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return ((Comparable) v2).compareTo(v1);
             }
         });
-        Collections.reverse(list);
+        //Collections.reverse(list);
+        Log.d("After",String.valueOf(list));
         return list.get(list.size()-1);
     }
     @Override

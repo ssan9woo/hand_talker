@@ -45,7 +45,7 @@ public class bluetoothService extends Service {
     @SuppressLint("StaticFieldLeak")
     static public  Context mContext;
     bluetoothReceiver mReceiver;
-    private Messenger mClient = null;
+    private static Messenger mClient = null;
     static sign mThread= null;
     boolean IsConnect_right = false,
             IsConnect_left = false;
@@ -98,15 +98,13 @@ public class bluetoothService extends Service {
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_REGISTER_CLIENT:
-                    mClient = msg.replyTo;
-                    break;
+            if (msg.what == MSG_REGISTER_CLIENT) {
+                mClient = msg.replyTo;
             }
             return false;
         }
     }));
-    private void sendMsgToActivity(Message msg){
+    public static void sendMsgToActivity(Message msg){
         try{
             mClient.send(msg);
         } catch (NullPointerException | RemoteException ignored) {}
@@ -304,6 +302,7 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
+                    //Log.d("BUFF",s);
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -315,7 +314,7 @@ public class bluetoothService extends Service {
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
                     */
-                    //Log.d("BUFF",s+ "!!!!"+s.length());
+                   //Log.d("BUFF",s+ "!!!!"+s.length());
 
                     if(IsConnect_left || IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
@@ -475,6 +474,9 @@ public class bluetoothService extends Service {
                             m.what=MainActivity.GESTURE;
                             m.arg1=MainActivity.SYLLABLE;
                             m.obj= syllable;
+                            Log.d("sendMessage","msg");
+                            sendMsgToActivity(m);
+
                             //sendMessage(m);
                         }
                         right_stack.clear();
