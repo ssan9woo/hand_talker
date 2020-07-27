@@ -53,10 +53,12 @@ void loop()
    
    for(int i = 0; i < 6; i++){
        flexData[i] = read_adc(i+3);
+       if(i==5) flexData[i]=3000;
        sprintf(rightHandFlex[i],"%d",flexData[i]);
        //Serial.print(flexData[i]); Serial.print(" ");
        if(flexData[i]<1000) flag=0;
    }
+  
    for(int i = 0; i < 6; i++){   
        dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
        //Serial.print(axis_6[i]); Serial.print(" ");

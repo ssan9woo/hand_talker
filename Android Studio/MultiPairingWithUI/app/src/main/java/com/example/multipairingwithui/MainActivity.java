@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +20,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.speech.tts.TextToSpeech;
+import android.widget.inline.InlineContentView;
+
+import com.github.kimkevin.hangulparser.HangulParser;
+import com.github.kimkevin.hangulparser.HangulParserException;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -62,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Messenger mServiceMessenger = null;
     boolean isService = false;
     private TextToSpeech tts;
+    ArrayList<String> input_gesture = new ArrayList<String>();
+    ArrayList<Integer> num = new ArrayList<>();
     ImageView leftRock;
     ImageView leftPaper;
     ImageView rightRock;
     ImageView rightPaper;
     ImageView signImage;
-
+    Handler delay = new Handler();
     //--------Right Hand---------
     Button reconnectRight;
     TextView bluetoothStateRight;
@@ -91,7 +99,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     Syllable[] consonants;
     Syllable[] vowels;
-
+    Button DeleteData;
+    TextView ReceiveData;
+    ScrollView scrollView;
     @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +112,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i, 5000);
         }
+        ReceiveData = (TextView) findViewById(R.id.ReceiveData);
+        DeleteData = (Button) findViewById(R.id.DeleteData);
+        DeleteData.setVisibility(View.INVISIBLE);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        ReceiveData.setMovementMethod(new ScrollingMovementMethod());
         leftRock = findViewById(R.id.leftRock);
         leftPaper = findViewById(R.id.leftPaper);
         rightRock = findViewById(R.id.rightRock);
@@ -136,6 +151,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         mainContext = this;
+        DeleteData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ReceiveData.setText(null);
+            }
+        });
+
         reconnectRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         tts.setSpeechRate(1.0f);    // 읽는 속도는 기본 설정
+        //PreferenceManager.clear(mainContext);
     }
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -299,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mServiceMessenger.send(msg);
             } catch (RemoteException ignored) {
             }
-            Toast.makeText(getApplicationContext(), "Service Connected", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Service Start!!", Toast.LENGTH_LONG).show();
             isService = true;
         }
 
@@ -365,10 +388,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else if(msg.what == BOTH)
             {
+                Toast.makeText(getApplicationContext(), "양손 연결 완료", Toast.LENGTH_LONG).show();
                 bluetoothStateLeft.setVisibility(View.INVISIBLE);
                 bluetoothStateRight.setVisibility(View.INVISIBLE);
                 reconnectLeft.setVisibility(View.INVISIBLE);
                 reconnectRight.setVisibility(View.INVISIBLE);
+                DeleteData.setVisibility(View.VISIBLE);
 
                 //animation
                 rightPaper.startAnimation(fadeOutAnimation);
@@ -399,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         for (Syllable consonant : consonants) {
                             if(Arrays.equals(consonant.touch,syllable.touch)) {
-                                if (consonant.getEuclideanDistance_Flex(syllable) < 40) {
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 15) {
                                     map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
                                     Log.d("Euclidean", consonant.syllable + " " + consonant.getEuclideanDistance_Gyro(syllable));
                                 }
@@ -407,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         for(Syllable vowel : vowels){
                             if(Arrays.equals(vowel.touch,syllable.touch)) {
-                                if (vowel.getEuclideanDistance_Flex(syllable) < 40) {
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 15) {
                                     map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
                                     Log.d("Euclidean", vowel.syllable + " " + vowel.getEuclideanDistance_Gyro(syllable));
                                 }
@@ -419,7 +444,73 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Log.d("map", String.valueOf(map));
                             String ret = HashMapSort(map);
                             Log.d("ret", ret);
+                            input_gesture.add(ret);
+                            ReceiveData.append(ret+"\n");
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
+                            scrollView.post(new Runnable() {
+                                public void run() {
+                                    // TODO Auto-generated method stub
+                                    scrollView.scrollTo(0, ReceiveData.getHeight());
+                                }
+                            });
+
+
+                            delay.removeMessages(0);
+                            delay.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        /*if(input_gesture.size() >= 2){
+                                            for(int i = 0; i < input_gesture.size()-1; i++){
+                                                if(input_gesture.get(i).equals(input_gesture.get(i+1))){
+                                                    num.add(i);
+                                                }
+                                            }
+                                            for(int i : num){
+                                                if(input_gesture.get(i).equals("ㄱ")) {
+                                                    input_gesture.set(i, "ㄲ");
+                                                    input_gesture.set(i + 1, " ");
+                                                }
+                                                else if(input_gesture.get(i).equals("ㄷ")) {
+                                                    input_gesture.set(i, "ㄸ");
+                                                    input_gesture.set(i + 1, " ");
+                                                }
+                                                else if(input_gesture.get(i).equals("ㅂ")) {
+                                                    input_gesture.set(i, "ㅃ");
+                                                    input_gesture.set(i + 1, " ");
+                                                }
+                                                else if(input_gesture.get(i).equals("ㅅ")) {
+                                                    input_gesture.set(i, "ㅆ");
+                                                    input_gesture.set(i + 1, " ");
+                                                }
+                                                else if(input_gesture.get(i).equals("ㅈ")) {
+                                                    input_gesture.set(i, "ㅉ");
+                                                    input_gesture.set(i + 1, " ");
+                                                }
+                                            }
+                                        }
+                                        input_gesture.removeAll(Collections.singleton(" "));*/
+                                        String s = HangulParser.assemble(input_gesture);
+                                        ReceiveData.append(s+"\n");
+                                        tts.speak(s,TextToSpeech.QUEUE_FLUSH,null);
+                                        input_gesture.clear();
+                                        System.out.println("지화 List : " + input_gesture);
+
+                                        scrollView.post(new Runnable() {
+                                            public void run() {
+                                                // TODO Auto-generated method stub
+                                                scrollView.scrollTo(0, ReceiveData.getHeight());
+                                            }
+                                        });
+
+                                    } catch (HangulParserException e) {
+                                        //tts.speak("인식오류가 발생하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
+                                        Log.d("clear","input_gesture List clear!!!");
+                                        input_gesture.clear();
+                                        e.printStackTrace();
+                                    }
+                                }
+                            },3000);
                         }
                         break;
                     case WORD:
@@ -441,6 +532,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
         Collections.sort(list,new Comparator() {

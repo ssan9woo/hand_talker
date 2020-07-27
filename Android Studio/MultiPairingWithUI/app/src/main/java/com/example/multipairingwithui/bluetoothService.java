@@ -194,6 +194,8 @@ public class bluetoothService extends Service {
         }
     }
     public void onDestroy(){
+        if(mReceiver != null)
+            unregisterReceiver(mReceiver);
         if(BC_right !=null) {
             try {
                 BC_right.cancel();
@@ -208,8 +210,7 @@ public class bluetoothService extends Service {
                 e.printStackTrace();
             }
         }
-        if(mReceiver != null)
-            unregisterReceiver(mReceiver);
+
         super.onDestroy();
     }
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
@@ -312,6 +313,7 @@ public class bluetoothService extends Service {
                 try {
                     String s = Buffer_in.readLine();
                     //Log.d("BUFF",s);
+
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -401,7 +403,9 @@ public class bluetoothService extends Service {
             bringHandler = new Handler(){
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 public void handleMessage(@NonNull Message msg){
-                    String[] arr = ((String)msg.obj).split(",");
+                    String[] arr = {};
+                    arr = ((String)msg.obj).split(",");
+
                     switch (msg.what){
                         case RIGHT://Right hand
                             for(int i=0; i< arr.length;i++){
