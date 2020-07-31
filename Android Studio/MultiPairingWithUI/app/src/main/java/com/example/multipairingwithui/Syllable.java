@@ -11,12 +11,14 @@ public class Syllable implements Cloneable{
     int[] flex;
     double[] gyro;
     boolean[] touch;
+
     Syllable(){
         syllable="";
         flex=new int[6];
         gyro=new double[3];
         touch=new boolean[2];
     }
+
     Syllable(String syllable){
         this.syllable=syllable;
         flex=new int[6];
@@ -43,6 +45,7 @@ public class Syllable implements Cloneable{
     public boolean[] getTouch(){
         return touch;
     }
+
     public double getEuclideanDistance(Syllable obj){
         double dist=0.00;
         double f=0.00;
@@ -54,11 +57,12 @@ public class Syllable implements Cloneable{
 
         for(int i=0;i<gyro.length;i++){
             dist+= Math.pow(this.gyro[i] - obj.gyro[i],2);
-            g+=Math.pow(this.flex[i] - obj.flex[i],2);
+            g+=Math.pow(this.gyro[i] - obj.gyro[i],2);
         }
         Log.d("get",this.syllable+dist+"   F:  "+f+"    G: "+g);
         return dist;
     }
+
     @Override
     @NonNull
     public Object clone() throws CloneNotSupportedException {
