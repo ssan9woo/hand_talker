@@ -97,6 +97,7 @@ public class PreferenceManager {
         Editor editor = new Editor(sharePref.edit());
         int count = sharePref.getInt(LEN_PREFIX + name, 0);
         editor.remove(LEN_PREFIX+name);
+        Log.d("remove",name);
         for(int i=0; i<count;i++){
             editor.remove(VAL_PREFIX+name+i);
         }

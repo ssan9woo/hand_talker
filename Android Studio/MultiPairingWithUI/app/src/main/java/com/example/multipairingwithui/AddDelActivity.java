@@ -39,7 +39,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     Toolbar toolbar;
-    public static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅠ","ㅎ"};
+    public static final String[] str_CONSONANT=new String[]{"ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"};
     public static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
     public static final String consonant="CONSONANT";
     public static final String vowel="VOWEL";
@@ -62,7 +62,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adddel);
         mContext=this;
-
+        bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
         for(int i=0;i <str_CONSONANT.length;i++){
             if(PreferenceManager.IskeyinPref(consonant+str_CONSONANT[i],mContext)){
                 list_consonant.add(str_CONSONANT[i]);
@@ -91,8 +91,11 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem( R.id.nav_add_del );
 
-        bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
+
     }
+
+
+
     public void setLayout(){
         consonant_listview = (ListView) findViewById(R.id.consonant_listview);
         consonant_btnAdd = (Button) findViewById(R.id.consonant_btnAdd);
@@ -132,8 +135,9 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(pos != ListView.INVALID_POSITION){
                 list_consonant.remove(pos);
                 consonant_listview.clearChoices();
-                consonant_adapter.notifyDataSetChanged();
                 PreferenceManager.remove_gesture_value(bluetoothService.CONSONANT +str,mContext);
+                consonant_adapter.notifyDataSetChanged();
+
             }
         }else if(v == vowel_btnAdd){
             String str = vowel_edittext.getText().toString();
@@ -145,12 +149,13 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             }
         }else if(v == vowel_btnDel){
             int pos = vowel_listview.getCheckedItemPosition();
-            String str = consonant_adapter.getItem(pos);
+            String str = vowel_adapter.getItem(pos);
             if(pos != ListView.INVALID_POSITION){
                 list_vowel.remove(pos);
                 vowel_listview.clearChoices();
-                vowel_adapter.notifyDataSetChanged();
                 PreferenceManager.remove_gesture_value(bluetoothService.VOWEL+str,mContext);
+                vowel_adapter.notifyDataSetChanged();
+
             }
         }
     }
@@ -185,10 +190,14 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         {
             isService = false;
         }
-        unbindService(conn);
         super.onDestroy();
 
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(conn);
+    };
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch ( menuItem.getItemId() ){
