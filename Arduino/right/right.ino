@@ -1,5 +1,6 @@
 #include <CapacitiveSensor.h>
 #include <SoftwareSerial.h>
+//추후 mcp 
 //define Mcp3208 Pin
 #define SBUF_SIZE 64
 #define SELPIN 10 //Selection Pin 
