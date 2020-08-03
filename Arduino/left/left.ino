@@ -78,32 +78,7 @@ void loop(){
     
 }
 
-int read_adc(int channel)
-{
-    int adcvalue = 0;
-    byte commandbits = B11000000;
-    commandbits|=((channel-1)<<3);
-    
-    digitalWrite(SELPIN,LOW); 
-    for (int i=7; i>=3; i--)
-    {
-        digitalWrite(DATAOUT,commandbits&1<<i);
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);    
-    }
-    digitalWrite(SPICLOCK,HIGH);    
-    digitalWrite(SPICLOCK,LOW);
-    digitalWrite(SPICLOCK,HIGH);  
-    digitalWrite(SPICLOCK,LOW);
-    for (int i=11; i>=0; i--)
-    {
-        adcvalue+=digitalRead(DATAIN)<<i;
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);
-    }
-    digitalWrite(SELPIN, HIGH);
-    return adcvalue;
-}
+
 
 int EBimuAsciiParser(float *item, int number_of_item)
 {
