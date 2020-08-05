@@ -1,14 +1,8 @@
 #include <CapacitiveSensor.h>
 #include <SoftwareSerial.h>
-//추후 mcp 
-//define Mcp3208 Pin
+
 #define SBUF_SIZE 64
-#define SELPIN 10 //Selection Pin 
-#define DATAOUT 11//MOSI 
-#define DATAIN  12//MISO 
-#define SPICLOCK  13//Clock
 int EBimuAsciiParser(float *item, int number_of_item);
-int read_adc(int channel);
 CapacitiveSensor   cs_2_3 = CapacitiveSensor(2, 3);
 CapacitiveSensor   cs_5_6 = CapacitiveSensor(5, 6); 
 SoftwareSerial bluetooth(4, 7);
@@ -98,33 +92,6 @@ void loop()
        bluetooth.write(vcc_buff);
        bluetooth.write("\n");
     }
-}
-
-int read_adc(int channel)
-{
-    int adcvalue = 0;
-    byte commandbits = B11000000;
-    commandbits|=((channel-1)<<3);
-    
-    digitalWrite(SELPIN,LOW); 
-    for (int i=7; i>=3; i--)
-    {
-        digitalWrite(DATAOUT,commandbits&1<<i);
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);    
-    }
-    digitalWrite(SPICLOCK,HIGH);    
-    digitalWrite(SPICLOCK,LOW);
-    digitalWrite(SPICLOCK,HIGH);  
-    digitalWrite(SPICLOCK,LOW);
-    for (int i=11; i>=0; i--)
-    {
-        adcvalue+=digitalRead(DATAIN)<<i;
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);
-    }
-    digitalWrite(SELPIN, HIGH); //turn off device
-    return adcvalue;
 }
 
 int EBimuAsciiParser(float *item, int number_of_item)
