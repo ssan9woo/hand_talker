@@ -21,7 +21,7 @@ int analogInput = 0;
 
 void setup()
 { 
-  //mcp3208 + Flex
+  
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
