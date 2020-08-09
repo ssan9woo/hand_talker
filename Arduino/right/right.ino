@@ -47,7 +47,6 @@ void loop()
    if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
    
    for(int i = 0; i < 6; i++){
-       flexData[i] = read_adc(i+3);
        sprintf(rightHandFlex[i],"%d",flexData[i]);
        //Serial.print(flexData[i]); Serial.print(" ");
        if(flexData[i]<1000) flag=0;
