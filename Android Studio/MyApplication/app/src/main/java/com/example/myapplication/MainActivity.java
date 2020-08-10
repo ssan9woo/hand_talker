@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity {
         fixedCollection = new ArrayList<String>(Arrays.asList("0","0","0","0","0","0","0","0","ㅘ","ㅙ","0","0","0","0","0","0","0","ㅝ","ㅞ"));
         fixedConsonant = new ArrayList<String>(Arrays.asList("0","0","0","0","0","0","0","0","ㄺ","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","ㄼ","ㄵ","0","0","0","0","0","ㄶ","0","0","0","0","ㅄ"));
 
-        //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㅣ"); //닭기
-        //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㅣ"); //닭끼
 
 
         arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅏ");arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅐ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅓ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅔ");
