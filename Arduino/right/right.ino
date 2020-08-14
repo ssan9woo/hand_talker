@@ -1,6 +1,5 @@
 #include <CapacitiveSensor.h>
 #include <SoftwareSerial.h>
-
 #define SBUF_SIZE 64
 int EBimuAsciiParser(float *item, int number_of_item);
 CapacitiveSensor   cs_2_3 = CapacitiveSensor(2, 3);
