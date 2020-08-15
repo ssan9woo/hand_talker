@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-//define Mcp3208 Pin
 #define SBUF_SIZE 64
 #define SELPIN 10 //Selection Pin 
 #define DATAOUT 11//MOSI 
