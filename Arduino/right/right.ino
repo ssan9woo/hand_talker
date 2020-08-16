@@ -20,7 +20,6 @@ char capacitor_buff[2][40];
 char vcc_buff[40];
 void setup()
 { 
-  //mcp3208 + Flex
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
