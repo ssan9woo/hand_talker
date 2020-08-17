@@ -68,7 +68,6 @@ void loop()
            bluetooth.write(",");
        }
        
-       //send Capacitor
        
        if(capacitor_left>70){
            sprintf(capacitor_buff[0],"true");
