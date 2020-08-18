@@ -77,8 +77,6 @@ void loop(){
     
 }
 
-
-
 int EBimuAsciiParser(float *item, int number_of_item)
 {
     int n,i;
