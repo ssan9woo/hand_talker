@@ -7,7 +7,6 @@
 int EBimuAsciiParser(float *item, int number_of_item);
 int read_adc(int channel);
 SoftwareSerial bluetooth(4, 7);
-//Flex-------------------------------------------
 char leftHandFlex[5][40];  //flexData -> dtostrf
 int flexData[5];            //get FlexData
 char vcc_buff[40];
