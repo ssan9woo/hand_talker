@@ -8,7 +8,6 @@ SoftwareSerial bluetooth(4, 7);
 //Flex-------------------------------------------
 char rightHandFlex[6][40];  //flexData -> dtostrf
 int flexData[6];            //get FlexData
-//-----------------------------------------------
 //Ebimu------------------------------------------
 char rightHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
