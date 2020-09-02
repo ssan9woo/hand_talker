@@ -17,7 +17,6 @@ signed int sbuf_cnt=0;
 int analogInput = 0;
 void setup()
 { 
-  
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
