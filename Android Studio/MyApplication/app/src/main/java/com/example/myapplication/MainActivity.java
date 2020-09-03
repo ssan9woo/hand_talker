@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         fixedConsonant = new ArrayList<String>(Arrays.asList("0","0","0","0","0","0","0","0","ㄺ","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","ㄼ","ㄵ","0","0","0","0","0","ㄶ","0","0","0","0","ㅄ"));
 
         //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㅣ"); //닭기
-        //arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅏ");arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅐ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅓ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅔ");
-        arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㅈ");arr.add("ㅈ");arr.add("ㅣ");arr.add("ㄹ");arr.add("ㅜ");arr.add("ㅔ"); //닭끼
+        arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅏ");arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅐ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅓ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅔ");
+        //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㅈ");arr.add("ㅈ");arr.add("ㅣ");arr.add("ㄹ");arr.add("ㅜ");arr.add("ㅔ"); //닭끼
         System.out.println("초기 지화로 입력된 List : " + arr);
 
         //모음##########################################################################
@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+
 //        button = (Button) findViewById(R.id.button);
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
