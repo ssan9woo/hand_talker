@@ -87,13 +87,13 @@ public class bluetoothService extends Service {
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
     }
-    IBinder mBinder = new MyBinder();
-
-    class MyBinder extends Binder {
-        bluetoothService getService() { // 서비스 객체를 리턴
-            return bluetoothService.this;
-        }
-    }
+//    IBinder mBinder = new MyBinder();
+//
+//    class MyBinder extends Binder {
+//        bluetoothService getService() { // 서비스 객체를 리턴
+//            return bluetoothService.this;
+//        }
+//    }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
@@ -173,6 +173,7 @@ public class bluetoothService extends Service {
         int a = 0;
         return a;
     }
+
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -265,7 +266,6 @@ public class bluetoothService extends Service {
                     connectedThread.cancel();
                 }
             }
-
         }
         void cancel() throws IOException {
             if(connectedThread != null){
@@ -470,6 +470,7 @@ public class bluetoothService extends Service {
                     }
                     //왼손 오른손 둘중 하나의 에너지가 150이상 이라면 스택에 쌓아둠//
                     if(E_right_sum < 100){
+                        //얘도 다시설정 -> 지화의 끝구간이 너무 가속도 민감도가 높으면 동작이 끝나기도 전에 구간이 종료될 수 있음.
                         if(right_stack.IsGesture()){
                             Syllable syllable =  new Syllable();
                             syllable.setFlex(right_stack.popflex());

@@ -45,18 +45,12 @@ public class MainActivity extends AppCompatActivity {
         fixedConsonant = new ArrayList<String>(Arrays.asList("0","0","0","0","0","0","0","0","ㄺ","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","ㄼ","ㄵ","0","0","0","0","0","ㄶ","0","0","0","0","ㅄ"));
 
         //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㅣ"); //닭기
-        //arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㄱ");arr.add("ㅣ"); //닭끼
-
-
-        arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅏ");arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅐ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅓ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅔ");
-
+        //arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅏ");arr.add("ㅇ");arr.add("ㅗ");arr.add("ㅐ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅓ");arr.add("ㅇ");arr.add("ㅜ");arr.add("ㅔ");
+        arr.add("ㄷ");arr.add("ㅏ");arr.add("ㄹ");arr.add("ㄱ");arr.add("ㅈ");arr.add("ㅈ");arr.add("ㅣ");arr.add("ㄹ");arr.add("ㅜ");arr.add("ㅔ"); //닭끼
         System.out.println("초기 지화로 입력된 List : " + arr);
+
         //모음##########################################################################
-        for(int i = 0; i < arr.size(); i++){
-            if(arr.get(i).codePointAt(0) > 12622 && arr.get(i).codePointAt(0) < 12644){ //모음일경우
-                collection_index.add(i);
-            }
-        }
+        FindCollectionIndex(arr);
         if(collection_index.size() >= 2){
             for(int i = 1; i <= collection_index.size()- 1; i++){
                 if(collection_index.get(i) - collection_index.get(i-1) == 1){
@@ -64,19 +58,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             arr.removeAll(Collections.singleton(" "));
+            System.out.println("모음 합성 후 Lisn : " + arr);
         }
         else{
             System.out.println(arr + "모음 합성 없음");
         }
-        //##############################################################################
         collection_index.clear();
-        //자음###########################################################################
-        for(int i = 0; i < arr.size(); i++){
-            if(arr.get(i).codePointAt(0) > 12622 && arr.get(i).codePointAt(0) < 12644){ //모음일경우
-                collection_index.add(i);
-            }
-        }
+        //##############################################################################
 
+
+        //자음###########################################################################
+        FindCollectionIndex(arr);
         if(collection_index.size() >= 2){
             for(int i = 1; i <= collection_index.size()- 1; i++){
                 if(collection_index.get(i) - collection_index.get(i-1) - 1 >= 3){
@@ -88,9 +80,24 @@ public class MainActivity extends AppCompatActivity {
         }
         //##############################################################################
 
+
+        //쌍자음##########################################################################
+        String arr_value = "";
+        for(int i = 0; i < arr.size(); i++){
+            if(arr.get(i).equals(arr_value)) {
+                char a = (char)(arr.get(i).codePointAt(0) + 1);
+                arr.set(i,String.valueOf(a));
+                arr.set(i-1," ");
+            }
+            arr_value = arr.get(i);
+        }
+        arr.removeAll(Collections.singleton(" "));
+        //##############################################################################
+
+
         //Hangual Parser################################################################
         try {
-            System.out.println("한글 조합 후 출력문자 : " + HangulParser.assemble(arr));
+            System.out.println("쌍자음 변환 후 List : " + arr + "\n한글 조합 후 출력문자 : " + HangulParser.assemble(arr));
         } catch (HangulParserException e) {
             e.printStackTrace();
         }
@@ -112,6 +119,14 @@ public class MainActivity extends AppCompatActivity {
         arr.set(collection_index.get(index - 1) + 1,fixedConsonant.get(fixIndex));
         arr.set(collection_index.get(index - 1) + 2," ");
         return arr;
+    }
+
+    public void FindCollectionIndex(ArrayList<String> arr){
+        for(int i = 0; i < arr.size(); i++){
+            if(arr.get(i).codePointAt(0) > 12622 && arr.get(i).codePointAt(0) < 12644){ //모음일경우
+                collection_index.add(i);
+            }
+        }
     }
 }
 
