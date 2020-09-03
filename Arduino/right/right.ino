@@ -1,6 +1,5 @@
 #include <CapacitiveSensor.h>
 #include <SoftwareSerial.h>
-
 #define SBUF_SIZE 64
 int EBimuAsciiParser(float *item, int number_of_item);
 CapacitiveSensor   cs_2_3 = CapacitiveSensor(2, 3);
@@ -9,7 +8,6 @@ SoftwareSerial bluetooth(4, 7);
 //Flex-------------------------------------------
 char rightHandFlex[6][40];  //flexData -> dtostrf
 int flexData[6];            //get FlexData
-//-----------------------------------------------
 //Ebimu------------------------------------------
 char rightHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
@@ -21,7 +19,6 @@ char capacitor_buff[2][40];
 char vcc_buff[40];
 void setup()
 { 
-  //mcp3208 + Flex
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
@@ -47,7 +44,6 @@ void loop()
    if(axis_6[3] >= 10 || axis_6[4] >= 10 || axis_6[5] >= 10) flag=0;
    
    for(int i = 0; i < 6; i++){
-       flexData[i] = read_adc(i+3);
        sprintf(rightHandFlex[i],"%d",flexData[i]);
        //Serial.print(flexData[i]); Serial.print(" ");
        if(flexData[i]<1000) flag=0;
@@ -71,7 +67,6 @@ void loop()
            bluetooth.write(",");
        }
        
-       //send Capacitor
        
        if(capacitor_left>70){
            sprintf(capacitor_buff[0],"true");
@@ -125,3 +120,5 @@ int EBimuAsciiParser(float *item, int number_of_item)
     }
     return result;
 }
+
+

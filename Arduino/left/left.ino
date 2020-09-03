@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-//define Mcp3208 Pin
 #define SBUF_SIZE 64
 #define SELPIN 10 //Selection Pin 
 #define DATAOUT 11//MOSI 
@@ -8,7 +7,6 @@
 int EBimuAsciiParser(float *item, int number_of_item);
 int read_adc(int channel);
 SoftwareSerial bluetooth(4, 7);
-//Flex-------------------------------------------
 char leftHandFlex[5][40];  //flexData -> dtostrf
 int flexData[5];            //get FlexData
 char vcc_buff[40];
@@ -16,12 +14,9 @@ char leftHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
 char sbuf[SBUF_SIZE];
 signed int sbuf_cnt=0;
-
 int analogInput = 0;
-
 void setup()
 { 
-  //mcp3208 + Flex
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
@@ -77,9 +72,6 @@ void loop(){
    }
     
 }
-
-
-
 int EBimuAsciiParser(float *item, int number_of_item)
 {
     int n,i;
