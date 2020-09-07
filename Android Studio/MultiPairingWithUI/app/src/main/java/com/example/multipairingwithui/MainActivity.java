@@ -36,6 +36,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.github.kimkevin.hangulparser.HangulParser;
 import com.google.android.material.navigation.NavigationView;
 
 import java.lang.reflect.Array;
@@ -544,8 +545,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         //Collections.reverse(list);
         Log.d("After",String.valueOf(list));
+
         return list.get(list.size()-1);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

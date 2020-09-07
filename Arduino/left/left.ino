@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-//define Mcp3208 Pin
 #define SBUF_SIZE 64
 #define SELPIN 10 //Selection Pin 
 #define DATAOUT 11//MOSI 
@@ -8,7 +7,6 @@
 int EBimuAsciiParser(float *item, int number_of_item);
 int read_adc(int channel);
 SoftwareSerial bluetooth(4, 7);
-//Flex-------------------------------------------
 char leftHandFlex[5][40];  //flexData -> dtostrf
 int flexData[5];            //get FlexData
 char vcc_buff[40];
@@ -16,12 +14,9 @@ char leftHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
 char sbuf[SBUF_SIZE];
 signed int sbuf_cnt=0;
-
 int analogInput = 0;
-
 void setup()
 { 
-  //mcp3208 + Flex
   pinMode(SELPIN, OUTPUT); 
   pinMode(DATAOUT, OUTPUT); 
   pinMode(DATAIN, INPUT); 
@@ -77,34 +72,6 @@ void loop(){
    }
     
 }
-
-int read_adc(int channel)
-{
-    int adcvalue = 0;
-    byte commandbits = B11000000;
-    commandbits|=((channel-1)<<3);
-    
-    digitalWrite(SELPIN,LOW); 
-    for (int i=7; i>=3; i--)
-    {
-        digitalWrite(DATAOUT,commandbits&1<<i);
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);    
-    }
-    digitalWrite(SPICLOCK,HIGH);    
-    digitalWrite(SPICLOCK,LOW);
-    digitalWrite(SPICLOCK,HIGH);  
-    digitalWrite(SPICLOCK,LOW);
-    for (int i=11; i>=0; i--)
-    {
-        adcvalue+=digitalRead(DATAIN)<<i;
-        digitalWrite(SPICLOCK,HIGH);
-        digitalWrite(SPICLOCK,LOW);
-    }
-    digitalWrite(SELPIN, HIGH);
-    return adcvalue;
-}
-
 int EBimuAsciiParser(float *item, int number_of_item)
 {
     int n,i;

@@ -11,12 +11,14 @@ public class Syllable implements Cloneable{
     int[] flex;
     double[] gyro;
     boolean[] touch;
+
     Syllable(){
         syllable="";
         flex=new int[6];
         gyro=new double[3];
         touch=new boolean[2];
     }
+
     Syllable(String syllable){
         this.syllable=syllable;
         flex=new int[6];
@@ -58,6 +60,7 @@ public class Syllable implements Cloneable{
         }
         return dist;
     }
+
     @Override
     @NonNull
     public Object clone() throws CloneNotSupportedException {
