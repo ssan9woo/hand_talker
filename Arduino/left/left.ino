@@ -14,6 +14,7 @@ char leftHandEbimu[6][40]; //axis_6 -> sprintf
 float axis_6[6];            //get 6 axis(euler, acc)
 char sbuf[SBUF_SIZE];
 signed int sbuf_cnt=0;
+
 int analogInput = 0;
 void setup()
 { 
