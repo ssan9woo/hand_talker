@@ -189,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
         clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.clear);
