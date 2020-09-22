@@ -43,6 +43,7 @@ public class PreferenceManager {
         Editor editor = new Editor(sharePref.edit());
         editor.putInt(LEN_PREFIX+name,bluetoothService.right_hand.getDatalength());
         int count = 0;
+        Log.d("Stored_Syllable",Arrays.toString(hand.getFlex())+Arrays.toString(hand.getGyro())+Arrays.toString(hand.getTouch()));
         if(hand.hand=="RIGHT"){
             for(double i:hand.getGyro()){
                 editor.putDouble( editor,VAL_PREFIX+name+count++,i);
