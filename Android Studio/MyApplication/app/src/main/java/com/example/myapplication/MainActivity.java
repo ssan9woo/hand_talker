@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Integer> num = new ArrayList<>();
     Handler h = new Handler();
 
-    /*
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    */
+
 }
 
 
