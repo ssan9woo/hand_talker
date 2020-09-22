@@ -421,17 +421,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Syllable syllable;
                         syllable = (Syllable) msg.obj;
                         HashMap<String, Double> map = new HashMap<String, Double>();
-
+                        Log.d("gesture",Arrays.toString(syllable.flex)+Arrays.toString(syllable.gyro)+Arrays.toString(syllable.touch));
                         for (Syllable consonant : consonants) {
                             if(Arrays.equals(consonant.touch,syllable.touch)) {
-                                if (consonant.getEuclideanDistance_Flex(syllable) < 15) {
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 50) {
                                     map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
+
                                 }
                             }
                         }
                         for(Syllable vowel : vowels){
                             if(Arrays.equals(vowel.touch,syllable.touch)) {
-                                if (vowel.getEuclideanDistance_Flex(syllable) < 15) {
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 50) {
                                     map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
@@ -456,41 +457,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 @Override
                                 public void run() {
                                     try {
-                                        /*if(input_gesture.size() >= 2){
-                                            for(int i = 0; i < input_gesture.size()-1; i++){
-                                                if(input_gesture.get(i).equals(input_gesture.get(i+1))){
-                                                    num.add(i);
-                                                }
-                                            }
-                                            for(int i : num){
-                                                if(input_gesture.get(i).equals("ㄱ")) {
-                                                    input_gesture.set(i, "ㄲ");
-                                                    input_gesture.set(i + 1, " ");
-                                                }
-                                                else if(input_gesture.get(i).equals("ㄷ")) {
-                                                    input_gesture.set(i, "ㄸ");
-                                                    input_gesture.set(i + 1, " ");
-                                                }
-                                                else if(input_gesture.get(i).equals("ㅂ")) {
-                                                    input_gesture.set(i, "ㅃ");
-                                                    input_gesture.set(i + 1, " ");
-                                                }
-                                                else if(input_gesture.get(i).equals("ㅅ")) {
-                                                    input_gesture.set(i, "ㅆ");
-                                                    input_gesture.set(i + 1, " ");
-                                                }
-                                                else if(input_gesture.get(i).equals("ㅈ")) {
-                                                    input_gesture.set(i, "ㅉ");
-                                                    input_gesture.set(i + 1, " ");
-                                                }
-                                            }
-                                        }
-                                        input_gesture.removeAll(Collections.singleton(" "));*/
-                                        String s = HangulParser.assemble(input_gesture);
+                                        SyllableCombination hangul = new SyllableCombination();
+                                        String s = hangul.getSentence(input_gesture);
                                         ReceiveData.append(s+"\n");
                                         tts.speak(s,TextToSpeech.QUEUE_FLUSH,null);
                                         input_gesture.clear();
-                                        System.out.println("지화 List : " + input_gesture);
 
                                         scrollView.post(new Runnable() {
                                             public void run() {
@@ -500,8 +471,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         });
 
                                     } catch (HangulParserException e) {
-                                        //tts.speak("인식오류가 발생하였습니다.",TextToSpeech.QUEUE_FLUSH,null);
-                                        Log.d("clear","input_gesture List clear!!!");
                                         input_gesture.clear();
                                         e.printStackTrace();
                                     }

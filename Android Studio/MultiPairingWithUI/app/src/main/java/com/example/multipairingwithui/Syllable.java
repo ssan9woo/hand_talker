@@ -49,12 +49,9 @@ public class Syllable implements Cloneable{
         double dist=0.00;
 
         for(int i=0;i<flex.length;i++){
-            if ( i== flex.length-1){
-                dist+=Math.pow(this.flex[i] - obj.flex[i],2)*2;
-            }
-            else {
-                dist += Math.pow(this.flex[i] - obj.flex[i], 2);
-            }
+
+            dist += Math.pow(this.flex[i] - obj.flex[i], 2);
+
         }
         return dist;
     }
