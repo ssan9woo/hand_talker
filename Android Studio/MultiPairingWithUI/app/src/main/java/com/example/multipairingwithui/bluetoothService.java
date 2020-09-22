@@ -312,7 +312,7 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    //Log.d("BUFF",s);
+                    Log.d("BUFF",s);
 
                     /*
                     Left data format
@@ -324,6 +324,8 @@ public class bluetoothService extends Service {
                     Flex1: 3000, Flex2: 3000, Flex3: 3000, Flex4: 3000 , Flex5: 3000, Flex6: 3000,
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
+
+                    ㅏ ㅗ ㅜ ㅡ
                     */
 
                     if(IsConnect_left || IsConnect_right){
@@ -480,7 +482,6 @@ public class bluetoothService extends Service {
                             syllable.setFlex(right_stack.popflex());
                             syllable.setGyro(right_stack.popgyro());
                             syllable.setTouch(right_hand.getTouch());
-                            Log.d("TT",Arrays.toString(syllable.getTouch()));
                             Message m = new Message();
                             m.what=MainActivity.GESTURE;
                             m.arg1=MainActivity.SYLLABLE;

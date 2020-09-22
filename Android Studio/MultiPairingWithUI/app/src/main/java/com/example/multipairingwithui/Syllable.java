@@ -48,14 +48,19 @@ public class Syllable implements Cloneable{
     public double getEuclideanDistance_Flex(Syllable obj){
         double dist=0.00;
 
-        for(int i=0;i<flex.length-1;i++){
-            dist+= Math.pow(this.flex[i] - obj.flex[i],2);
+        for(int i=0;i<flex.length;i++){
+            if ( i== flex.length-1){
+                dist+=Math.pow(this.flex[i] - obj.flex[i],2)*2;
+            }
+            else {
+                dist += Math.pow(this.flex[i] - obj.flex[i], 2);
+            }
         }
         return dist;
     }
     public double getEuclideanDistance_Gyro(Syllable obj){
         double dist=0.00;
-        for(int i=0;i<gyro.length;i++){
+        for(int i=0;i<gyro.length-1;i++){
             dist+= Math.pow(this.gyro[i] - obj.gyro[i],2);
         }
         return dist;

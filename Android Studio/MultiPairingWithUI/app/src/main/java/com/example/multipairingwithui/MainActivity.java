@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         signImage.startAnimation(fadeOutAnimation);
                         signMessage.startAnimation(fadeOutAnimation);
                     }
-                }, 500); // 0.5초후
+                }, 500);
             }
             else if (msg.what == GESTURE){
                 switch (msg.arg1){
@@ -427,7 +427,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if(Arrays.equals(consonant.touch,syllable.touch)) {
                                 if (consonant.getEuclideanDistance_Flex(syllable) < 15) {
                                     map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
-                                    Log.d("Euclidean", consonant.syllable + " " + consonant.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
                         }
@@ -435,16 +434,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if(Arrays.equals(vowel.touch,syllable.touch)) {
                                 if (vowel.getEuclideanDistance_Flex(syllable) < 15) {
                                     map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
-                                    Log.d("Euclidean", vowel.syllable + " " + vowel.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
                         }
-                        System.out.println(map.size()+String.valueOf(map.isEmpty()));
 
                         if(!map.isEmpty()) {
-                            Log.d("map", String.valueOf(map));
                             String ret = HashMapSort(map);
-                            Log.d("ret", ret);
+                            Log.d("Return",ret);
                             input_gesture.add(ret);
                             ReceiveData.append(ret+"\n");
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
@@ -515,6 +511,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         break;
                     case WORD:
+
                         break;
                 }
             }
@@ -536,6 +533,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
+
+        Log.d("Before",String.valueOf(list));
         Collections.sort(list,new Comparator() {
             public int compare(Object o1,Object o2) {
                 Object v1 = map.get(o1);
@@ -544,7 +543,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         //Collections.reverse(list);
-        Log.d("After",String.valueOf(list));
 
         return list.get(list.size()-1);
     }
