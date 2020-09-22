@@ -87,13 +87,6 @@ public class bluetoothService extends Service {
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
     }
-//    IBinder mBinder = new MyBinder();
-//
-//    class MyBinder extends Binder {
-//        bluetoothService getService() { // 서비스 객체를 리턴
-//            return bluetoothService.this;
-//        }
-//    }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
@@ -163,15 +156,11 @@ public class bluetoothService extends Service {
         }
         //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[ROCK]), mContext)));
         //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[PAPER]), mContext)));
-        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
-        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
         super.onCreate();
-    }
-    public int getVcc(){
-        int a = 0;
-        return a;
     }
 
     @SuppressLint("HandlerLeak")
