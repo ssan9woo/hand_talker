@@ -37,14 +37,13 @@ void setup()
 
 void loop() 
 {
-   capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
-   capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
-   Serial.print(capacitor_left); Serial.print("  ");Serial.print(capacitor_right);
+   capacitor_left = cs_2_3.capacitiveSensorRaw(2);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
+   capacitor_right = cs_5_6.capacitiveSensorRaw(2);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
    //6 ~ 2 : 엄지 ~ 새끼, 1 : 손목
-
+   Serial.print(capacitor_left); Serial.println(capacitor_right);
 
    //Flex Sensor---------------------------------------
-   Serial.print("  Flex sensor :");
+   //Serial.print("  Flex sensor :");
    for(int i = 0; i < 6; i++){
       flexData[i] = analogRead(6-i);
       sprintf(rightHandFlex[i],"%d",flexData[i]);
@@ -56,28 +55,30 @@ void loop()
 
    //Ebimu---------------------------------------------
    EBimuAsciiParser(axis_6,6);
-   Serial.print("  6 axis : ");
+   //Serial.print("  6 axis : ");
    for(int i = 0; i < 6; i++){
       dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
-      Serial.print(rightHandEbimu[i]); Serial.print(" ");
+      //Serial.print(rightHandEbimu[i]); Serial.print(" ");
    }
-   Serial.println(" ");
+   //Serial.println(" ");
    //--------------------------------------------------
 
    
    //Capacitor-----------------------------------------
-   if(capacitor_left>70){
+   if(capacitor_left > 0){
       sprintf(capacitor_buff[0],"true");
    }
    else{
       sprintf(capacitor_buff[0],"false");
    }
-   if(capacitor_right>70){
+   if(capacitor_right > 4){
       sprintf(capacitor_buff[1],"true");
    }
    else{
       sprintf(capacitor_buff[1],"false");
    }
+   Serial.print(capacitor_buff[0]); Serial.println(capacitor_buff[1]);
+   Serial.println("==================================");
    //--------------------------------------------------
 
    
@@ -96,6 +97,7 @@ void loop()
    }
    bluetooth.write("5.00");
    bluetooth.write("\n");
+
    //--------------------------------------------------
 } 
 
