@@ -312,8 +312,6 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    Log.d("BUFF",s);
-
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -324,8 +322,6 @@ public class bluetoothService extends Service {
                     Flex1: 3000, Flex2: 3000, Flex3: 3000, Flex4: 3000 , Flex5: 3000, Flex6: 3000,
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
-
-                    ㅏ ㅗ ㅜ ㅡ
                     */
 
                     if(IsConnect_left || IsConnect_right){
@@ -439,7 +435,6 @@ public class bluetoothService extends Service {
                             rightenergy_q.offer(E_right);
                             if (rightenergy_q.size()>5) E_right_sum-=rightenergy_q.poll();
                             if(E_left_sum >=130 || E_right_sum >= 130) {
-                                Log.d("rightEnergy", String.valueOf(E_right_sum));
                                 right_stack.push(Gyro,Flex_right);
                             }
                             break;
