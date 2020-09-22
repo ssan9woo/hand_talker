@@ -91,7 +91,6 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem( R.id.nav_add_del );
 
-
     }
 
 

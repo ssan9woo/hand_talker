@@ -195,6 +195,8 @@ public class bluetoothService extends Service {
         }
     }
     public void onDestroy(){
+        if(mReceiver != null)
+            unregisterReceiver(mReceiver);
         if(BC_right !=null) {
             try {
                 BC_right.cancel();
@@ -209,8 +211,7 @@ public class bluetoothService extends Service {
                 e.printStackTrace();
             }
         }
-        if(mReceiver != null)
-            unregisterReceiver(mReceiver);
+
         super.onDestroy();
     }
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device)
@@ -311,7 +312,8 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-                    //Log.d("BUFF",s);
+                    Log.d("BUFF",s);
+
                     /*
                     Left data format
                     X: 0.00, Y: 0.00, Z: 0.00, AccX: 0.00, AccY: 0.00, AccZ: 0.00,
@@ -322,6 +324,8 @@ public class bluetoothService extends Service {
                     Flex1: 3000, Flex2: 3000, Flex3: 3000, Flex4: 3000 , Flex5: 3000, Flex6: 3000,
                     Capacitive Sensor1: 0/1, Capacitive Sensor2: 0/1, VCC:0.00
                     오른쪽 손 총 최소 길이 = 85
+
+                    ㅏ ㅗ ㅜ ㅡ
                     */
 
                     if(IsConnect_left || IsConnect_right){
@@ -401,7 +405,9 @@ public class bluetoothService extends Service {
             bringHandler = new Handler(){
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 public void handleMessage(@NonNull Message msg){
-                    String[] arr = ((String)msg.obj).split(",");
+                    String[] arr = {};
+                    arr = ((String)msg.obj).split(",");
+
                     switch (msg.what){
                         case RIGHT://Right hand
                             for(int i=0; i< arr.length;i++){
@@ -476,7 +482,6 @@ public class bluetoothService extends Service {
                             syllable.setFlex(right_stack.popflex());
                             syllable.setGyro(right_stack.popgyro());
                             syllable.setTouch(right_hand.getTouch());
-                            Log.d("TT",Arrays.toString(syllable.getTouch()));
                             Message m = new Message();
                             m.what=MainActivity.GESTURE;
                             m.arg1=MainActivity.SYLLABLE;
