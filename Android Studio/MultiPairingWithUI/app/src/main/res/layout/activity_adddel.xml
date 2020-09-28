@@ -15,7 +15,9 @@
         android:id="@+id/nav_view"
         app:headerLayout="@layout/header"
         app:menu="@menu/main_menu"
-        android:layout_gravity="start"/>
+        android:layout_gravity="start">
+
+    </com.google.android.material.navigation.NavigationView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,42 +32,22 @@
             android:background="#00008577"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
-            app:layout_constraintBottom_toTopOf="@+id/consonant_btnAdd"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/toolbar_menubar" />
 
-        <ListView
-            android:id="@+id/consonant_listview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="13dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginEnd="13dp"
-            android:layout_marginRight="13dp"
-            android:layout_marginBottom="49dp"
-            app:layout_constraintBottom_toTopOf="@+id/vowel_edit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/consonant_edit"
-            tools:ignore="DuplicateIds,MissingConstraints" />
-
         <EditText
             android:id="@+id/consonant_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginBottom="31dp"
             android:ems="10"
+            android:hint="자음"
             android:inputType="textPersonName"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/consonant_btnAdd"
             app:layout_constraintBottom_toTopOf="@+id/consonant_listview"
-            app:layout_constraintEnd_toStartOf="@+id/consonant_btnDel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/consonant_btnAdd"
             tools:ignore="MissingConstraints" />
 
         <Button
@@ -73,8 +55,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="추가"
-            app:layout_constraintBottom_toTopOf="@+id/consonant_edit"
-            app:layout_constraintStart_toStartOf="@+id/consonant_btnDel"
+            app:layout_constraintBottom_toTopOf="@+id/consonant_listview"
+            app:layout_constraintLeft_toRightOf="@+id/consonant_edit"
+            app:layout_constraintRight_toLeftOf="@+id/consonant_btnDel"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             tools:ignore="MissingConstraints" />
 
@@ -82,65 +65,114 @@
             android:id="@+id/consonant_btnDel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="11dp"
             android:text="삭제"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/consonant_edit"
-            app:layout_constraintTop_toBottomOf="@+id/consonant_btnAdd"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/consonant_btnAdd"
+            app:layout_constraintBottom_toTopOf="@+id/consonant_listview"
+
             tools:ignore="MissingConstraints" />
+        <ListView
+            android:id="@+id/consonant_listview"
+            android:layout_width="583dp"
+            android:layout_height="50dp"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/consonant_btnAdd"
+            app:layout_constraintBottom_toTopOf="@+id/vowel_btnAdd"
+            tools:ignore="DuplicateIds,MissingConstraints" />
+
 
         <EditText
             android:id="@+id/vowel_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:ems="10"
             android:inputType="textPersonName"
-            app:layout_constraintBottom_toTopOf="@+id/vowel_btnDel"
-            app:layout_constraintEnd_toStartOf="@+id/vowel_btnDel"
-            app:layout_constraintStart_toStartOf="parent"
+            android:hint="모음"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/vowel_btnAdd"
             app:layout_constraintTop_toBottomOf="@+id/consonant_listview"
+            app:layout_constraintBottom_toTopOf="@+id/vowel_listview"
             tools:ignore="MissingConstraints" />
-
         <Button
             android:id="@+id/vowel_btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="9dp"
             android:text="추가"
-            app:layout_constraintBottom_toTopOf="@+id/vowel_btnDel"
-            app:layout_constraintStart_toStartOf="@+id/vowel_btnDel"
+            app:layout_constraintRight_toLeftOf="@+id/vowel_btnDel"
+            app:layout_constraintLeft_toRightOf="@+id/vowel_edit"
+            app:layout_constraintTop_toBottomOf="@+id/consonant_listview"
+            app:layout_constraintBottom_toTopOf="@+id/vowel_listview"
             tools:ignore="MissingConstraints" />
 
         <Button
             android:id="@+id/vowel_btnDel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:layout_marginRight="6dp"
-            android:layout_marginBottom="6dp"
             android:text="삭제"
+            app:layout_constraintLeft_toRightOf="@+id/vowel_btnAdd"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/consonant_listview"
             app:layout_constraintBottom_toTopOf="@+id/vowel_listview"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/vowel_edit"
-            app:layout_constraintTop_toBottomOf="@+id/vowel_edit"
             tools:ignore="MissingConstraints" />
 
         <ListView
             android:id="@+id/vowel_listview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="49dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="583dp"
+            android:layout_height="50dp"
+
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/vowel_btnDel"
+            app:layout_constraintBottom_toTopOf="@+id/word_btnAdd"
             tools:ignore="MissingConstraints" />
+
+        <EditText
+            android:id="@+id/word_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="문장"
+            android:inputType="textPersonName"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/word_btnAdd"
+            app:layout_constraintTop_toBottomOf="@+id/vowel_listview"
+            app:layout_constraintBottom_toTopOf="@+id/word_listview"
+            tools:ignore="MissingConstraints" />
+        <Button
+            android:id="@+id/word_btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="추가"
+            app:layout_constraintRight_toLeftOf="@+id/word_btnDel"
+            app:layout_constraintLeft_toRightOf="@+id/word_edit"
+            app:layout_constraintTop_toBottomOf="@+id/vowel_listview"
+            app:layout_constraintBottom_toTopOf="@+id/word_listview"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/word_btnDel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            app:layout_constraintLeft_toRightOf="@+id/word_btnAdd"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/vowel_listview"
+            app:layout_constraintBottom_toTopOf="@+id/word_listview"
+            tools:ignore="MissingConstraints" />
+
+        <ListView
+            android:id="@+id/word_listview"
+            android:layout_width="583dp"
+            android:layout_height="50dp"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/word_btnDel"
+            tools:ignore="MissingConstraints" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

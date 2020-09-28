@@ -43,16 +43,17 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
     public static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
     public static final String consonant="CONSONANT";
     public static final String vowel="VOWEL";
-    Button consonant_btnAdd, consonant_btnDel;
-    Button vowel_btnAdd, vowel_btnDel;
-    EditText consonant_edittext;
-    EditText vowel_edittext;
+    Button consonant_btnAdd, consonant_btnDel, vowel_btnAdd, vowel_btnDel, word_btnAdd, word_btnDel;
+    EditText consonant_edittext,vowel_edittext,word_edittext;
     List<String> list_consonant = new ArrayList<>();
     List<String> list_vowel = new ArrayList<>();
+    List<String> list_word = new ArrayList<>();
     ArrayAdapter<String> consonant_adapter;
     ArrayAdapter<String> vowel_adapter;
+    ArrayAdapter<String> word_adapter;
     ListView consonant_listview;
     ListView vowel_listview;
+    ListView word_listview;
 
     Context mContext;
     private boolean isService;
