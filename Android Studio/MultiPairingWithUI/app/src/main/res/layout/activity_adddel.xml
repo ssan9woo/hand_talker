@@ -74,7 +74,7 @@
             tools:ignore="MissingConstraints" />
         <ListView
             android:id="@+id/consonant_listview"
-            android:layout_width="583dp"
+            android:layout_width="300dp"
             android:layout_height="50dp"
             app:layout_constraintLeft_toRightOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
@@ -119,7 +119,7 @@
 
         <ListView
             android:id="@+id/vowel_listview"
-            android:layout_width="583dp"
+            android:layout_width="300dp"
             android:layout_height="50dp"
 
             app:layout_constraintLeft_toRightOf="parent"
@@ -164,7 +164,7 @@
 
         <ListView
             android:id="@+id/word_listview"
-            android:layout_width="583dp"
+            android:layout_width="300dp"
             android:layout_height="50dp"
             app:layout_constraintLeft_toRightOf="parent"
             app:layout_constraintRight_toLeftOf="parent"

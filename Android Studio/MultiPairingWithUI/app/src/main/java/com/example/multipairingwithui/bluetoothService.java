@@ -75,6 +75,7 @@ public class bluetoothService extends Service {
     public static final String[] str_rock_or_paper={"ROCK","PAPER"};
     public static final String CONSONANT ="CONSONANT";
     public static final String VOWEL="VOWEL";
+    public static final String WORD="WORD";
     public static final int DISCONNECT = 0;
     public static final int CONNECTING = 50;
     public static final int CONNECTED = 2;
