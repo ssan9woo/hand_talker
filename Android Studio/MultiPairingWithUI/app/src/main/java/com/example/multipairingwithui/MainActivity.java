@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (PreferenceManager.IskeyinPref(AddDelActivity.consonant + AddDelActivity.str_CONSONANT[i], mainContext)) {
                 consonants[i] = new Syllable();
                 try {
-                    consonants[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
+                    consonants[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
                     Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
                 vowels[i] = new Syllable();
                 try {
-                    vowels[i] = (Syllable) PreferenceManager.get_gesture_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
+                    vowels[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
                     Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
