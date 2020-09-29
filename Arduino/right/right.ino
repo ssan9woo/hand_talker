@@ -8,6 +8,7 @@ SoftwareSerial bluetooth(4, 7);
 //Flex-------------------------------------------
 char rightHandFlex[6][40];  //flexData -> dtostrf
 int flexData[6];            //get FlexData
+float sensitivity = 0.1;
 //-----------------------------------------------
 
 
@@ -37,47 +38,68 @@ void setup()
 
 void loop() 
 {
-   capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
-   capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
-   Serial.print(capacitor_left); Serial.print("  ");Serial.print(capacitor_right);
+   capacitor_left = cs_2_3.capacitiveSensorRaw(10);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
+   capacitor_right = cs_5_6.capacitiveSensorRaw(10);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
    //6 ~ 2 : 엄지 ~ 새끼, 1 : 손목
-
+   Serial.print(capacitor_left); Serial.println(capacitor_right);
 
    //Flex Sensor---------------------------------------
-   Serial.print("  Flex sensor :");
+   //Serial.print("  Flex sensor :");
+   /*
    for(int i = 0; i < 6; i++){
       flexData[i] = analogRead(6-i);
       sprintf(rightHandFlex[i],"%d",flexData[i]);
       Serial.print(rightHandFlex[i]); Serial.print(" ");
    }
    Serial.println(" ");
+   */
    //--------------------------------------------------
+   //test
+      for(int i = 0; i < 6; i++){
+        int value = analogRead(6-i);
+        float filtered_value = value;
+        filtered_value = filtered_value * (1 - sensitivity) + value * sensitivity;
+        flexData[i] = int(filtered_value);
 
+        if (i == 5){
+          if (flexData[i] > 600){
+            flexData[i] = 3000;
+          }
+          else{
+            flexData[i] = 100;
+          }
+        }
+        sprintf(rightHandFlex[i],"%d",flexData[i]);
+        Serial.print(rightHandFlex[i]); Serial.print(" ");
+   }
+   //test
 
    //Ebimu---------------------------------------------
    EBimuAsciiParser(axis_6,6);
-   Serial.print("  6 axis : ");
+   //Serial.print("  6 axis : ");
    for(int i = 0; i < 6; i++){
       dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
-      Serial.print(rightHandEbimu[i]); Serial.print(" ");
+      //Serial.print(rightHandEbimu[i]); Serial.print(" ");
    }
-   Serial.println(" ");
+   //Serial.println(" ");
    //--------------------------------------------------
 
    
    //Capacitor-----------------------------------------
-   if(capacitor_left>70){
+   if(capacitor_left > 10){
       sprintf(capacitor_buff[0],"true");
    }
    else{
       sprintf(capacitor_buff[0],"false");
    }
-   if(capacitor_right>70){
+   if(capacitor_right > 21){
       sprintf(capacitor_buff[1],"true");
    }
    else{
       sprintf(capacitor_buff[1],"false");
    }
+   Serial.print(capacitor_buff[0]); Serial.println(capacitor_buff[1]);
+   Serial.println("==================================");
    //--------------------------------------------------
 
    
@@ -96,6 +118,7 @@ void loop()
    }
    bluetooth.write("5.00");
    bluetooth.write("\n");
+
    //--------------------------------------------------
 } 
 
