@@ -50,9 +50,7 @@ public class Word implements Cloneable{
     public int[] get_right_flex(){
         return right_flex;
     }
-    public double[] get_right_gyro(){
-        return right_gyro;
-    }
+    public double[] get_right_gyro(){ return right_gyro; }
     public boolean[] get_touch(){
         return touch;
     }

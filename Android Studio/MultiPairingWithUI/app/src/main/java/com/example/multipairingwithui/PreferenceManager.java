@@ -113,16 +113,10 @@ public class PreferenceManager {
 
         String key= VAL_PREFIX + hand.hand + word;
 
-        String list = sharePref.getString(wordlist,"");
-        editor.remove(wordlist);
-        assert list != null;
-        if(!list.equals("")) {
-            editor.putString(wordlist, list + "," + word);
-        }
-        else{
-            editor.putString(wordlist,word);
-        }
+
         if(hand.hand.equals("RIGHT")) {
+
+
             for (double i : hand.getGyro()) {
                 editor.putDouble(editor, key + count++, i);
             }
@@ -134,6 +128,17 @@ public class PreferenceManager {
             }
         }
         else{
+
+            String list = sharePref.getString(wordlist,"");
+            editor.remove(wordlist);
+            assert list != null;
+            if(!list.equals("")) {
+                editor.putString(wordlist, list + "," + word);
+            }
+            else{
+                editor.putString(wordlist,word);
+            }
+
             for (double i : hand.getGyro()) {
                 editor.putDouble(editor, key + count++, i);
             }
@@ -185,44 +190,49 @@ public class PreferenceManager {
 
         int left_count = sharePref.getInt(LEN_PREFIX + left + word, 0);
         int right_count = sharePref.getInt(LEN_PREFIX + right + word, 0);
-
         StringBuilder words = new StringBuilder(Objects.requireNonNull(sharePref.getString(wordlist, "")));
-        try {
-            String[] array = words.toString().split(",");
-            List<String> list = Arrays.asList(array);
-            list.remove(word);
-            words = new StringBuilder();
-            for (int i = 0; i < list.size(); i++) {
-                words.append(list.get(i));
-                if (i < list.size() - 1) {
-                    words.append(",");
+        if(!isEmptyWordList(context)) {
+            try {
+                String[] array = words.toString().split(",");
+                List<String> list = new ArrayList<>(Arrays.asList(array));
+                list.remove((Object)word );
+                words = new StringBuilder();
+                for (int i = 0; i < list.size(); i++) {
+                    words.append(list.get(i));
+                    if (i < list.size() - 1) {
+                        words.append(",");
+                    }
                 }
+                editor.remove(wordlist);
+                editor.putString(wordlist, words.toString());
+            } catch (PatternSyntaxException e) {
+                editor.remove(wordlist);
             }
-            editor.remove(wordlist);
-            editor.putString(wordlist, words.toString());
-        }catch (PatternSyntaxException e){
-            editor.remove(wordlist);
+            editor.remove(LEN_PREFIX + left + word);
+            editor.remove(LEN_PREFIX + right + word);
+            for (int i = 0; i < left_count; i++) {
+                editor.remove(VAL_PREFIX + left + word + i);
+            }
+            for (int i = 0; i < right_count; i++) {
+                editor.remove(VAL_PREFIX + right + word + i);
+            }
         }
-        editor.remove(LEN_PREFIX+word);
-        for(int i=0; i<left_count;i++){
-            editor.remove(VAL_PREFIX+ left + word+i);
-        }
-        for(int i=0; i<right_count;i++){
-            editor.remove(VAL_PREFIX+ right + word+i);
-        }
-
         editor.apply();
     }
-
+    public static boolean isEmptyWordList(Context context) {
+        SharedPreferences sharePref = getPreferences(context);
+        String str = sharePref.getString(wordlist, "");
+        assert str != null;
+        return str.equals("");
+    }
     public static String[] getWordList(Context context){
         SharedPreferences sharePref = getPreferences(context);
-
         String str = sharePref.getString(wordlist, "");
         try {
-            String[] array = str.split(",");
-            return array;
+            assert str != null;
+            return str.split(",");
         }catch(PatternSyntaxException e){
-            return new String[]{str};
+            return new String[0];
         }
     }
     public static boolean IskeyinPref(String name, Context context){
@@ -250,8 +260,6 @@ public class PreferenceManager {
                 return (Editor)editor;
             return new Editor(editor);
         }
-
-        //region Overrides
 
         @Override
         public Editor putString(String key, String value) {

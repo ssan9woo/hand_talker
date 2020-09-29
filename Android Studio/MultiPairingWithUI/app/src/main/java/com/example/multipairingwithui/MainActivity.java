@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     Syllable[] consonants;
     Syllable[] vowels;
+    Word[] words;
+    String[] words_arr;
     Button DeleteData;
     TextView ReceiveData;
     ScrollView scrollView;
@@ -149,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             reconnectRight.setVisibility(View.INVISIBLE);
         }
 
-
-
         mainContext = this;
         DeleteData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 consonants[i] = new Syllable();
                 try {
                     consonants[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
-                    Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
+                    //Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -204,11 +204,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 vowels[i] = new Syllable();
                 try {
                     vowels[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
-                    Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
+                    //Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        /*단어 데이터베이스에서 word객체 가져옴*/
+
+        if(!PreferenceManager.isEmptyWordList(mainContext)) {
+            words_arr = PreferenceManager.getWordList(mainContext);
+            arr_cnt=words_arr.length;
+            words = new Word[arr_cnt];
+            for(int i=0; i < arr_cnt;i++){
+                words[i]=new Word();
+                try {
+                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+                    Log.d("Oncreate",words[i].word);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            arr_cnt=0;
         }
 
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
@@ -412,20 +432,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else if (msg.what == GESTURE){
                 switch (msg.arg1){
-                    /*객체 처리 해줘야함
-                    msg.obj를 Syllable 객체로 만들어줘야함
-                    Syllable 클래스안에
-                    getEuclideanDistance()함수 사용
-                    */
                     case SYLLABLE:
                         Syllable syllable;
                         syllable = (Syllable) msg.obj;
-                        HashMap<String, Double> map = new HashMap<String, Double>();
-                        Log.d("gesture",Arrays.toString(syllable.flex)+Arrays.toString(syllable.gyro)+Arrays.toString(syllable.touch));
+                        HashMap<String, Double> map_syllable = new HashMap<String, Double>();
                         for (Syllable consonant : consonants) {
                             if(Arrays.equals(consonant.touch,syllable.touch)) {
                                 if (consonant.getEuclideanDistance_Flex(syllable) < 50) {
-                                    map.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
+                                    map_syllable.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
 
                                 }
                             }
@@ -433,14 +447,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         for(Syllable vowel : vowels){
                             if(Arrays.equals(vowel.touch,syllable.touch)) {
                                 if (vowel.getEuclideanDistance_Flex(syllable) < 50) {
-                                    map.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
+                                    map_syllable.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
                         }
 
-                        if(!map.isEmpty()) {
-                            String ret = HashMapSort(map);
-                            Log.d("Return",ret);
+                        if(!map_syllable.isEmpty()) {
+                            String ret = HashMapSort(map_syllable);
                             input_gesture.add(ret);
                             ReceiveData.append(ret+"\n");
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
@@ -450,7 +463,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     scrollView.scrollTo(0, ReceiveData.getHeight());
                                 }
                             });
-
 
                             delay.removeMessages(0);
                             delay.postDelayed(new Runnable() {
@@ -479,7 +491,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         break;
                     case WORD:
+                        Word word;
+                        word = (Word) msg.obj;
+                        HashMap<String, Double> map_word = new HashMap<String, Double>();
 
+                        for(Word _word_ : words){
+                            if(Arrays.equals(word.touch,_word_.touch)) {
+                                if (_word_.getEuclideanDistance_flex(word) < 150) {
+                                    map_word.put(word.word, _word_.getEuclideanDistance_gyro(word));
+                                }
+                            }
+                        }
+                        if(!map_word.isEmpty()) {
+                            String ret = HashMapSort(map_word);
+                            tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
+                        }
                         break;
                 }
             }
@@ -502,7 +528,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String HashMapSort(final HashMap<String,Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
 
-        Log.d("Before",String.valueOf(list));
         Collections.sort(list,new Comparator() {
             public int compare(Object o1,Object o2) {
                 Object v1 = map.get(o1);
@@ -510,9 +535,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return ((Comparable) v2).compareTo(v1);
             }
         });
-        //Collections.reverse(list);
 
-        return list.get(list.size()-1);
+        return list.get(0);
     }
 
     @Override
