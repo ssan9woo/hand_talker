@@ -66,19 +66,20 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         setContentView(R.layout.activity_adddel);
         mContext=this;
         bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
-        for(int i=0;i <str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(consonant+str_CONSONANT[i],mContext)){
-                list_consonant.add(str_CONSONANT[i]);
+        for (String s : str_CONSONANT) {
+            if (PreferenceManager.IskeyinPref(consonant + s, mContext)) {
+                list_consonant.add(s);
             }
         }
-        for(int i=0;i<str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(vowel+str_VOWEL[i],mContext)){
-                list_vowel.add(str_VOWEL[i]);
+
+        for (String s : str_VOWEL) {
+            if (PreferenceManager.IskeyinPref(vowel + s, mContext)) {
+                list_vowel.add(s);
             }
         }
-        String[] strlist = PreferenceManager.getWordList(mContext);
-        if(strlist.length>0){
-            list_word.addAll(Arrays.asList(strlist));
+
+        if(!PreferenceManager.isEmptyWordList(mContext)){
+            list_word.addAll(Arrays.asList(PreferenceManager.getWordList(mContext)));
         }
 
         setLayout();
@@ -222,8 +223,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         }
     }));
     public void onDestory(){
-        if(isService)
-        {
+        if(isService) {
             isService = false;
         }
         super.onDestroy();
