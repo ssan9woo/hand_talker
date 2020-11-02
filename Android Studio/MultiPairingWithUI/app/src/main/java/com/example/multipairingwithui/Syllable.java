@@ -58,7 +58,11 @@ public class Syllable implements Cloneable{
     public double getEuclideanDistance_Gyro(Syllable obj){
         double dist=0.00;
         for(int i=0;i<gyro.length-1;i++){
-            dist+= Math.pow(this.gyro[i] - obj.gyro[i],2);
+            double d = Math.pow(this.gyro[i] - obj.gyro[i],2);
+            if (d> 10000){
+                return dist+100000000.0;
+            }
+            dist+= d;
         }
         return dist;
     }
