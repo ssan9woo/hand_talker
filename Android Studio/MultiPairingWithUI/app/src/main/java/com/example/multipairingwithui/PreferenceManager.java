@@ -177,8 +177,10 @@ public class PreferenceManager {
             }
         }
         word.set_touch(touch);
-        word.set_gyro(left_gyro,right_gyro);
-        word.set_flex(left_flex ,right_flex);
+//        word.set_gyro(left_gyro,right_gyro);
+//        word.set_flex(left_flex ,right_flex);
+        word.set_gyro(right_gyro);
+        word.set_flex(right_flex);
         return word;
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

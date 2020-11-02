@@ -192,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 consonants[i] = new Syllable();
                 try {
                     consonants[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.consonant, AddDelActivity.str_CONSONANT[i], mainContext).clone();
-                    //Log.d("Oncreate", consonants[i].syllable + Arrays.toString(consonants[i].getFlex()) + Arrays.toString(consonants[i].getGyro())+Arrays.toString(consonants[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -204,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 vowels[i] = new Syllable();
                 try {
                     vowels[i] = (Syllable) PreferenceManager.get_syllable_value(AddDelActivity.vowel, AddDelActivity.str_VOWEL[i], mainContext).clone();
-                    //Log.d("Oncreate", vowels[i].syllable + Arrays.toString(vowels[i].getFlex()) + Arrays.toString(vowels[i].getGyro())+Arrays.toString(vowels[i].getTouch()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -498,7 +496,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         for(Word _word_ : words){
                             if(Arrays.equals(word.touch,_word_.touch)) {
                                 if (_word_.getEuclideanDistance_flex(word) < 150) {
-                                    map_word.put(word.word, _word_.getEuclideanDistance_gyro(word));
+                                    map_word.put(_word_.word, _word_.getEuclideanDistance_gyro(word));
+
                                 }
                             }
                         }
@@ -535,8 +534,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return ((Comparable) v2).compareTo(v1);
             }
         });
-
-        return list.get(0);
+        Log.d("HASH", String.valueOf(list));
+        return list.get(list.size()-1);
     }
 
     @Override

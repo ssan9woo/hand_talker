@@ -155,8 +155,8 @@ public class bluetoothService extends Service {
         }catch (Exception e){
             Log.e("ERROR","Could not load default values",e);
         }
-        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
-        Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
         super.onCreate();
@@ -304,16 +304,18 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
+                    Log.d("qwe",s);
 
                     if(IsConnect_left && IsConnect_right){
-                        if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
+                        if((bluetooth_index==LEFT && s.length()>=71) || (bluetooth_index==RIGHT && s.length()>=85)) {
                             if(Data.size() < 5){
                                 Data.add(s);
                             }
                             if(Data.size()==5) {
                                 for (int i = 0; i < Data.size(); i++) {
                                     Message msg = Message.obtain(null, bluetooth_index, Data.get(i));
-                                    mThread.bringHandler.sendMessage(msg);
+                                    if(bluetooth_index == RIGHT)
+                                        mThread.bringHandler.sendMessage(msg);
                                 }
                                 Data.clear();
                             }
@@ -387,6 +389,7 @@ public class bluetoothService extends Service {
 
                     switch (msg.what){
                         case RIGHT://Right hand
+
                             for(int i=0; i< arr.length;i++){
                                 if(i > 13){
                                     battery=Double.parseDouble(arr[i]);
@@ -420,6 +423,7 @@ public class bluetoothService extends Service {
                             }
                             break;
                         case LEFT://Left hand
+
                             for(int i=0; i< arr.length;i++){
                                 if(i>10){
                                     battery=Double.parseDouble(arr[i]);
@@ -450,11 +454,12 @@ public class bluetoothService extends Service {
                             break;
                     }
                     //왼손 오른손 둘중 하나의 에너지가 150이상 이라면 스택에 쌓아둠//
-                    if(E_right_sum < 80 && E_left_sum < 80){
+                    if(E_right_sum < 80 ){
+
                         //얘도 다시설정 -> 지화의 끝구간이 너무 가속도 민감도가 높으면 동작이 끝나기도 전에 구간이 종료될 수 있음.
                         Message m = new Message();
                         m.what=MainActivity.GESTURE;
-                        if(left_stack.IsGesture() && right_stack.IsGesture()){
+                        if(left_stack.IsGesture() && right_stack.IsGesture()){          //여기를 라디오 플래그로 바꿔 주기
                             Word word = new Word();
                             word.set_flex(left_stack.popflex(), right_stack.popflex());
                             word.set_gyro(left_stack.popgyro(), right_stack.popgyro());
@@ -462,13 +467,20 @@ public class bluetoothService extends Service {
                             m.arg1=MainActivity.WORD;
                             m.obj= word;
                         }
-                        else if(right_stack.IsGesture()){
+                        else if(right_stack.IsGesture()){                               //여기를 라디오 플래그로 바꿔 주기
+
                             Syllable syllable =  new Syllable();
                             syllable.setFlex(right_stack.popflex());
                             syllable.setGyro(right_stack.popgyro());
                             syllable.setTouch(right_hand.getTouch());
-                            m.arg1=MainActivity.SYLLABLE;
+                            m.arg1=MainActivity.WORD;
                             m.obj= syllable;
+                            Word word = new Word();
+                            word.set_flex(right_stack.popflex());
+                            word.set_gyro(right_stack.popgyro());
+                            word.set_touch(right_hand.getTouch());
+                            m.arg1=MainActivity.WORD;
+                            m.obj= word;
                         }
                         sendMsgToActivity(m);
                         left_stack.clear();
@@ -496,12 +508,6 @@ public class bluetoothService extends Service {
             return (int)Math.round(energy);
         }
     }
-//    public int[] getRaw_Flex_left(String hand){
-//        if(hand==str_hand[LEFT])
-//            return left_rowflex;
-//        else
-//            return right_rowflex;
-//    }
 
     public static class Duration{
         Stack<int[]> flex;
