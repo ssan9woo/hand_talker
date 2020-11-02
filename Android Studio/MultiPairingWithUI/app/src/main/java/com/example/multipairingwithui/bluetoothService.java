@@ -302,7 +302,6 @@ public class bluetoothService extends Service {
             while (is){
                 try {
                     String s = Buffer_in.readLine();
-<<<<<<< HEAD
                     Log.d("123",s);
                     /*
                     Left data format

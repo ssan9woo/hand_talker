@@ -230,6 +230,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             arr_cnt=0;
         }
 
+        /*단어 데이터베이스에서 word객체 가져옴*/
+
+        if(!PreferenceManager.isEmptyWordList(mainContext)) {
+            words_arr = PreferenceManager.getWordList(mainContext);
+            arr_cnt=words_arr.length;
+            words = new Word[arr_cnt];
+            for(int i=0; i < arr_cnt;i++){
+                words[i]=new Word();
+                try {
+                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+                    Log.d("Oncreate",words[i].word);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            arr_cnt=0;
+        }
+
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
         fadeInAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein);
         clearAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.clear);
