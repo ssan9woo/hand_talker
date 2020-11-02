@@ -155,15 +155,13 @@ public class bluetoothService extends Service {
         }catch (Exception e){
             Log.e("ERROR","Could not load default values",e);
         }
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[ROCK]), mContext)));
+        //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[LEFT] + str_rock_or_paper[PAPER]), mContext)));
         //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[ROCK]), mContext)));
         //Log.d("set", Arrays.toString(PreferenceManager.getUserdata((str_hand[RIGHT] + str_rock_or_paper[PAPER]), mContext)));
         left_hand = new Hand(str_hand[LEFT]);
         right_hand= new Hand(str_hand[RIGHT]);
         super.onCreate();
-    }
-    public int getVcc(){
-        int a = 0;
-        return a;
     }
 
     @SuppressLint("HandlerLeak")

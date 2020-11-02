@@ -25,6 +25,7 @@ public class PreferenceManager {
     public static final String wordlist = "WORDLIST";
     private static SharedPreferences getPreferences(Context context) {
         return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+
     }
 
     public static int[] getUserdata(String name,Context context){
