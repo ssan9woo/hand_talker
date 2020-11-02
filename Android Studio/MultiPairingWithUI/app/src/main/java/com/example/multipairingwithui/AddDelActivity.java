@@ -32,6 +32,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AddDelActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -43,16 +44,18 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
     public static final String[] str_VOWEL=new String[]{"ㅏ","ㅑ","ㅓ","ㅕ","ㅗ","ㅛ","ㅜ","ㅠ","ㅡ","ㅣ"};
     public static final String consonant="CONSONANT";
     public static final String vowel="VOWEL";
-    Button consonant_btnAdd, consonant_btnDel;
-    Button vowel_btnAdd, vowel_btnDel;
-    EditText consonant_edittext;
-    EditText vowel_edittext;
+    public static final String word="WORD";
+    Button consonant_btnAdd, consonant_btnDel, vowel_btnAdd, vowel_btnDel, word_btnAdd, word_btnDel;
+    EditText consonant_edittext,vowel_edittext,word_edittext;
     List<String> list_consonant = new ArrayList<>();
     List<String> list_vowel = new ArrayList<>();
+    List<String> list_word = new ArrayList<>();
     ArrayAdapter<String> consonant_adapter;
     ArrayAdapter<String> vowel_adapter;
+    ArrayAdapter<String> word_adapter;
     ListView consonant_listview;
     ListView vowel_listview;
+    ListView word_listview;
 
     Context mContext;
     private boolean isService;
@@ -63,16 +66,22 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         setContentView(R.layout.activity_adddel);
         mContext=this;
         bindService(new Intent(AddDelActivity.this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
-        for(int i=0;i <str_CONSONANT.length;i++){
-            if(PreferenceManager.IskeyinPref(consonant+str_CONSONANT[i],mContext)){
-                list_consonant.add(str_CONSONANT[i]);
+        for (String s : str_CONSONANT) {
+            if (PreferenceManager.IskeyinPref(consonant + s, mContext)) {
+                list_consonant.add(s);
             }
         }
-        for(int i=0;i<str_VOWEL.length;i++){
-            if(PreferenceManager.IskeyinPref(vowel+str_VOWEL[i],mContext)){
-                list_vowel.add(str_VOWEL[i]);
+
+        for (String s : str_VOWEL) {
+            if (PreferenceManager.IskeyinPref(vowel + s, mContext)) {
+                list_vowel.add(s);
             }
         }
+
+        if(!PreferenceManager.isEmptyWordList(mContext)){
+            list_word.addAll(Arrays.asList(PreferenceManager.getWordList(mContext)));
+        }
+
         setLayout();
         isService = true;
 
@@ -116,6 +125,16 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         vowel_listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         vowel_listview.setAdapter(vowel_adapter);
 
+        word_listview = (ListView) findViewById(R.id.word_listview);
+        word_btnAdd = (Button) findViewById(R.id.word_btnAdd);
+        word_btnDel = (Button) findViewById(R.id.word_btnDel);
+        word_edittext =  (EditText) findViewById(R.id.word_edit);
+        word_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice, list_word);
+        word_btnAdd.setOnClickListener(this);
+        word_btnDel.setOnClickListener(this);
+        word_listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        word_listview.setAdapter(word_adapter);
+
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -125,7 +144,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(str.length() != 0){
                 consonant_edittext.setText("");
                 list_consonant.add(str);
-                PreferenceManager.save_gesture_value(bluetoothService.right_hand,bluetoothService.CONSONANT +str,mContext);
+                PreferenceManager.save_syllable_value(bluetoothService.right_hand,bluetoothService.CONSONANT +str,mContext);
                 consonant_adapter.notifyDataSetChanged();
             }
         }else if(v == consonant_btnDel){
@@ -134,7 +153,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(pos != ListView.INVALID_POSITION){
                 list_consonant.remove(pos);
                 consonant_listview.clearChoices();
-                PreferenceManager.remove_gesture_value(bluetoothService.CONSONANT +str,mContext);
+                PreferenceManager.remove_syllable_value(bluetoothService.CONSONANT +str,mContext);
                 consonant_adapter.notifyDataSetChanged();
 
             }
@@ -143,7 +162,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(str.length() != 0){
                 vowel_edittext.setText("");
                 list_vowel.add(str);
-                PreferenceManager.save_gesture_value(bluetoothService.right_hand,bluetoothService.VOWEL+str,mContext);
+                PreferenceManager.save_syllable_value(bluetoothService.right_hand,bluetoothService.VOWEL+str,mContext);
                 vowel_adapter.notifyDataSetChanged();
             }
         }else if(v == vowel_btnDel){
@@ -152,8 +171,27 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
             if(pos != ListView.INVALID_POSITION){
                 list_vowel.remove(pos);
                 vowel_listview.clearChoices();
-                PreferenceManager.remove_gesture_value(bluetoothService.VOWEL+str,mContext);
+                PreferenceManager.remove_syllable_value(bluetoothService.VOWEL+str,mContext);
                 vowel_adapter.notifyDataSetChanged();
+
+            }
+        }else if(v == word_btnAdd){
+            String str = word_edittext.getText().toString();
+            if(str.length() != 0){
+                word_edittext.setText("");
+                list_word.add(str);
+                PreferenceManager.save_word_value(bluetoothService.left_hand,str,mContext);
+                PreferenceManager.save_word_value(bluetoothService.right_hand,str,mContext);
+                word_adapter.notifyDataSetChanged();
+            }
+        }else if(v == word_btnDel){
+            int pos = word_listview.getCheckedItemPosition();
+            String str = word_adapter.getItem(pos);
+            if(pos != ListView.INVALID_POSITION){
+                list_word.remove(pos);
+                word_listview.clearChoices();
+                PreferenceManager.remove_word_value(str,mContext);
+                word_adapter.notifyDataSetChanged();
 
             }
         }
@@ -185,8 +223,7 @@ public class AddDelActivity extends AppCompatActivity implements NavigationView.
         }
     }));
     public void onDestory(){
-        if(isService)
-        {
+        if(isService) {
             isService = false;
         }
         super.onDestroy();
