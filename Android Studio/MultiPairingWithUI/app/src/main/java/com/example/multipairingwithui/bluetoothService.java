@@ -306,6 +306,7 @@ public class bluetoothService extends Service {
 
                     if(IsConnect_left && IsConnect_right){
                         if((bluetooth_index==LEFT && s.length()>=71) || (bluetooth_index==RIGHT && s.length()>=85)) {
+
                             if(Data.size() < 5){
                                 Data.add(s);
                             }
