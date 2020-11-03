@@ -40,20 +40,7 @@ void loop()
 {
    capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
    capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
-   //6 ~ 2 : 엄지 ~ 새끼, 1 : 손목
-   //Serial.print(capacitor_left); Serial.print("  ");Serial.print(capacitor_right); Serial.print(" ");
 
-   //Flex Sensor---------------------------------------
-   //Serial.print("  Flex sensor :");
-   /*
-   for(int i = 0; i < 6; i++){
-      flexData[i] = analogRead(6-i);
-      sprintf(rightHandFlex[i],"%d",flexData[i]);
-      Serial.print(rightHandFlex[i]); Serial.print(" ");
-   }
-   Serial.println(" ");
-   */
-   //--------------------------------------------------
    //test
       for(int i = 0; i < 6; i++){
         int value = analogRead(i);
@@ -62,16 +49,15 @@ void loop()
         flexData[i] = int(filtered_value);
 
         if (i == 0){
-          
-          if (flexData[i] > 800){
+//          Serial.println(flexData[i]);
+          if (flexData[i] > 770){
             flexData[i] = 3000;
           }
           else{
             flexData[i] = 100;
           }
         }
-        sprintf(rightHandFlex[i],"%d",flexData[i]);
-        
+        sprintf(rightHandFlex[i],"%d",flexData[i]); 
    }
    //test
 
@@ -80,9 +66,7 @@ void loop()
    //Serial.print("  6 axis : ");
    for(int i = 0; i < 6; i++){
       dtostrf(axis_6[i],7,2,rightHandEbimu[i]);
-      Serial.print(i);Serial.print("번: ");Serial.print(rightHandEbimu[i]); Serial.print(" ");
    }
-   Serial.println(" ");
    //--------------------------------------------------
 
    
@@ -99,9 +83,11 @@ void loop()
    else{
       sprintf(capacitor_buff[1],"false");
    }
-   //Serial.print(capacitor_buff[0]); Serial.print(" "); Serial.println(capacitor_buff[1]);
-   //Serial.println("==================================");
-   //--------------------------------------------------
+   
+//   Serial.print("오른쪽 Capacitor : ");
+//   Serial.print(capacitor_buff[0]);
+//   Serial.print("  왼쪽 Capacitor : ");
+//   Serial.println(capacitor_buff[1]);
 
    
    //Bluetooth Send------------------------------------
@@ -122,21 +108,30 @@ void loop()
    bluetooth.write(rightHandFlex[0]);
    bluetooth.write(",");
 
-//   Serial.print(rightHandFlex[1]); Serial.print(" ");
-//   Serial.print(rightHandFlex[5]); Serial.print(" ");
-//   Serial.print(rightHandFlex[4]); Serial.print(" ");
-//   Serial.print(rightHandFlex[3]); Serial.print(" ");
-//   Serial.print(rightHandFlex[2]); Serial.print(" ");
-//   Serial.print(rightHandFlex[0]); Serial.println(" ");
-   
+//  Serial.print("엄지 : "); Serial.print(rightHandFlex[1]);
+//  Serial.print("  검지 : "); Serial.print(rightHandFlex[5]);
+//  Serial.print("  중지 : "); Serial.print(rightHandFlex[4]);
+//  Serial.print("  약지 : "); Serial.print(rightHandFlex[3]);
+//  Serial.print("  새끼 : "); Serial.print(rightHandFlex[2]);
+//  Serial.print("  손목 : "); Serial.println(rightHandFlex[0]);
+//
+//  
+//  Serial.print("  X : "); Serial.print(rightHandEbimu[0]);
+//  Serial.print("  Y : "); Serial.print(rightHandEbimu[1]);
+//  Serial.print("  Z : "); Serial.print(rightHandEbimu[2]);
+//  Serial.print("  AccX : "); Serial.print(rightHandEbimu[3]);
+//  Serial.print("  AccY : "); Serial.print(rightHandEbimu[4]);
+//  Serial.print("  AccZ : "); Serial.println(rightHandEbimu[5]);
+
+  
    for(int i = 0; i < 2; i++){
       bluetooth.write(capacitor_buff[i]);
       bluetooth.write(",");
    }
    bluetooth.write("5.00");
    bluetooth.write("\n");
-
    //--------------------------------------------------
+   delay(5);
 } 
 
 int EBimuAsciiParser(float *item, int number_of_item)

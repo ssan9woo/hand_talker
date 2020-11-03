@@ -315,20 +315,20 @@ public class bluetoothService extends Service {
                     오른쪽 손 총 최소 길이 = 85
                     */
 
-                    if(IsConnect_left || IsConnect_right){
-                        if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
-                            if(Data.size() < 5){
-                                Data.add(s);
-                            }
-                            if(Data.size()==5) {
-                                for (int i = 0; i < Data.size(); i++) {
-                                    Message msg = Message.obtain(null, bluetooth_index, Data.get(i));
-                                    mThread.bringHandler.sendMessage(msg);
-                                }
-                                Data.clear();
-                            }
-                        }
-                    }
+//                    if(IsConnect_left || IsConnect_right){
+//                        if((bluetooth_index==LEFT && s.length()>=77) || (bluetooth_index==RIGHT && s.length()>=85)) {
+//                            if(Data.size() < 5){
+//                                Data.add(s);
+//                            }
+//                            if(Data.size()==5) {
+//                                for (int i = 0; i < Data.size(); i++) {
+//                                    Message msg = Message.obtain(null, bluetooth_index, Data.get(i));
+//                                    mThread.bringHandler.sendMessage(msg);
+//                                }
+//                                Data.clear();
+//                            }
+//                        }
+//                    }
                 } catch (IOException ignored) { }
             }
         }

@@ -25,7 +25,7 @@ void setup(){
 
 void loop(){
     //Flex Sensor-------------------------------
-    //Serial.print("Flex sensor : ");
+    Serial.print("Flex sensor : ");
     for(int i = 0; i < 5; i++){
         flexData[i] = analogRead(i+1);
         sprintf(leftHandFlex[i],"%d",flexData[i]);
@@ -35,21 +35,21 @@ void loop(){
     //------------------------------------------
 
     
-//    //Ebimu-------------------------------------
-//    EBimuAsciiParser(axis_6,6);
-//    //Serial.print("  6 axis : ");
-//    for(int i = 0; i < 6; i++){
-//        dtostrf(axis_6[i],7,2,leftHandEbimu[i]);
-//        //Serial.print(leftHandEbimu[i]); Serial.print(" ");
-//    }
-    //Serial.println(" ");
+    //Ebimu-------------------------------------
+    EBimuAsciiParser(axis_6,6);
+//    Serial.print("  6 axis : ");
+    for(int i = 0; i < 6; i++){
+        dtostrf(axis_6[i],7,2,leftHandEbimu[i]);
+        Serial.print(leftHandEbimu[i]); Serial.print(" ");
+    }
+    Serial.println(" ");
     //------------------------------------------
 
     //Bluetooth Send----------------------------
-//    for(int i = 0; i < 6; i++){
-//      bluetooth.write(leftHandEbimu[i]);
-//      bluetooth.write(",");
-//    }
+    for(int i = 0; i < 6; i++){
+      bluetooth.write(leftHandEbimu[i]);
+      bluetooth.write(",");
+    }
     
 //    for(int i = 0 ; i < 2; i++){
 //      bluetooth.write(leftHandFlex[i]);
@@ -68,9 +68,11 @@ void loop(){
     bluetooth.write(",");   
     bluetooth.write("5.00");
     bluetooth.write("\n");
-    
-    //------------------------------------------
-    //bluetooth.write("ssibal\n");
+ 
+//------------------------------------------
+//    bluetooth.write("ssibal");
+//    bluetooth.write("\n");
+    delay(5);
 }
 
 

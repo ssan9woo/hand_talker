@@ -218,12 +218,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             words = new Word[arr_cnt];
             for(int i=0; i < arr_cnt;i++){
                 words[i]=new Word();
-                try {
-                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
-                    Log.d("Oncreate",words[i].word);
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    words[i] = (Word)PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+//                    Log.d("Oncreate",words[i].word);
+//                } catch (CloneNotSupportedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         else {
@@ -238,12 +238,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             words = new Word[arr_cnt];
             for(int i=0; i < arr_cnt;i++){
                 words[i]=new Word();
-                try {
-                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
-                    Log.d("Oncreate",words[i].word);
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+//                    Log.d("Oncreate",words[i].word);
+//                } catch (CloneNotSupportedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         else {
@@ -514,13 +514,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         word = (Word) msg.obj;
                         HashMap<String, Double> map_word = new HashMap<String, Double>();
 
-                        for(Word _word_ : words){
-                            if(Arrays.equals(word.touch,_word_.touch)) {
-                                if (_word_.getEuclideanDistance_flex(word) < 150) {
-                                    map_word.put(word.word, _word_.getEuclideanDistance_gyro(word));
-                                }
-                            }
-                        }
+//                        for(Word _word_ : words){
+//                            if(Arrays.equals(word.touch,_word_.touch)) {
+//                                if (_word_.getEuclideanDistance_flex(word) < 150) {
+//                                    map_word.put(word.word, _word_.getEuclideanDistance_gyro(word));
+//                                }
+//                            }
+//                        }
                         if(!map_word.isEmpty()) {
                             String ret = HashMapSort(map_word);
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
