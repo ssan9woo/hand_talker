@@ -222,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
-
         for (int i = 0; i < AddDelActivity.str_VOWEL.length; i++) {
             if (PreferenceManager.IskeyinPref(AddDelActivity.vowel + AddDelActivity.str_VOWEL[i], mainContext)) {
                 vowels[i] = new Syllable();
@@ -251,6 +250,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } else {
             arr_cnt = 0;
+        }
+
+        /*단어 데이터베이스에서 word객체 가져옴*/
+
+        if(!PreferenceManager.isEmptyWordList(mainContext)) {
+            words_arr = PreferenceManager.getWordList(mainContext);
+            arr_cnt=words_arr.length;
+            words = new Word[arr_cnt];
+            for(int i=0; i < arr_cnt;i++){
+                words[i]=new Word();
+                try {
+                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+                    Log.d("Oncreate",words[i].word);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            arr_cnt=0;
         }
 
         fadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadeout);
@@ -560,7 +579,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
     public boolean isCheckedLeftBtn() {
         return left_btn.isChecked();
     }
@@ -569,4 +587,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return right_btn.isChecked();
     }
 }
+
 
