@@ -64,35 +64,16 @@ public class Word implements Cloneable{
     }
 
 
-//    public double getEuclideanDistance_flex(Word obj){
-//        double dist=0.00;
-//
-//        for(int i=0;i<right_flex.length;i++){
-//            dist += Math.pow(this.right_flex[i] - obj.right_flex[i], 2);
-//        }
-//
-//        for(int i=0;i<left_flex.length;i++){
-//            dist += Math.pow(this.left_flex[i] - obj.left_flex[i], 2);
-//        }
-//        return dist;
-//    }
-//    public double getEuclideanDistance_gyro(Word obj){
-//        double dist=0.00;
-//        for(int i=0;i<right_gyro.length-1;i++){
-//            dist+= Math.pow(this.right_gyro[i] - obj.right_gyro[i],2);
-//        }
-//        for(int i=0;i<left_gyro.length-1;i++){
-//            dist+= Math.pow(this.left_gyro[i] - obj.left_gyro[i],2);
-//        }
-//        return dist;
-//    }
     public double getEuclideanDistance_flex(Word obj){
         double dist=0.00;
 
         for(int i=0;i<right_flex.length;i++){
             dist += Math.pow(this.right_flex[i] - obj.right_flex[i], 2);
         }
-        Log.d("Dist", String.valueOf(dist)+obj.word+this.word);
+
+        for(int i=0;i<left_flex.length;i++){
+            dist += Math.pow(this.left_flex[i] - obj.left_flex[i], 2);
+        }
         return dist;
     }
     public double getEuclideanDistance_gyro(Word obj){
@@ -100,8 +81,27 @@ public class Word implements Cloneable{
         for(int i=0;i<right_gyro.length-1;i++){
             dist+= Math.pow(this.right_gyro[i] - obj.right_gyro[i],2);
         }
+        for(int i=0;i<left_gyro.length-1;i++){
+            dist+= Math.pow(this.left_gyro[i] - obj.left_gyro[i],2);
+        }
         return dist;
     }
+//    public double getEuclideanDistance_flex(Word obj){
+//        double dist=0.00;
+//
+//        for(int i=0;i<right_flex.length;i++){
+//            dist += Math.pow(this.right_flex[i] - obj.right_flex[i], 2);
+//        }
+//        Log.d("Dist", String.valueOf(dist)+obj.word+this.word);
+//        return dist;
+//    }
+//    public double getEuclideanDistance_gyro(Word obj){
+//        double dist=0.00;
+//        for(int i=0;i<right_gyro.length-1;i++){
+//            dist+= Math.pow(this.right_gyro[i] - obj.right_gyro[i],2);
+//        }
+//        return dist;
+//    }
     @Override
     @NonNull
     public Object clone() throws CloneNotSupportedException {
