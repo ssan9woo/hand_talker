@@ -6,8 +6,9 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:fitsSystemWindows="true"
+    android:visibility="visible"
+    tools:context=".MainActivity"
     tools:openDrawer="start">
 
     <com.google.android.material.navigation.NavigationView
@@ -220,5 +221,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.drawerlayout.widget.DrawerLayout>

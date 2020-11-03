@@ -318,6 +318,7 @@ public class bluetoothService extends Service {
                             }
                         }
                     }
+                    
                 } catch (IOException ignored) { }
             }
         }
