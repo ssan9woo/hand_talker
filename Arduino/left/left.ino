@@ -12,6 +12,7 @@ char leftHandFlex[5][40];
 
 
 //Ebimu----------------------
+int flag = 0;
 char leftHandEbimu[6][40];
 float axis_6[6];
 char sbuf[SBUF_SIZE];
@@ -45,34 +46,35 @@ void loop(){
     Serial.println(" ");
     //------------------------------------------
 
-    //Bluetooth Send----------------------------
-    for(int i = 0; i < 6; i++){
-      bluetooth.write(leftHandEbimu[i]);
+   if(axis_6[3] < -5 || axis_6[3] > 5 || axis_6[4] > 5 || axis_6[4] < -5 || axis_6[5] > 5 || axis_6[5] < -5){
+      flag = 0;
+   }
+   else{
+      flag = 1; 
+   }  
+   
+    if(flag == 1){    
+      //Bluetooth Send----------------------------
+      for(int i = 0; i < 6; i++){
+        bluetooth.write(leftHandEbimu[i]);
+        bluetooth.write(",");
+      }
+      
+      bluetooth.write(leftHandFlex[0]);
       bluetooth.write(",");
-    }
-    
-//    for(int i = 0 ; i < 2; i++){
-//      bluetooth.write(leftHandFlex[i]);
-//      bluetooth.write(",");
-//    }
+      bluetooth.write(leftHandFlex[1]);
+      bluetooth.write(",");
+      bluetooth.write(leftHandFlex[2]);
+      bluetooth.write(",");
+      bluetooth.write(leftHandFlex[3]);
+      bluetooth.write(",");
+      bluetooth.write(leftHandFlex[4]);
+      bluetooth.write(",");   
+      bluetooth.write("5.00");
+      bluetooth.write("\n");
 
-    bluetooth.write(leftHandFlex[0]);
-    bluetooth.write(",");
-    bluetooth.write(leftHandFlex[1]);
-    bluetooth.write(",");
-    bluetooth.write(leftHandFlex[2]);
-    bluetooth.write(",");
-    bluetooth.write(leftHandFlex[3]);
-    bluetooth.write(",");
-    bluetooth.write(leftHandFlex[4]);
-    bluetooth.write(",");   
-    bluetooth.write("5.00");
-    bluetooth.write("\n");
- 
-//------------------------------------------
-//    bluetooth.write("ssibal");
-//    bluetooth.write("\n");
-    delay(5);
+      delay(5);
+    }
 }
 
 
