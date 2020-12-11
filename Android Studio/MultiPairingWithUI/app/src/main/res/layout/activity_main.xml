@@ -205,14 +205,14 @@
         app:layout_constraintVertical_bias="0.015">
 
         <RadioButton
-            android:id="@+id/rg_btn1"
+            android:id="@+id/left_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="지화" />
 
         <RadioButton
-            android:id="@+id/rg_btn2"
+            android:id="@+id/right_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

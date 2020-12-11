@@ -142,8 +142,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bluetoothStateRight = findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = findViewById(R.id.bluetoothStateLeft);
 
-        left_btn = (RadioButton) findViewById(R.id.rg_btn1);
-        right_btn = (RadioButton) findViewById(R.id.rg_btn2);
+
+        left_btn = (RadioButton) findViewById(R.id.left_btn);
+        right_btn = (RadioButton) findViewById(R.id.right_btn);
 
         //                           라디오                      //
         left_btn.setOnClickListener(new View.OnClickListener() {
@@ -468,7 +469,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         HashMap<String, Double> map_syllable = new HashMap<String, Double>();
                         for (Syllable consonant : consonants) {
                             if (Arrays.equals(consonant.touch, syllable.touch)) {
-                                if (consonant.getEuclideanDistance_Flex(syllable) < 100) {
+
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 50) {
                                     map_syllable.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
 
                                 }
@@ -477,7 +479,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         for (Syllable vowel : vowels) {
                             if (Arrays.equals(vowel.touch, syllable.touch)) {
-                                if (vowel.getEuclideanDistance_Flex(syllable) < 100) {
+
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 50) {
                                     map_syllable.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
@@ -527,6 +530,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         HashMap<String, Double> map_word = new HashMap<String, Double>();
                         for (Word _word_ : words) {
                             if (Arrays.equals(word.touch, _word_.touch)) {
+
                                 if (_word_.getEuclideanDistance_flex(word) < 150) {
                                     map_word.put(_word_.word, _word_.getEuclideanDistance_gyro(word));
 
@@ -587,3 +591,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return right_btn.isChecked();
     }
 }
+
+
