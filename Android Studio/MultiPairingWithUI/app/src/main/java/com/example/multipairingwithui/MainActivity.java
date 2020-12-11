@@ -20,6 +20,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int WORD = 3000;
     public static boolean isconnect_left = false;
     public static boolean isconnect_right = false;
-    int arr_cnt=0;
+    int arr_cnt = 0;
     @SuppressLint("StaticFieldLeak")
     public static Context mainContext;
     private Messenger mServiceMessenger = null;
@@ -77,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView rightPaper;
     ImageView signImage;
     Handler delay = new Handler();
+
+    RadioButton left_btn, right_btn;
+    RadioGroup radioGroup;
+
     //--------Right Hand---------
     Button reconnectRight;
     TextView bluetoothStateRight;
@@ -105,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Button DeleteData;
     TextView ReceiveData;
     ScrollView scrollView;
+
     @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,17 +141,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         reconnectLeft = findViewById(R.id.reconnectLeft);
         bluetoothStateRight = findViewById(R.id.bluetoothStateRight);
         bluetoothStateLeft = findViewById(R.id.bluetoothStateLeft);
+
+        left_btn = (RadioButton) findViewById(R.id.rg_btn1);
+        right_btn = (RadioButton) findViewById(R.id.rg_btn2);
+
+        //                           라디오                      //
+        left_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "지화모드 On", Toast.LENGTH_SHORT).show();
+            }
+        });
+        right_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "수화모드 On", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         if (savedInstanceState != null) {
             isconnect_left = savedInstanceState.getBoolean(bluetoothService.str_hand[LEFT]);
             isconnect_right = savedInstanceState.getBoolean(bluetoothService.str_hand[RIGHT]);
         }
-        if(isconnect_left) {
+        if (isconnect_left) {
             leftPaper.setVisibility(View.VISIBLE);
             leftRock.setVisibility(View.INVISIBLE);
             bluetoothStateLeft.setVisibility(View.INVISIBLE);
             reconnectLeft.setVisibility(View.INVISIBLE);
         }
-        if(isconnect_right){
+        if (isconnect_right) {
             rightPaper.setVisibility(View.VISIBLE);
             rightRock.setVisibility(View.INVISIBLE);
             bluetoothStateRight.setVisibility(View.INVISIBLE);
@@ -210,22 +235,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         /*단어 데이터베이스에서 word객체 가져옴*/
 
-        if(!PreferenceManager.isEmptyWordList(mainContext)) {
+        if (!PreferenceManager.isEmptyWordList(mainContext)) {
             words_arr = PreferenceManager.getWordList(mainContext);
-            arr_cnt=words_arr.length;
+            arr_cnt = words_arr.length;
             words = new Word[arr_cnt];
-            for(int i=0; i < arr_cnt;i++){
-                words[i]=new Word();
-//                try {
-//                    words[i] = (Word)PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
-//                    Log.d("Oncreate",words[i].word);
-//                } catch (CloneNotSupportedException e) {
-//                    e.printStackTrace();
-//                }
+            for (int i = 0; i < arr_cnt; i++) {
+                words[i] = new Word();
+                try {
+                    words[i] = (Word) PreferenceManager.get_word_value(words_arr[i], mainContext).clone();
+                    Log.d("Oncreate", words[i].word);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        else {
-            arr_cnt=0;
+        } else {
+            arr_cnt = 0;
         }
 
         /*단어 데이터베이스에서 word객체 가져옴*/
@@ -236,12 +260,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             words = new Word[arr_cnt];
             for(int i=0; i < arr_cnt;i++){
                 words[i]=new Word();
-//                try {
-//                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
-//                    Log.d("Oncreate",words[i].word);
-//                } catch (CloneNotSupportedException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    words[i] =(Word) PreferenceManager.get_word_value(words_arr[i],mainContext).clone();
+                    Log.d("Oncreate",words[i].word);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         else {
@@ -280,29 +304,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         tts.setSpeechRate(1.0f);    // 읽는 속도는 기본 설정
-        //PreferenceManager.clear(mainContext);
+
     }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState); // 반드시 호출해 주세요.
-        Log.d("onSaveInstanceState","여기는 세이브");
-        // 추가로 자료를 저장하는 코드는 여기에 작성 하세요.
         outState.putBoolean(bluetoothService.str_hand[LEFT], isconnect_left);
         outState.putBoolean(bluetoothService.str_hand[RIGHT], isconnect_right);
     }
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d(" onRestoreInstanceState","여기는 가져옴");
-        // 추가로 자료를 복원하는 코드는 여기에 작성하세요.
     }
+
     @Override
     public void onBackPressed() {
 
-        if( drawerLayout.isDrawerOpen( GravityCompat.START ) ){
-            drawerLayout.closeDrawer( GravityCompat.START );
-        }
-        else{
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
             super.onBackPressed();
         }
     }
@@ -310,19 +332,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-        switch ( menuItem.getItemId() ){
+        switch (menuItem.getItemId()) {
             case R.id.nav_home:
                 break;
             case R.id.nav_add_del:
-                Intent intent_add = new Intent( MainActivity.this, AddDelActivity.class);
+                Intent intent_add = new Intent(MainActivity.this, AddDelActivity.class);
                 startActivity(intent_add);
                 break;
             case R.id.nav_scaling:
-                Intent intent_scaling = new Intent( MainActivity.this, scalingActivity.class);
+                Intent intent_scaling = new Intent(MainActivity.this, scalingActivity.class);
                 startActivity(intent_scaling);
                 break;
         }
-        drawerLayout.closeDrawer( GravityCompat.START );
+        drawerLayout.closeDrawer(GravityCompat.START);
         //finish();
         return true;
     }
@@ -330,22 +352,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onStart() {
         super.onStart();
         startService(new Intent(this, bluetoothService.class));
-        bindService(new Intent(this,bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, bluetoothService.class), conn, Context.BIND_AUTO_CREATE);
     }
 
-    public void onDestroy(){
-        if(isService)
-        {
+    public void onDestroy() {
+        if (isService) {
             unbindService(conn);
             isService = false;
         }
-        stopService(new Intent(this,bluetoothService.class));
-        if(tts != null){
+        stopService(new Intent(this, bluetoothService.class));
+        if (tts != null) {
             tts.stop();
             tts.shutdown();
             tts = null;
         }
-        System.out.println("123123123");
         super.onDestroy();
     }
 
@@ -353,8 +373,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceMessenger = new Messenger(service);
-            try{
-                Message msg = Message.obtain(null,1);
+            try {
+                Message msg = Message.obtain(null, 1);
                 msg.replyTo = mMessenger;
                 mServiceMessenger.send(msg);
             } catch (RemoteException ignored) {
@@ -377,54 +397,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             if (msg.what == RIGHT) {
-                switch(msg.arg1)
-                {
+                switch (msg.arg1) {
                     case bluetoothService.DISCONNECT:
                         bluetoothStateRight.setVisibility(View.VISIBLE);
                         bluetoothStateRight.setText("오른손 연결끊김");
                         rightPaper.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.VISIBLE);
                         reconnectRight.setVisibility(View.VISIBLE);
-                        isconnect_right=false;
+                        isconnect_right = false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateRight.setText("오른손 연결됨");
                         reconnectRight.setVisibility(View.INVISIBLE);
                         rightRock.setVisibility(View.INVISIBLE);
                         rightPaper.setVisibility(View.VISIBLE);
-                        isconnect_right=true;
+                        isconnect_right = true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateRight.setText("오른손 연결중");
                         break;
                 }
-            }
-            else if(msg.what == LEFT)
-            {
-                switch(msg.arg1)
-                {
+            } else if (msg.what == LEFT) {
+                switch (msg.arg1) {
                     case bluetoothService.DISCONNECT:
                         bluetoothStateLeft.setVisibility(View.VISIBLE);
                         bluetoothStateLeft.setText("왼손 연결끊김");
                         leftPaper.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.VISIBLE);
                         reconnectLeft.setVisibility(View.VISIBLE);
-                        isconnect_left=false;
+                        isconnect_left = false;
                         break;
                     case bluetoothService.CONNECTED:
                         bluetoothStateLeft.setText("왼손 연결됨");
                         reconnectLeft.setVisibility(View.INVISIBLE);
                         leftRock.setVisibility(View.INVISIBLE);
                         leftPaper.setVisibility(View.VISIBLE);
-                        isconnect_left=true;
+                        isconnect_left = true;
                         break;
                     case bluetoothService.CONNECTING:
                         bluetoothStateLeft.setText("왼손 연결중");
                         break;
                 }
-            }
-            else if(msg.what == BOTH)
-            {
+            } else if (msg.what == BOTH) {
                 Toast.makeText(getApplicationContext(), "양손 연결 완료", Toast.LENGTH_LONG).show();
                 bluetoothStateLeft.setVisibility(View.INVISIBLE);
                 bluetoothStateRight.setVisibility(View.INVISIBLE);
@@ -438,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 signImage.startAnimation(fadeInAnimation);
 
                 Handler mHandler = new Handler();
-                mHandler.postDelayed(new Runnable()  {
+                mHandler.postDelayed(new Runnable() {
                     public void run() {
                         rightPaper.startAnimation(clearAnimation);
                         leftPaper.startAnimation(clearAnimation);
@@ -446,33 +460,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         signMessage.startAnimation(fadeOutAnimation);
                     }
                 }, 500);
-            }
-            else if (msg.what == GESTURE){
-                switch (msg.arg1){
+            } else if (msg.what == GESTURE) {
+                switch (msg.arg1) {
                     case SYLLABLE:
                         Syllable syllable;
                         syllable = (Syllable) msg.obj;
                         HashMap<String, Double> map_syllable = new HashMap<String, Double>();
                         for (Syllable consonant : consonants) {
-                            if(Arrays.equals(consonant.touch,syllable.touch)) {
-                                if (consonant.getEuclideanDistance_Flex(syllable) < 50) {
+                            if (Arrays.equals(consonant.touch, syllable.touch)) {
+                                if (consonant.getEuclideanDistance_Flex(syllable) < 100) {
                                     map_syllable.put(consonant.syllable, consonant.getEuclideanDistance_Gyro(syllable));
 
                                 }
                             }
                         }
-                        for(Syllable vowel : vowels){
-                            if(Arrays.equals(vowel.touch,syllable.touch)) {
-                                if (vowel.getEuclideanDistance_Flex(syllable) < 50) {
+
+                        for (Syllable vowel : vowels) {
+                            if (Arrays.equals(vowel.touch, syllable.touch)) {
+                                if (vowel.getEuclideanDistance_Flex(syllable) < 100) {
                                     map_syllable.put(vowel.syllable, vowel.getEuclideanDistance_Gyro(syllable));
                                 }
                             }
                         }
 
-                        if(!map_syllable.isEmpty()) {
+                        if (!map_syllable.isEmpty()) {
                             String ret = HashMapSort(map_syllable);
                             input_gesture.add(ret);
-                            ReceiveData.append(ret+"\n");
+                            ReceiveData.append(ret + "\n");
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
                             scrollView.post(new Runnable() {
                                 public void run() {
@@ -481,45 +495,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             });
 
-                            delay.removeMessages(0);
-                            delay.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        SyllableCombination hangul = new SyllableCombination();
-                                        String s = hangul.getSentence(input_gesture);
-                                        ReceiveData.append(s+"\n");
-                                        tts.speak(s,TextToSpeech.QUEUE_FLUSH,null);
-                                        input_gesture.clear();
-
-                                        scrollView.post(new Runnable() {
-                                            public void run() {
-                                                // TODO Auto-generated method stub
-                                                scrollView.scrollTo(0, ReceiveData.getHeight());
-                                            }
-                                        });
-
-                                    } catch (HangulParserException e) {
-                                        input_gesture.clear();
-                                        e.printStackTrace();
-                                    }
-                                }
-                            },3000);
+//                            delay.removeMessages(0);
+//                            delay.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    try {
+//                                        SyllableCombination hangul = new SyllableCombination();
+//                                        String s = hangul.getSentence(input_gesture);
+//                                        ReceiveData.append(s + "\n");
+//                                        tts.speak(s, TextToSpeech.QUEUE_FLUSH, null);
+//                                        input_gesture.clear();
+//
+//                                        scrollView.post(new Runnable() {
+//                                            public void run() {
+//                                                // TODO Auto-generated method stub
+//                                                scrollView.scrollTo(0, ReceiveData.getHeight());
+//                                            }
+//                                        });
+//
+//                                    } catch (HangulParserException e) {
+//                                        input_gesture.clear();
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }, 3000);
                         }
                         break;
                     case WORD:
                         Word word;
                         word = (Word) msg.obj;
                         HashMap<String, Double> map_word = new HashMap<String, Double>();
-                        for(Word _word_ : words){
-                            if(Arrays.equals(word.touch,_word_.touch)) {
+                        for (Word _word_ : words) {
+                            if (Arrays.equals(word.touch, _word_.touch)) {
                                 if (_word_.getEuclideanDistance_flex(word) < 150) {
                                     map_word.put(_word_.word, _word_.getEuclideanDistance_gyro(word));
 
                                 }
                             }
                         }
-                        if(!map_word.isEmpty()) {
+                        if (!map_word.isEmpty()) {
                             String ret = HashMapSort(map_word);
                             tts.speak(ret, TextToSpeech.QUEUE_FLUSH, null);
                         }
@@ -530,10 +544,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }));
 
-    private void sendMessageToService(Message msg){
-        if(isService){
-            if(mServiceMessenger != null){
-                try{
+    private void sendMessageToService(Message msg) {
+        if (isService) {
+            if (mServiceMessenger != null) {
+                try {
                     mServiceMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -542,18 +556,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public static String HashMapSort(final HashMap<String,Double> map) {
+    public static String HashMapSort(final HashMap<String, Double> map) {
         List<String> list = new ArrayList<>(map.keySet());
 
-        Collections.sort(list,new Comparator() {
-            public int compare(Object o1,Object o2) {
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
                 Object v1 = map.get(o1);
                 Object v2 = map.get(o2);
                 return ((Comparable) v2).compareTo(v1);
             }
         });
         Log.d("HASH", String.valueOf(list));
-        return list.get(list.size()-1);
+        return list.get(list.size() - 1);
     }
 
     @Override
@@ -564,5 +578,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 finish();
             }
         }
+    }
+    public boolean isCheckedLeftBtn() {
+        return left_btn.isChecked();
+    }
+
+    public boolean isCheckedRightBtn() {
+        return right_btn.isChecked();
     }
 }

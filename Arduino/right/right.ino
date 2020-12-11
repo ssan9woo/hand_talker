@@ -41,8 +41,7 @@ void loop()
 {
    capacitor_left = cs_2_3.capacitiveSensorRaw(30);    // 1번 터치패드 값 수신 <접촉시 55~60의 정수값 출력>
    capacitor_right = cs_5_6.capacitiveSensorRaw(30);    // 2번 터치패드 값 수신 <접촉시 55~60의 정수값 출력> 
-   
-   //test
+   Serial.print(capacitor_left); Serial.print("     ");Serial.println(capacitor_right);
       for(int i = 0; i < 6; i++){
         int value = analogRead(i);
         float filtered_value = value;
@@ -51,7 +50,7 @@ void loop()
 
         if (i == 0){
 //          Serial.println(flexData[i]);
-          if (flexData[i] > 770){
+          if (flexData[i] > 600){
             flexData[i] = 3000;
           }
           else{
@@ -78,7 +77,7 @@ void loop()
    //--------------------------------------------------
    
    //Capacitor-----------------------------------------
-   if(capacitor_left > 80){
+   if(capacitor_left > 50){
       sprintf(capacitor_buff[0],"true");
    }
    else{
@@ -121,6 +120,9 @@ void loop()
      
      //--------------------------------------------------
      delay(5);
+   }
+   else{
+    Serial.println("Error");
    }
 } 
 

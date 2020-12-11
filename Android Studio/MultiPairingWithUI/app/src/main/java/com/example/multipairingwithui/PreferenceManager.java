@@ -47,6 +47,7 @@ public class PreferenceManager {
         for (int i: flex_values){
             editor.putInt(VAL_PREFIX + name + count++, i);
         }
+        Log.d("shared", Arrays.toString(flex_values));
         editor.apply();
     }
     public static void save_syllable_value(Hand hand,String name, Context context){

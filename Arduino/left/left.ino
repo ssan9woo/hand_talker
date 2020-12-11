@@ -73,7 +73,9 @@ void loop(){
       bluetooth.write("5.00");
       bluetooth.write("\n");
 
-      delay(5);
+      delay(10);
+    }else{
+      Serial.println("Error");
     }
 }
 
